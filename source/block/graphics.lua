@@ -72,7 +72,7 @@ do
 	-- @return `Int` The order of the object in the Display stack
 	-- @return `String` The name of the object
 	local addImage = tfm.exec.addImage
-	local removeImage
+	local removeImage = tfm.exec.removeImage
 	local tinsert = table.insert
 	function Block:addDisplay(name, order, imageUrl, targetLayer, displayX, displayY, scaleX, scaleY, rotation, alpha, show)
 		self.associativeList[order] = name

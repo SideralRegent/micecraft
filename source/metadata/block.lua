@@ -10,7 +10,7 @@ do
 			cascadeDestroy = false
 		},
 		
-		fluidRate = nil, -- How many ticks it takes to "flow"
+		fluidRate = 0, -- How many ticks it takes to "flow"
 		fluidLevel = FL_EMPTY, -- The level of the fluid [n/4 of a block vertically]
 		
 		glow = 0, -- Light emission (none = 0; max: 15)

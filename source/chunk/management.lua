@@ -1,5 +1,6 @@
 do
-	local unloadingTime = 120
+	local ceil = math.ceil
+	local unloadingTime = 120 -- Magic number !! 
 	local copykeys = table.copykeys
 	local isEmpty = table.isEmpty
 	--- Sets the Time that the Chunk should wait before unloading.
@@ -9,17 +10,16 @@ do
 -- @param Int:ticks How many ticks should the Chunk await
 -- @param String:type The type of unload
 -- @return `Boolean` Whether the unload scheduling was successful or not.
+	local valid = {
+		setPhysicState = true,
+		setDisplayState = true
+	}
 	function Chunk:setUnloadDelay(ticks, type)
-		if type == "physics" then
-			Tick:removeTask(self.collisionTimer)
-			self.collisionTimer = self:setQueue(ticks, "setPhysicState", false, nil)
-		
-			return (not not self.collisionTimer)
-		elseif type == "graphics" then
-			Tick:removeTask(self.displayTimer)
-			self.displayTimer = self:setQueue(ticks, "setDisplayState", false, nil)
-		
-			return (not not self.displayTimer)
+		if valid[type] then
+			local timer = self.timers[type]
+			Tick:removeTask(timer and timer.taskId or 0)
+			
+			return not not self:setQueue(ticks, type, false, nil)
 		end
 		
 		return false
@@ -27,7 +27,6 @@ do
 
 	local type = type
 	function Chunk:setQueue(set, operation, ...)
-		
 		local chunkInfo = {
 			uniqueId = self.uniqueId,
 			x = self.x,
@@ -44,9 +43,29 @@ do
 				ChunkQueue:clearBuffer()
 			end
 		elseif type(set) == "number" then -- Await some ticks
-			return Tick:newTask(set, false, function()
+			local taskId = Tick:newTask(set, false, function()
 				ChunkQueue:push(chunkInfo)
 			end)
+		
+			self.timers[operation] = {
+				taskId = taskId,
+				targetForRenewal = Tick.current + (set - 10) -- Magic number, excercise for the reader c:
+			}
+		
+			return taskId
+		end
+	end
+	
+	--- Evaluates wheter it is proper or not to make a Unload Delay renewal and proceeds.
+	-- @name Chunk:requestUnloadDelayRenewal
+	-- @param Number:time Delay in ticks
+	-- @param String:operation Which function to call for renewal
+		
+	function Chunk:requestUnloadDelayRenewal(time, operation)
+		local threesold = (self.timers[operation] and self.timers[operation].targetForRenewal or 0)
+		
+		if Tick.current > threesold then
+			self:setUnloadDelay(time, operation)
 		end
 	end
 	
@@ -67,7 +86,7 @@ do
 			if targetPlayer and active then
 				goAhead = (not self.collidesTo[targetPlayer] == active)
 				self.collidesTo[targetPlayer] = active
-			else
+			else -- nil players
 				goAhead = true
 				self.collidesTo = copykeys(Room.presencePlayerList, not not active)
 			end
@@ -77,7 +96,7 @@ do
 			end
 			
 			if active then
-				self:setUnloadDelay(unloadingTime, "physics")
+				self:requestUnloadDelayRenewal(90, "setPhysicState")
 			end
 			
 			return goAhead
@@ -113,20 +132,22 @@ do
 			end
 			
 			if goAhead then
+				local activeType = nil
 				if targetPlayer == nil then
 					if active then
-						self:setQueue(true, "setDisplayState", nil)
+						activeType = nil
 					else
-						
-						self:setQueue(true, "setDisplayState", false)
+						activeType = false
 					end
 				else
-					self:setQueue(true, "setDisplayState", active, targetPlayer)
+					activeType = active
 				end
+				
+				self:setQueue(true, "setDisplayState", activeType, targetPlayer)
 			end
 			
 			if active then
-				self:setUnloadDelay(math.ceil(unloadingTime * 1.5), "graphics")
+				self:requestUnloadDelayRenewal(90, "setDisplayState")
 			end
 			
 			return goAhead

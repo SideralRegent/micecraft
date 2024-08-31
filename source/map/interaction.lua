@@ -113,7 +113,7 @@ function Map:getSpawn()
 		local under = self:getBlock(self.spawnPoint.x, self.spawnPoint.y + 1, CD_MTX)
 		
 		if under then
-			self:spawnStructure("SpawnPoint", under.x, under.y, 0.5, 0.8)
+			--self:spawnStructure("SpawnPoint", under.x, under.y, 0.5, 0.8)
 		end
 	end
 	

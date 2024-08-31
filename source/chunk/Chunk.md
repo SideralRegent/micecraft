@@ -122,6 +122,16 @@ Sets the Time that the Chunk should wait before unloading. There are three optio
 
 ---
 
+### **Chunk:requestUnloadDelayRenewal** ( `time`: number, `operation`: string )
+Evaluates wheter it is proper or not to make a Unload Delay renewal and proceeds. 
+
+
+**Parameters:**
+- **time** (`Number`) : Delay in ticks
+- **operation** (`String`) : Which function to call for renewal
+
+---
+
 ### **Chunk:setCollisions** ( `active`: boolean|nil, `targetPlayer`: string|nil )
 Sets the Collisions for the Chunk. This is just an interface function that manages the interactions between players and the Chunk, to ensure no innecessary calls for players that had the Chunk already loaded.
 

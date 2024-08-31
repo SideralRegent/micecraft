@@ -294,11 +294,13 @@ function Block:setTask(delay, shouldLoop, callback, ...)
 	self:removeEventTimer()
 	
 	self.eventTimer = Tick:newTask(delay, shouldLoop, callback, ...)
+	
+	return self.eventTimer
 end
 
 function Block:setFluidState(level, isSource, display, update, updatePhysics)
 	local meta = blockMetadata:get(self.type)
-	if self.fluidRate then
+	if self.fluidRate > 0 then
 		self.fluidLevel = level or 0
 		self.isFluidSource = isSource
 		self.category = meta.category + self.fluidLevel
@@ -306,6 +308,7 @@ function Block:setFluidState(level, isSource, display, update, updatePhysics)
 	
 	if display then
 		local sprite = meta.fluidImages[self.fluidLevel]
+		self:addDisplay("main", 1, sprite, "!99999999", self.dx, self.dy, nil, nil, 0, 1.0, false)
 		
 		self:refreshDisplayAt(1)
 	end

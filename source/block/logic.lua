@@ -148,7 +148,7 @@ function Block:assertFallAction()
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
 		
 		if lowerBlock then
-			if lowerBlock.type == blockMetadata._C_VOID or lowerBlock.translucent or lowerBlock.fluidRate then
+			if (lowerBlock.type == blockMetadata._C_VOID) or lowerBlock.translucent or (lowerBlock.fluidRate > 0) then
 				self:fallAction(lowerBlock)
 			end
 		end
@@ -159,8 +159,9 @@ function Block:assertFallAction()
 	return false
 end
 
-function Block:fallAction(lowerBlock)
-	local tangible = self.foreground
+function Block:fallAction(lowerBlock) -- To do: fix
+	if not lowerBlock then return end
+	local tangible = self.tangible
 	local type = self.type
 	
 	local y = self.y - 1
@@ -169,13 +170,13 @@ function Block:fallAction(lowerBlock)
 	
 	while y > 0 do
 		block = Map:getBlock(self.x, y, CD_MTX)
-		if block.type == type and block.tangible == tangible then
+		if block.type == type and block.tangible == tangible then -- Objective is the block that should get deleted
 			objective = block 
+			
+			y = y - 1
 		else
 			break
 		end
-		
-		y = y - 1
 	end
 	
 	self:setTask(1, false, function()
@@ -187,18 +188,21 @@ function Block:fallAction(lowerBlock)
 end
 
 function Block:scheduleFluidCreation(delay, type, flowLevel, asSource, display, update, updatePhysics)
-	self:setTask(delay, false, function()
+	return self:setTask(delay, false, function()
 		self:createAsFluidWith(type, flowLevel, asSource, display, update, updatePhysics)	
 	end)
 end
 
+-- To do: Add conndition for blocks which are not source
 function Block:flowVerticalAction()
 	local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
+	if not lowerBlock then return false end
+	
 	local mustFlow = false
 	
 	if lowerBlock.type == blockMetadata._C_VOID then
 		mustFlow = true
-	elseif lowerBlock.fluidRate then
+	elseif lowerBlock.fluidRate > 0 then
 		if lowerBlock.type == self.type then
 			-- Only if the fluid below is the same type AND not filled.
 			mustFlow = (lowerBlock.fluidLevel < FL_FILL)
@@ -252,7 +256,7 @@ function Block:hFlowCheckTo(block, nextLevel)
 		elseif block.fluidLevel > nextLevel then
 			-- Do nothing
 		end
-	elseif block.fluidRate then
+	elseif block.fluidRate > 0 then
 		-- Implement behaviour when colliding with other fluid
 	end
 	
@@ -260,6 +264,7 @@ function Block:hFlowCheckTo(block, nextLevel)
 end
 
 function Block:hFlowContinous(sides, nextLevel)	
+	print("hFlowContinous")
 	local flowLevel = FL_EMPTY
 	
 	for index, block in next, sides do
@@ -272,21 +277,40 @@ function Block:hFlowContinous(sides, nextLevel)
 end
 
 function Block:hFlowIsolate(sides, maxIndex, minIndex, nextLevel)
-	local candidate = sides[1]
 	local flowLevel = FL_EMPTY
 
-	if #sides ~= 1 then
-		if sides[maxIndex].fluidLevel == sides[minIndex].fluidLevel then
-			candidate = table.random(sides)
-		else
-			candidate = sides[minIndex]
+	local blockAbove = Map:getBlock(self.x, self.y - 1, CD_MTX)
+	
+	if (blockAbove and (blockAbove.type == self.type)) or self.isFluidSource then -- spills to both sides
+		print("spill ".. #sides)
+		for _, block in next, sides do
+			flowLevel = self:hFlowCheckTo(block, nextLevel)
+			
+			if flowLevel > 0 then
+				print(block.uniqueId)
+				block:scheduleFluidCreation(self.fluidRate, self.type, flowLevel, false, true, true, true)
+				tfm.exec.removeImage(tfm.exec.addImage("1817dc55c70.png", "!9999999", block.dx, block.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
+			end
 		end
-	end
-	
-	flowLevel = self:hFlowCheckTo(candidate, nextLevel)
-	
-	if flowLevel > 0 then
-		candidate:scheduleFluidCreation(self.fluidRate, self.type, flowLevel, false, true, true, true)
+	else -- not spilling to both sides
+		local candidate = sides[1]
+		
+		if #sides ~= 1 then --
+			if sides[maxIndex].fluidLevel == sides[minIndex].fluidLevel then
+				candidate = table.random(sides)
+			else
+				candidate = sides[minIndex]
+			end
+		end
+		
+		flowLevel = self:hFlowCheckTo(candidate, nextLevel)
+		
+		if flowLevel > 0 then
+			candidate:scheduleFluidCreation(self.fluidRate, self.type, flowLevel, false, true, true, true)
+			self:setTask(self.fluidRate, false, function() -- drains 1 level from current one
+				self:setFluidState(self.fluidLevel - 1, false, true, true, true)
+			end)
+		end
 	end
 end
 
@@ -315,7 +339,7 @@ function Block:flowHorizontalAction()
 end
 
 function Block:flowAction()
-	if self.fluidRate then
+	if self.fluidRate > 0 then
 		-- We only want a fluid to expand downwards, and
 		-- to the sides if the block downwards is solid.
 		if not self:flowVerticalAction() then

@@ -120,7 +120,7 @@ do
 		self.drop = 0
 		
 		self.stateAction = {}
-		self.fluidRate = nil
+		self.fluidRate = 0
 		self.fluidLevel = FL_EMPTY
 		self.isFluidSource = false
 		

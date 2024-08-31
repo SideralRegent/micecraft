@@ -43,6 +43,8 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome)
 		displayActive = false,
 		displayTimer=  -1,
 		
+		timers = {},
+		
 		segments = {},
 		items = {},
 		debugImageId = -1,

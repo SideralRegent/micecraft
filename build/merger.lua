@@ -110,7 +110,8 @@ local fileList = {
 		__directory = "source/modes",
 		__docs = false,
 		"init",
-		"vanilla"
+		"vanilla",
+		"testing"
 	},
 	{
 		__name = "Events",
