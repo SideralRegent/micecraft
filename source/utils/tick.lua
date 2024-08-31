@@ -212,8 +212,6 @@ do
 	function Tick:newTask(awaitTicks, shouldLoop, callback, ...)
 		local task = Task:new(awaitTicks, shouldLoop, callback, ...)
 		
-		print(task.tickTarget)
-		
 		self.taskList[task.uniqueId] = task
 		self.slice:addTask(task.tickTarget, task.uniqueId)
 		

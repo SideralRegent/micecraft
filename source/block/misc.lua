@@ -64,4 +64,21 @@ do
 		
 		return false
 	end
+	
+	function Block:hasActiveTask(tick)
+		tick = tick or Tick.current 
+		local task = Tick:getTask(self.eventTimer)
+		
+		if task then
+			if tick ~= -1 then
+				return (task.tickTarget == tick)
+			else
+				return true
+			end
+		else
+			return false
+		end
+		
+		return false
+	end
 end

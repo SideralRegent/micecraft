@@ -21,6 +21,7 @@ function Block:create(type, foreground, display, update, updatePhysics)
 		
 		do
 			self.type = type
+			self:setCategory(meta.category)
 			self.category = foreground and meta.category or 0
 			
 			self.drop = meta.drop
@@ -54,8 +55,6 @@ function Block:create(type, foreground, display, update, updatePhysics)
 			self.onContact = meta.onContact
 			self.onUpdate = meta.onUpdate
 		end
-		
-		Map.physicsMap[self.y][self.x] = foreground and self.category or 0
 		
 		self:removeAllDisplays()
 		self:setDefaultDisplay()
@@ -107,7 +106,8 @@ do
 			self.category = 0
 			
 			if self.foreground then
-				Map.physicsMap[self.y][self.x] = 0 -- abs(Map.physicsMap[self.y][self.x])
+				self:setCategory(0)
+				-- abs(Map.physicsMap[self.y][self.x])
 				self.foreground = false
 				self.damageLevel = 0
 				
@@ -298,12 +298,17 @@ function Block:setTask(delay, shouldLoop, callback, ...)
 	return self.eventTimer
 end
 
+function Block:setCategory(category)
+	self.category = category
+	Map.physicsMap[self.y][self.x] = category
+end
+
 function Block:setFluidState(level, isSource, display, update, updatePhysics)
 	local meta = blockMetadata:get(self.type)
 	if self.fluidRate > 0 then
 		self.fluidLevel = level or 0
 		self.isFluidSource = isSource
-		self.category = meta.category + self.fluidLevel
+		self:setCategory(meta.category + self.fluidLevel)
 	end
 	
 	if display then

@@ -70,6 +70,7 @@ function Block:updateEvent(update, updatePhysics)
 					segmentList[block.segmentId] = true
 				end
 				block:onUpdate(self)
+				tfm.exec.removeImage(tfm.exec.addImage("1817dc55c70.png", "!9999999", block.dx, block.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
 			end
 			
 			self:assertStateActions()
@@ -82,7 +83,7 @@ function Block:updateEvent(update, updatePhysics)
 					segmentList[block.segmentId] = true
 				end
 			end
-			
+
 			self:getChunk():refreshPhysics(Map.physicsMode, segmentList, true, {
 					xStart = self.x, 
 					xEnd = self.x, 
@@ -161,6 +162,8 @@ end
 
 function Block:fallAction(lowerBlock) -- To do: fix
 	if not lowerBlock then return end
+	if self:hasActiveTask(-1) then return end
+	
 	local tangible = self.tangible
 	local type = self.type
 	
@@ -179,11 +182,15 @@ function Block:fallAction(lowerBlock) -- To do: fix
 		end
 	end
 	
-	self:setTask(1, false, function()
+	
+	
+	lowerBlock:setTask(1, false, function()
 		objective:destroy(true, true, true)
 		objective:setVoid(true)
 		
 		lowerBlock:create(type, tangible, true, true, true)
+		
+		--lowerBlock:updateEvent(true, true) 
 	end)
 end
 
@@ -256,15 +263,14 @@ function Block:hFlowCheckTo(block, nextLevel)
 		elseif block.fluidLevel > nextLevel then
 			-- Do nothing
 		end
-	elseif block.fluidRate > 0 then
+	elseif block.fluidRate ~= 0 then
 		-- Implement behaviour when colliding with other fluid
 	end
 	
 	return flowLevel
 end
 
-function Block:hFlowContinous(sides, nextLevel)	
-	print("hFlowContinous")
+function Block:hFlowContinous(sides, nextLevel)
 	local flowLevel = FL_EMPTY
 	
 	for index, block in next, sides do
@@ -282,14 +288,13 @@ function Block:hFlowIsolate(sides, maxIndex, minIndex, nextLevel)
 	local blockAbove = Map:getBlock(self.x, self.y - 1, CD_MTX)
 	
 	if (blockAbove and (blockAbove.type == self.type)) or self.isFluidSource then -- spills to both sides
-		print("spill ".. #sides)
 		for _, block in next, sides do
 			flowLevel = self:hFlowCheckTo(block, nextLevel)
 			
 			if flowLevel > 0 then
-				print(block.uniqueId)
-				block:scheduleFluidCreation(self.fluidRate, self.type, flowLevel, false, true, true, true)
-				tfm.exec.removeImage(tfm.exec.addImage("1817dc55c70.png", "!9999999", block.dx, block.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
+				if not block:hasActiveTask() then 
+					block:scheduleFluidCreation(self.fluidRate, self.type, flowLevel, false, true, true, true)
+				end
 			end
 		end
 	else -- not spilling to both sides

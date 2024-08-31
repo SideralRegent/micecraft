@@ -43,21 +43,24 @@ do
 	end
 	
 	local catinfo = {
-		[enum.category.default] = {type=14, friction=0.30, restitution=0.20, collides=true}, -- Default
-		[enum.category.grains] = {type=14, friction=0.5, restitution=0.00, collides=true}, -- Grains
-		-- [enum.category.wood] = {type=14, friction=0.60, restitution=0.25, collides=true}, -- Wood stuff
-		[enum.category.rocks_n_metals] = {type=14, friction=0.40, restitution=0.40, collides=true}, -- Rocks and Metals
-		[enum.category.crystals] = {type=14, friction=0.10, restitution=0.20, collides=true}, -- Crystal
-		-- [enum.category.other] = {type=14, friction=0.50, restitution=0.00, collides=true}, -- Others (leaves, wool)
-		[enum.category.water] = {type=09, friction=0.00, restitution=0.00, collides=false}, -- Water
-		[enum.category.lava] = {type=14, friction=2.00, restitution=5.00, collides=true}, -- Lava
-		[enum.category.cobweb] = {type=15, friction=0.00, restitution=0.00, collides=false}, -- Cobweb
-		[enum.category.acid]= {type=19, friction=20.0, restitution=0.00, collides=true}, -- Acid
+		[enum.category.default] = {type=14, friction=0.30, restitution=0.20, collides=true, y_offset = 0}, -- Default
+		[enum.category.grains] = {type=14, friction=0.5, restitution=0.00, collides=true, y_offset = 0}, -- Grains
+		-- [enum.category.wood] = {type=14, friction=0.60, restitution=0.25, collides=true, y_offset = 0}, -- Wood stuff
+		[enum.category.rocks_n_metals] = {type=14, friction=0.40, restitution=0.40, collides=true, y_offset = 0}, -- Rocks and Metals
+		[enum.category.crystals] = {type=14, friction=0.10, restitution=0.20, collides=true, y_offset = 0}, -- Crystal
+		-- [enum.category.other] = {type=14, friction=0.50, restitution=0.00, collides=true, y_offset = 0}, -- Others (leaves, wool)
+		[enum.category.water] = {type=09, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Water
+		[enum.category.lava] = {type=14, friction=2.00, restitution=5.00, collides=true, y_offset = 0}, -- Lava
+		[enum.category.cobweb] = {type=15, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Cobweb
+		[enum.category.acid]= {type=19, friction=20.0, restitution=0.00, collides=true, y_offset = 0}, -- Acid
 	}
 	catinfo.default = catinfo[enum.category.default]
 	for _, liquid in next, {"lava", "water"} do
+		local t
 		for i = 1, 4 do
-			catinfo[enum.category[("%s_%d"):format(liquid, i)]] = catinfo[enum.category[liquid]]
+			t = table.copy(catinfo[enum.category[liquid]])
+			t.y_offset = (4 - i) / 4
+			catinfo[enum.category[("%s_%d"):format(liquid, i)]] = t
 		end
 	end
 	
@@ -75,7 +78,7 @@ do
 		local catdef = catinfo[self.category] or catinfo.default or {}
 		
 		local w = self.width * self.bw
-		local h = self.height * self.bh
+		local h = (self.height - catdef.y_offset) * self.bh
 		self.bodydef = {
 			type = catdef.type,
 			
@@ -96,7 +99,7 @@ do
 		}
 		
 		self.x = self.xtl + (w / 2)
-		self.y = self.ytl + (h / 2)
+		self.y = self.ytl + (h / 2) + (catdef.y_offset * self.bw)
 	end
 	
 	local addPhysicObject = tfm.exec.addPhysicObject
@@ -202,6 +205,7 @@ do
 	function Chunk:getCollisions(mode, xStart, xEnd, yStart, yEnd, categories)
 		mode = mode or "rectangle_detailed"
 		
+		-- here
 		local seglist = Map.physicsMap[mode](Map.physicsMap,
 			xStart or self.xf,
 			xEnd or self.xb,
