@@ -165,7 +165,6 @@ do
 				end
 				
 				if matches > 0 then
-					print(cat)
 					q(list, self:getSegment(xs, ys, xe, ye, cat))
 				end
 				
