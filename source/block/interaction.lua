@@ -98,8 +98,6 @@ do
 			self:removeEventTimer()
 			
 			self.category = 0
-			
-			
 			self:setVoid()
 
 			if display then
@@ -155,16 +153,19 @@ do
 				
 				return false
 			else
+				local tile = self:getDecoTile()
+				
 				if self.damagePhase > 0 then
 					local image = damage_sprites[self.damagePhase]
-					-- TODO
-					self:addDisplay("damage", 2, image, (self.foreground and "!" or "_") .. "99999999", self.dx, self.dy, nil, nil, 0, 1.0)
+					
+					tile:addDisplay("damage", 1, image, "!99999999", 0, 0, true, nil, nil, 0, 1.0)
 					
 					if display then
-						self:refreshDisplayAt(2)
+						
+						tile:refreshDisplayAt(1)
 					end
 				else
-					self:removeDisplay(2, true)
+					tile:removeDisplay(1, true)
 				end
 			end
 			

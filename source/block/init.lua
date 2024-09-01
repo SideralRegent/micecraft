@@ -13,7 +13,6 @@ do
 	local setmetatable = setmetatable
 --	local blockMetadata = blockMetadata
 	function Block:new(uniqueId, type, MapX, MapY, displayX, displayY, width, height)
-		
 		local meta = blockMetadata[type]
 		
 		local this = setmetatable({ -- Define this way to save some table acceses.
@@ -72,7 +71,7 @@ do
 			hide = self.hide,
 			display = self.display,
 			refreshDisplay = self.refreshDisplay,
-			setSprite = self.setSprite,
+			-- setSprite = self.setSprite,
 			
 			onCreate = meta.onCreate,
 			onPlacement = meta.onPlacement,
@@ -129,6 +128,10 @@ do
 		self.onDamage = void
 		self.onContact = void
 		self.onUpdate = void
+		
+		self.sprite = false
+		
+		self:getDecoTile():removeDisplay(1, true)
 		
 		Map.physicsMap[self.y][self.x] = 0
 		

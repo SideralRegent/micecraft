@@ -1,8 +1,9 @@
 do
 	local DEC = {}
-	
 	local Tile = {}
 	Tile.__index = Tile
+	
+	DEC.TileClass = Tile
 	
 	local setmetatable = setmetatable
 	local next = next
@@ -17,6 +18,8 @@ do
 		}, self)
 		
 		this.__index = self
+		
+		return this
 	end
 
 	--- Returns a display object from the Tile, given the index, if it exists.
@@ -26,7 +29,7 @@ do
 	-- @return `Number` The numerical index
 	-- @return `String` The string index 
 	local type = type
-	function Block:getDisplay(index)
+	function Tile:getDisplay(index)
 		local numeric, str
 		if type(index) == "string" then
 			numeric = self.associativeList[index]
@@ -226,11 +229,13 @@ do
 	end
 	
 	function DEC:getTile(x, y)
-		if self[y] then
-			return self[y][x]
-		end
+		return self[y][x]
 	end
 	
 	
 	Map.decorations = DEC
+	
+	function Map:getDecoTile(x, y)
+		return self.decorations[y][x]
+	end
 end

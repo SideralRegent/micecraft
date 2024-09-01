@@ -4,7 +4,7 @@ do
 		if self.sprite then
 			self.spriteId = addImage(
 				self.sprite,
-				"!999999",
+				"!100",
 				self.dx, self.dy,
 				targetPlayer,
 				REFERENCE_SCALE_X, REFERENCE_SCALE_Y,
@@ -23,16 +23,16 @@ do
 		end
 	end
 	
+	function Block:refreshDisplay()
+		self:hide()
+		self:display()
+	end
+	
 	function Block:setSprite(sprite, refresh)
 		self.sprite = sprite or blockMetadata:get(self.type).sprite
 			
 		if refresh then
 			self:refreshDisplay()
 		end
-	end
-	
-	function Block:refreshDisplay()
-		self:hide()
-		self:display()
 	end
 end

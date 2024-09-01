@@ -12,47 +12,59 @@ end
 function Map:initBlocks(width, height)
 	local blockId = 0
 	
+	-- Localization
 	local blocks = self.blocks
 	local field = Field
-	local pm = self.physicsMap
+	local physics = self.physicsMap
+	local deco = self.decorations
 	
 	local block = Block
+	local decoTile = deco.TileClass
 	
-	local bw, bh = self:getBlockDimensions()
-	local ox, oy = self:getEdges()
+	-- Values for correct positioning
+	local blockWidth, blockHeight = self:getBlockDimensions()
+	local originX, originY = self:getEdges()
 	
-	local temp
+	-- local temp
 	
-	local dy
-	local line, fl, pml
+	local displayY
+	local displayX = {}
 	
-	local dxl = {}
+	-- For general line indexing (saves acceses)
+	local line, fieldLine, physicsLine, decoLine
 	
+	-- Calculates the display X once and stores it. 
 	for x = 1, width do
-		dxl[x] = ox + ((x-1) * bw)
+		displayX[x] = originX + ((x - 1) * blockWidth)
 	end
 	
 	for y = 1, height do
-		line = {}
-		fl = field[y]
-		pml = pm[y]
-		dy = oy + ((y-1) * bh)
+		line = {} -- For storing blocks in a single line
+		decoLine = {}
+		fieldLine = field[y] -- For indexing only once the line
+		physicsLine = physics[y] -- Same as above
+		
+		-- Calculates Y pos with proper displacement
+		displayY = originY + ((y - 1) * blockHeight)
 		
 		for x = 1, width do
 			blockId = blockId + 1
+			-- temp = fieldLine[x]
 			
-			temp = fl[x]
-			
-			line[x], pml[x] = block:new(
+			-- Creates a block and stores it in the lines
+			line[x], physicsLine[x] = block:new(
 				blockId,
-				temp.type,
+				fieldLine[x].type,
 				x, y,
-				dxl[x], dy,
-				bw, bh
+				displayX[x], displayY,
+				blockWidth, blockHeight
 			)
+			
+			decoLine[x] = decoTile:new(displayX[x], displayY)
 		end
 		
 		blocks[y] = line
+		deco[y] = decoLine
 	end
 end
 
