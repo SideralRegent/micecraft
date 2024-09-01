@@ -81,4 +81,8 @@ do
 		
 		return false
 	end
+	
+	function Block:getDecoTile()
+		return Map:getDecoTile(self.x, self.y)
+	end
 end

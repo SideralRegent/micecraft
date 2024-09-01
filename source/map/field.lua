@@ -3,7 +3,7 @@ function Field:generateNew(width, height)
 	for y = 1, height do
 		self[y] = {}
 		for x = 1, width do
-			self[y][x] = {type = VOID, tangible = false}
+			self[y][x] = {type = VOID}
 		end
 	end
 end
@@ -13,10 +13,6 @@ function Field:assignTemplate(x, y, template)
 	local this = self[y][x]
 	if template.type ~= nil then
 		this.type = template.type
-	end
-	
-	if template.tangible ~= nil then
-		this.tangible = template.tangible
 	end
 end
 
@@ -47,7 +43,7 @@ do
 		for y = yStart, yEnd do
 			for x = xStart, xEnd do 
 				template = matrix[(y - yStart) + 1][(x - xStart) + 1]
-				if not (template.type == VOID and template.tangible) then
+				if not (template.type == VOID) then
 					self:assignTemplate(x, y, template)
 				end
 			end
@@ -144,14 +140,14 @@ do
 			end
 		end
 		
-		local template = {type = VOID, tangible = false}
+		local template = {type = VOID}
 		
 		for x = xs, xe do
 			xo = (x - xs) + 1
 			
 			ys = heightMap[xo] or 1
 			
-			template = {type = VOID, tangible = false}
+			template = {type = VOID}
 			
 			for y = ys, height do
 				yo = loops and ((y - ys) % mod) or (y - ys) + 1 -- I have no idea what 'mod' is supposed to do now.
@@ -216,13 +212,13 @@ do
 		local BEDROCK = blockMetadata._C_BEDROCK
 		
 		for x = 1, width do
-			self:assignTemplate(x, height, {type = BEDROCK, tangible=true})
+			self:assignTemplate(x, height, {type = BEDROCK})
 		end
 		
 		for x = 1, width do
 			for y = height - 2, height - 1 do
 				if random(20) > 7 then
-					self:assignTemplate(x, y, {type = BEDROCK, tangible=true})
+					self:assignTemplate(x, y, {type = BEDROCK})
 				end
 			end
 		end

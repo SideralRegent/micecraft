@@ -57,6 +57,10 @@ do
 			end
 		end)
 		
+		Mousebinds:new(keys.one, true, function(player, block, xPosition, yPosition)
+			block:create(blockMetadata.maps.stone, true, true, true)	
+		end)
+		
 		Mousebinds:new(keys.ALT, false, function(player, _, xPosition, yPosition)
 			player:move(xPosition, yPosition, false)
 		end)

@@ -24,8 +24,6 @@ function Player:new(playerName)
 		
 		keys = {},
 		
-		showDebugInfo = false,
-		
 		internalTime = 0,
 		
 		dataFile = "",

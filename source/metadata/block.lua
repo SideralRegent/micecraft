@@ -16,9 +16,9 @@ do
 		glow = 0, -- Light emission (none = 0; max: 15)
 		translucent = false, -- If it is translucent (has different alpha values) [blocks with non-quadratic/irregular shapes have this property too]
 		
-		shadow = "17e2d5113f3.png", -- Sprite for shawdow [black]
-		lightning = "1817dc55c70.png", -- Sprite for lightning [white]
-		sprite = "17e1315385d.png", -- Regular sprite
+		--shadow = "17e2d5113f3.png", -- Sprite for shawdow [black]
+		--lightning = "1817dc55c70.png", -- Sprite for lightning [white]
+		sprite = false,-- "17e1315385d.png", -- Regular sprite
 		
 		durability = 24, -- How durable is this block against hits
 		
@@ -51,7 +51,7 @@ do
 		-- if the block is destroyed because of a Hit, then onDamage will not trigger.
 		-- onHit only triggers with entities, onDamage does always.
 		
-		onContact = void, -- Triggers when a Player makes contact with the Block (only works on foreground layer)
+		onContact = void, -- Triggers when a Player makes contact with the Block
 		
 		onUpdate = void -- Triggers when a Block nearby has suffered an update of its properties
 	})
@@ -71,19 +71,17 @@ blockMetadata:newTemplate("Dirt", {
 	
 	interactable = false,
 	color = 0x866042,
-	onUpdate = function(self, block) -- Make grass
-		if self.x == block.x and block.y < self.y then -- If the block is right above us
-			if block.type ~= blockMetadata._C_VOID then -- If it isn't air
-				if not (self.foreground and not block.foreground) then -- If its layer isn't lower than ours
-					if not block.translucent then -- If it isn't translucent
-						return false -- Do nothing
-					end
+	onUpdate = function(self, upperblock) -- Make grass
+		if self.x == upperblock.x and upperblock.y < self.y then -- If the block is right above us
+			if upperblock.type ~= blockMetadata._C_VOID then -- If it isn't air
+				if not upperblock.translucent then -- If it isn't translucent
+					return false -- Do nothing
 				end
 			end
 			
 			local grassifyTime = math.random(6, 16)
 			self:setTask(grassifyTime, false, function()
-				self:create(blockMetadata.maps.grass, self.foreground, true, true, false) -- Create a grass block
+				self:create(blockMetadata.maps.grass, true, true, false) -- Create a grass block
 			end)
 	
 			return true
@@ -106,15 +104,13 @@ blockMetadata:newTemplate("Grass", "Dirt", {
 	onUpdate = function(self, block) -- Make it dirt
 		if block.x == self.x and block.y < self.y then -- If the block that updated is above this one
 			if block.type ~= 0 then -- If it isn't air
-				if not (self.foreground and not block.foreground) then -- If the block layer isn't lower than ours
-					if not block.translucent then -- If the block isn't translucent
-						local dirtifyTime = math.random(6, 16)
-						self:setTask(dirtifyTime, false, function()
-							self:create(blockMetadata.maps.dirt, self.foreground, true, true, false) -- Create a dirt block
-						end)
-					
-						return true
-					end
+				if not block.translucent then -- If the block isn't translucent
+					local dirtifyTime = math.random(6, 16)
+					self:setTask(dirtifyTime, false, function()
+						self:create(blockMetadata.maps.dirt, true, true, false) -- Create a dirt block
+					end)
+				
+					return true
 				end
 			end
 		end
@@ -341,7 +337,12 @@ blockMetadata:set("256", {
 	end
 })
 
-blockMetadata:set("10", "Fluid", {name = "water", sprite = "182076fc21b.png", fluidImages = {"17dd4b26b5d.png", "17dd4b39b5c.png", "17dd4b34f5a.png", "17dd4b2b75d.png"}})
+blockMetadata:set("10", "Fluid", {
+		name = "water",
+		sprite = false
+		--[[sprite = "182076fc21b.png", 
+		fluidImages = {"17dd4b26b5d.png", "17dd4b39b5c.png", "17dd4b34f5a.png", "17dd4b2b75d.png"}]]
+})
 blockMetadata:set("10:1", "Fluid", {
 	name = "lava", 
 	sprite = "187ee766e73.png",

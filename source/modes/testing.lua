@@ -15,7 +15,7 @@ Module:newMode("test", function(this, g)
 			exclusive = true,
 			dir = {
 				min = height,
-				[1] = {type = blockMetadata.maps.cobblestone, tangible = true}
+				[1] = {type = blockMetadata.maps.cobblestone}
 			}
 		})
 		

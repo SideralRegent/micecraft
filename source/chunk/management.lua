@@ -173,7 +173,7 @@ do
 		local xx = self.x
 		local yy = self.y
 		
-		if mode == "special" then -- Order matters
+		if mode == CD_SPC then -- Order matters
 			local p1x = xx + 1
 			local s1x = xx - 1
 			local p1y = yy + 1

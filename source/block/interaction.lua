@@ -4,68 +4,65 @@
 -- it will default to an invalid block type.
 -- @name Block:create
 -- @param Int:type The type of the Block
--- @param Boolean:foreground Whether the new state belongs to the foreground layer or not
 -- @param Boolean:display Whether the new state should be automatically displayed
 -- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically
-function Block:create(type, foreground, display, update, updatePhysics)
-	if type == blockMetadata._C_VOID then
-		self:setVoid()
-	else
-		local meta = blockMetadata:get(type)
-		
-		self.timestamp = os.time()
-		
-		self:removeEventTimer()
-		self:setRepairDelay(false)
-		
-		do
-			self.type = type
-			self:setCategory(meta.category)
-			self.category = foreground and meta.category or 0
+do
+	local currentTime = os.time
+	function Block:create(type, display, update, updatePhysics)
+		if type == blockMetadata._C_VOID then
+			self:setVoid()
+		else
+			local meta = blockMetadata:get(type)
 			
-			self.drop = meta.drop
+			self.timestamp = currentTime()
 			
-			self.foreground = foreground
-			self.tangible = foreground
+			self:removeEventTimer()
+			self:setRepairDelay(false)
 			
-			self.stateAction = meta.state
-			self.fluidRate = meta.fluidRate
-			self.fluidLevel = meta.fluidLevel
-			self.isFluidSource = false
+			do
+				self.type = type
+				self:setCategory(meta.category)
+				
+				self.drop = meta.drop
+				
+				self.isSolid = meta.isSolid
+				
+				self.stateAction = meta.state
+				self.fluidRate = meta.fluidRate
+				self.fluidLevel = meta.fluidLevel
+				self.isFluidSource = false
+				
+				self.damageLevel = 0
+				self.damagePhase = 0
+				self.durability = meta.durability
+				self.hardness = meta.hardness
+				
+				self.glow = meta.glow
+				self.translucent = meta.translucent
+				
+				self.sprite = meta.sprite
+				self.shadow = meta.shadow
+				self.lighting  = meta.lighting
+				
+				self.onCreate = meta.onCreate
+				self.onPlacement = meta.onPlacement
+				self.onDestroy = meta.onDestroy
+				self.onInteract = meta.onInteract
+				self.onHit = meta.onHit
+				self.onDamage = meta.onDamage
+				self.onContact = meta.onContact
+				self.onUpdate = meta.onUpdate
+			end
 			
-			self.damageLevel = 0
-			self.damagePhase = 0
-			self.durability = meta.durability
-			self.hardness = meta.hardness
+			if display then
+				self:refreshDisplay()
+			end
 			
-			self.glow = meta.glow
-			self.translucent = meta.translucent
+			self:updateEvent(update, updatePhysics)
 			
-			self.sprite = meta.sprite
-			self.shadow = meta.shadow
-			self.lighting  = meta.lighting
-			
-			self.onCreate = meta.onCreate
-			self.onPlacement = meta.onPlacement
-			self.onDestroy = meta.onDestroy
-			self.onInteract = meta.onInteract
-			self.onHit = meta.onHit
-			self.onDamage = meta.onDamage
-			self.onContact = meta.onContact
-			self.onUpdate = meta.onUpdate
+			self:onCreate()
 		end
-		
-		self:removeAllDisplays()
-		self:setDefaultDisplay()
-		
-		if display then
-			self:refreshDisplay()
-		end
-		
-		self:updateEvent(update, updatePhysics)
-		
-		self:onCreate()
 	end
 end
 
@@ -84,8 +81,7 @@ function Block:createAsFluidWith(type, level, source, display, update, updatePhy
 end
 
 --- Destroys a Block.
--- In case the Block was in foreground layer, it will descend to background layer,
--- otherwise, it becomes void.
+-- The block will become void/air.
 -- @name Block:destroy
 -- @param Boolean:display Whether the new state should be automatically displayed
 -- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event
@@ -93,33 +89,17 @@ end
 do
 	local time = os.time
 	local abs = math.abs
-	function Block:destroy(display, update, updatePhysics, definitely)
+	function Block:destroy(display, update, updatePhysics)
 		if self.type ~= blockMetadata._C_VOID then
 			self.timestamp = time()
 			
 			self:onDestroy()
 			
-			self:removeAllDisplays()
-			
 			self:removeEventTimer()
 			
 			self.category = 0
-			
-			if self.foreground then
-				self:setCategory(0)
-				-- abs(Map.physicsMap[self.y][self.x])
-				self.foreground = false
-				self.damageLevel = 0
-				
-				if definitely then
-					self:setVoid()
-				else
-					self:setDefaultDisplay()
-				end
-			else
-				self:setVoid()
-			end
-			
+			self:setVoid()
+
 			if display then
 				self:refreshDisplay()
 			end
@@ -173,16 +153,19 @@ do
 				
 				return false
 			else
+				local tile = self:getDecoTile()
+				
 				if self.damagePhase > 0 then
 					local image = damage_sprites[self.damagePhase]
 					
-					self:addDisplay("damage", 2, image, (self.foreground and "!" or "_") .. "99999999", self.dx, self.dy, nil, nil, 0, 1.0)
+					tile:addDisplay("damage", 1, image, "!99999999", 0, 0, true, nil, nil, 0, 1.0)
 					
 					if display then
-						self:refreshDisplayAt(2)
+						
+						tile:refreshDisplayAt(1)
 					end
 				else
-					self:removeDisplay(2, true)
+					tile:removeDisplay(1, true)
 				end
 			end
 			
@@ -311,11 +294,10 @@ function Block:setFluidState(level, isSource, display, update, updatePhysics)
 		self:setCategory(meta.category + self.fluidLevel)
 	end
 	
-	if display then
-		local sprite = meta.fluidImages[self.fluidLevel]
-		self:addDisplay("main", 1, sprite, "!99999999", self.dx, self.dy, nil, nil, 0, 1.0, false)
+	if display and self.sprite then
+		self.sprite = meta.fluidImages[self.fluidLevel]
 		
-		self:refreshDisplayAt(1)
+		self:refreshDisplay()
 	end
 
 	self:updateEvent(update, updatePhysics)

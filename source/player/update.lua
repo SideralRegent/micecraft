@@ -75,15 +75,11 @@ do
 		self.internalTime = (add and self.internalTime + time or time)
 
 		if runEvents then
-			if self.internalTime % 1000 == 0 then
+			-- if self.internalTime % 1000 == 0 then
 				if self.internalTime % 2000 == 0 then -- Every 2 seconds
 					self:updateChunkArea()
 				end
-			end
-			
-			if self.showDebugInfo then
-				self:setDebugInformation()
-			end
+			-- end
 		end
 	end
 end
