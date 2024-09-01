@@ -90,9 +90,13 @@ ChunkQueue.__index = ChunkQueue
 
 local Map = {
 	physicsMap = {},
+	lightningMap = {},
+	decorations = {},
 	blocks = {},
+	
 	chunks = {},
 	chunkLookup = {},
+	
 	counter = {},
 	gravityForce = 0,
 	windForce = 0

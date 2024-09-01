@@ -10,7 +10,9 @@ do
 	local ipairs = ipairs
 	local next = next
 	
-	function Map.physicsMap:getSegment(xs, ys, xe, ye, cat)
+	local PM = {}
+	
+	function PM:getSegment(xs, ys, xe, ye, cat)
 		return {
 			xStart = xs,
 			xEnd = xe,
@@ -27,7 +29,7 @@ do
 		t[#t + 1] = v
 	end
 
-	function Map.physicsMap:individual(xStart, xEnd, yStart, yEnd)
+	function PM:individual(xStart, xEnd, yStart, yEnd)
 		local list = {}
 		for y = yStart, yEnd do
 			for x = xStart, xEnd do
@@ -43,7 +45,7 @@ do
 	
 	local max = math.max
 	local min = math.min
-	function Map.physicsMap:rectangle(xStart, xEnd, yStart, yEnd)
+	function PM:rectangle(xStart, xEnd, yStart, yEnd)
 		local x, y = 0, 0
 		local xs, xe, ys, ye
 		local matches = 0
@@ -106,7 +108,7 @@ do
 		return list
 	end
 	
-	function Map.physicsMap:rectangle_detailed(xStart, xEnd, yStart, yEnd, catlist)
+	function PM:rectangle_detailed(xStart, xEnd, yStart, yEnd, catlist)
 		local x, y = 0, 0
 		local xs, xe, ys, ye
 		local matches = 0
@@ -174,7 +176,7 @@ do
 		return list
 	end
 	
-	function Map.physicsMap:line(xStart, xEnd, yStart, yEnd)
+	function PM:line(xStart, xEnd, yStart, yEnd)
 		local list = {}
 		
 		local match = false
@@ -210,7 +212,7 @@ do
 		return list
 	end
 	
-	function Map.physicsMap:line_detailed(xStart, xEnd, yStart, yEnd, catlist)
+	function PM:line_detailed(xStart, xEnd, yStart, yEnd, catlist)
 		local list = {}
 		catlist = catlist or default_cats
 		
@@ -255,7 +257,7 @@ do
 		return list
 	end
 	
-	function Map.physicsMap:row(xStart, xEnd, yStart, yEnd)
+	function PM:row(xStart, xEnd, yStart, yEnd)
 		local list = {}
 		
 		local match = false
@@ -291,7 +293,7 @@ do
 		return list
 	end
 	
-		function Map.physicsMap:row_detailed(xStart, xEnd, yStart, yEnd, catlist)
+		function PM:row_detailed(xStart, xEnd, yStart, yEnd, catlist)
 		local list = {}
 		
 		local match = false
@@ -334,4 +336,6 @@ do
 		
 		return list
 	end
+	
+	Map.physicsMap = PM
 end

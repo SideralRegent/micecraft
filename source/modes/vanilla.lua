@@ -48,9 +48,9 @@ Module:newMode("vanilla", function(this, g)
 			exclusive = false,
 			dir = {
 				--max = WATER_LEVEL - 1,
-				[1] = {type = blockMetadata.maps.grass, tangible = true},
-				[2] = {type = blockMetadata.maps.dirt, tangible = true},
-				[10] = {type = -1, tangible = false},
+				[1] = {type = blockMetadata.maps.grass},
+				[2] = {type = blockMetadata.maps.dirt},
+				[10] = {type = -1},
 			}
 		}, heightMap)
 
@@ -59,7 +59,7 @@ Module:newMode("vanilla", function(this, g)
 			exclusive = true,
 			dir = {
 				max = ICE_LEVEL,
-				[1] = {type = blockMetadata.maps.snowed_grass, tangible = true},
+				[1] = {type = blockMetadata.maps.snowed_grass},
 				[2] = {type = -1}
 			}
 		}, heightMap)
@@ -69,8 +69,8 @@ Module:newMode("vanilla", function(this, g)
 			exclusive = true,
 			dir = {
 				min = WATER_LEVEL - 8,
-				[1] = {type = blockMetadata.maps.sand, tangible = true},
-				--[6] = {type = blockMetadata.maps.sandstone, tangible = true},
+				[1] = {type = blockMetadata.maps.sand},
+				--[6] = {type = blockMetadata.maps.sandstone},
 				[10] = {type = -1}
 			}
 		}, heightMap)
@@ -83,7 +83,7 @@ Module:newMode("vanilla", function(this, g)
 			--exclusive = true,
 			dir = {
 				--max = WATER_LEVEL,
-				[1] = {type = blockMetadata.maps.stone, tangible=true}
+				[1] = {type = blockMetadata.maps.stone}
 			}
 		}, stoneLayerMap)
 
@@ -92,7 +92,7 @@ Module:newMode("vanilla", function(this, g)
 			exclusive = true,	
 			dir = {
 				min = WATER_LEVEL - 5,
-				[1] = {type = blockMetadata.maps.sandstone, tangible=true}
+				[1] = {type = blockMetadata.maps.sandstone}
 			}
 		}, stoneLayerMap)
 
@@ -102,8 +102,8 @@ Module:newMode("vanilla", function(this, g)
 			field:setLayer({
 				overwrite = true,
 				dir = {
-					[1] = {type=nil, tangible=false},
-					[math.random(4, 6)] = {type=-1, tangible=false}
+					[1] = {type=0},
+					[math.random(4, 6)] = {type=-1}
 				}
 			}, caveMap)
 		end
@@ -113,7 +113,7 @@ Module:newMode("vanilla", function(this, g)
 			exclusive = true,
 			dir = {
 				min = WATER_LEVEL,
-				[1] = {type = blockMetadata.maps.water, tangible = true}
+				[1] = {type = blockMetadata.maps.water}
 			}
 		})
 		

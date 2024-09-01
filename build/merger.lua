@@ -47,11 +47,11 @@ local fileList = {
 		__directory = "source/map",
 		__docs = true,
 		"init",
-		"env",
+		"environment",
 		"interaction",
 		"field",
 		"physics",
-		--"biome",
+		"decoration",
 		"encoding"
 	},
 	{

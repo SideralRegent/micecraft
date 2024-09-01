@@ -156,10 +156,9 @@ do
 			for x = xStart, xEnd do 
 				template = structure.matrix[(y - yStart) + 1][(x - xStart) + 1]
 				block = Map:getBlock(x, y, CD_MTX)
-				if not (template.type == VOID and template.tangible) then
+				if not (template.type == VOID) then
 					block:create(
 						template.type, -- type
-						template.tangible, -- foreground
 						true, -- display
 						true, -- update
 						true -- update physics

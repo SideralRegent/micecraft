@@ -2,7 +2,6 @@
 -- @name Block:new
 -- @param Int:uniqueId The unique ID of the Block in the Map
 -- @param Int:type The Block type. Data will be consulted on **blockMetadata** to apply for this object
--- @param Boolean:foreground Whether the Block should be in the foreground layer or not
 -- @param Int:MapX Horizontal position of the Block in the Map matrix
 -- @param Int:MapY Vertical position of the Block in the Map matrix
 -- @param Int:displayX Horizontal position of the Block in Transformice's map
@@ -13,7 +12,7 @@
 do
 	local setmetatable = setmetatable
 --	local blockMetadata = blockMetadata
-	function Block:new(uniqueId, type, foreground, MapX, MapY, displayX, displayY, width, height)
+	function Block:new(uniqueId, type, MapX, MapY, displayX, displayY, width, height)
 		
 		local meta = blockMetadata[type]
 		
@@ -23,14 +22,13 @@ do
 			segmentId = -1,
 			
 			type = type,
-			category = foreground and meta.category or 0,
+			category = meta.category,
 			
 			timestamp = 0,
 			eventTimer = T_NULL,
 			repairTimer = T_INF,
 			
-			foreground = foreground,
-			tangible = foreground,
+			isSolid = meta.isSolid,
 			
 			stateAction = meta.state,
 			
@@ -47,7 +45,7 @@ do
 			durability = meta.durability,
 			hardness = meta.hardness,
 			
-			act = foreground and -meta.category or 0,
+			act = -meta.category,
 			
 			x = MapX,
 			y = MapY,
@@ -64,22 +62,17 @@ do
 			height = height,
 			
 			sprite = meta.sprite,
-			shadow = meta.shadow,
-			lighting = meta.lighting,
+			spriteId = nil,
+			--[[shadow = meta.shadow,
+			lighting = meta.lighting,]]
 			
 			dx = displayX,
 			dy = displayY,
-			displayList = {},
-			removalList = {}, --setmetatable({}, {__index = function() return -1 end}),
-			associativeList = {},
 			
 			hide = self.hide,
 			display = self.display,
-			addDisplay = self.addDisplay,
-			removeDisplay = self.removeDisplay,
-			removeAllDisplays = self.removeAllDisplays,
 			refreshDisplay = self.refreshDisplay,
-			setDefaultDisplay = self.setDefaultDisplay,
+			setSprite = self.setSprite,
 			
 			onCreate = meta.onCreate,
 			onPlacement = meta.onPlacement,
@@ -92,8 +85,6 @@ do
 		}, self)
 
 		this.__index = self
-		
-		this:setDefaultDisplay()
 		
 		return this, this.category
 	end
@@ -109,13 +100,11 @@ do
 		
 		self.type = blockMetadata._C_VOID
 		
-		self.foreground = false
-		self.tangible = false
+		self.isSolid = false
 		
 		self.category = 0
 		
 		self:hide()
-		self:removeAllDisplays()
 		
 		self.drop = 0
 		

@@ -45,7 +45,7 @@ function Map:initBlocks(width, height)
 			
 			line[x], pml[x] = block:new(
 				blockId,
-				temp.type, temp.tangible,
+				temp.type,
 				x, y,
 				dxl[x], dy,
 				bw, bh

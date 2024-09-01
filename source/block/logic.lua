@@ -70,7 +70,7 @@ function Block:updateEvent(update, updatePhysics)
 					segmentList[block.segmentId] = true
 				end
 				block:onUpdate(self)
-				tfm.exec.removeImage(tfm.exec.addImage("1817dc55c70.png", "!9999999", block.dx, block.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
+				-- tfm.exec.removeImage(tfm.exec.addImage("1817dc55c70.png", "!9999999", block.dx, block.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
 			end
 			
 			self:assertStateActions()
@@ -107,7 +107,7 @@ function Block:assertCascadeDestroyAction()
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
 		
 		if lowerBlock then
-			if lowerBlock.type == blockMetadata._C_VOID or (self.foreground and not lowerBlock.foreground) then
+			if lowerBlock.type == blockMetadata._C_VOID then
 				self:cascadeAction()
 			end
 		end
@@ -119,7 +119,6 @@ function Block:assertCascadeDestroyAction()
 end
 
 function Block:cascadeAction()
-	local tangible = self.foreground
 	local type = self.type
 	
 	local y = self.y
@@ -134,7 +133,7 @@ function Block:cascadeAction()
 				-- Can't pass 'block' into the arguments because the referece is lost and modifying it makes a new table.
 				-- Lua issue or Java implementation issue?
 				local target = Map:getBlock(xPoint, yPoint, CD_MTX)
-				target:destroy(true, true, true, true)
+				target:destroy(true, true, true)
 			end, self.x, y)
 		else
 			break
@@ -149,7 +148,7 @@ function Block:assertFallAction()
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
 		
 		if lowerBlock then
-			if (lowerBlock.type == blockMetadata._C_VOID) or lowerBlock.translucent or (lowerBlock.fluidRate > 0) then
+			if (lowerBlock.type == blockMetadata._C_VOID) or (lowerBlock.fluidRate > 0) then
 				self:fallAction(lowerBlock)
 			end
 		end
@@ -163,8 +162,7 @@ end
 function Block:fallAction(lowerBlock) -- To do: fix
 	if not lowerBlock then return end
 	if self:hasActiveTask(-1) then return end
-	
-	local tangible = self.tangible
+
 	local type = self.type
 	
 	local y = self.y - 1
@@ -173,22 +171,20 @@ function Block:fallAction(lowerBlock) -- To do: fix
 	
 	while y > 0 do
 		block = Map:getBlock(self.x, y, CD_MTX)
-		if block.type == type and block.tangible == tangible then -- Objective is the block that should get deleted
+		if block.type == type then -- Objective is the block that should get deleted
 			objective = block 
 			
 			y = y - 1
 		else
 			break
 		end
-	end
-	
-	
+	end	
 	
 	lowerBlock:setTask(1, false, function()
 		objective:destroy(true, true, true)
 		objective:setVoid(true)
 		
-		lowerBlock:create(type, tangible, true, true, true)
+		lowerBlock:create(type, true, true, true)
 		
 		--lowerBlock:updateEvent(true, true) 
 	end)

@@ -12,8 +12,7 @@ function Structure:new(name, definition)
 			matrix[y] = {}
 			for x = 1, #definition[1] do
 				matrix[y][x] = {
-					type = definition[y][x][1],
-					tangible = definition[y][x][2]
+					type = definition[y][x][1]
 				}
 			end
 		end

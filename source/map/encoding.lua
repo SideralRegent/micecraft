@@ -1,4 +1,4 @@
-do
+do -- TODO
 	local tobase = math.tobase
 	local tonumber = tonumber
 	local lchar = {[true] = "+", [false] = "-", ["+"] = true, ["-"] = false}
@@ -24,10 +24,10 @@ do
 					for xi = x, x + (repeats - 1) do
 						x = xi
 						
-						field[y][x] = {type=type, tangible=tangible}
+						field[y][x] = {type=type}
 					end
 				else
-					field[y][x] = {type=tinfo, tangible=tangible}
+					field[y][x] = {type=tinfo}
 				end
 				
 				x = x + 1
@@ -66,7 +66,7 @@ do
 				for xi = x + 1, xEnd do
 					par = bm[y][xi]
 					
-					if tile.type == par.type and tile.tangible == par.tangible then
+					if tile.type == par.type then
 						matches = matches + 1
 						x = xi
 					else
