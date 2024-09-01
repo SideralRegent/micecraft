@@ -6,22 +6,27 @@
 -- @param Boolean:active Whether it should be active or not
 function Chunk:setDisplayState(active, targetPlayer)
 	local matrix = Map.blocks
-	local method
+	local deco = Map.decorations
+	local mBlock, mDeco
 	
 	if active == nil then
-		method = Block.refreshDisplay
+		mBlock = Block.refreshDisplay
+		mDeco = deco.TileClass.refreshDisplay
 	else
 		if active then
-			method = Block.display
+			mBlock = Block.display
+			mDeco = deco.TileClass.display
 		else
-			method = Block.hide
+			mBlock = Block.hide
+			mDeco = deco.TileClass.hide
 			self.displaysTo = {}
 		end
 	end
 	
 	for y = self.yf, self.yb do
 		for x = self.xf, self.xb do
-			method(matrix[y][x], targetPlayer) -- Block:[method]()
+			mBlock(matrix[y][x], targetPlayer) -- Block:[method]()
+			mDeco(deco[y][x], targetPlayer)
 		end
 	end
 	

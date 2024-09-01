@@ -16,6 +16,7 @@ local CD_MTX = 1 -- Matrix
 local CD_MAP = 2 -- Map
 local CD_UID = 3 -- Unique ID
 local CD_BLK = 4 -- Block
+local CD_SPC = 5 -- Special
 
 local FL_FILL = 4
 local FL_EMPTY = 0

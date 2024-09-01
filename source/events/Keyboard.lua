@@ -68,7 +68,7 @@ do
 		end)
 	
 		Keybinds:new("F3", true, function(player)
-			player:setDebugInformation(not player.showDebugInfo)
+			print("debug")
 		end)
 	
 		Keybinds:new("L", true, function(player)
