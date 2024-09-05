@@ -10,10 +10,25 @@ end
 
 
 function Field:assignTemplate(x, y, template)
-	local this = self[y][x]
+	-- local this = self[y][x]
 	if template.type ~= nil then
-		this.type = template.type
+		self[y][x].type = template.type
 	end
+end
+
+function Field:checkAssign(x, y, template, overwrite, excepts)
+	if template.type == -1 then return false end
+	
+	local cell = self[y][x]
+	
+	if overwrite or cell.type == "0" then -- blockMetadata._C_VOID
+		if not (excepts and excepts[cell.type]) then
+			self:assignTemplate(x, y, template)
+			return true
+		end
+	end
+	
+	return false
 end
 
 do
@@ -61,6 +76,8 @@ do
 		local overwrite = layer.overwrite
 		local exclusive = layer.exclusive
 		
+		local excepts = dir.excepts
+		
 		local minc, maxc, start
 		
 		local template = dir[1]
@@ -78,15 +95,9 @@ do
 					for x = max(start, minc), maxc do
 						template = dir[depth] or template
 						
-						if template.type == -1 then
-							break
+						if self:checkAssign(x, y, template, overwrite, excepts) then
+							depth = depth + 1
 						end
-						
-						if overwrite or self[y][x].type == VOID then
-							self:assignTemplate(x, y, template)
-						end
-						
-						depth = depth + 1
 					end
 				end
 			end
@@ -101,15 +112,9 @@ do
 					for y = max(start, minc), maxc do
 						template = dir[depth] or template
 						
-						if template.type == -1 then
-							break
+						if self:checkAssign(x, y, template, overwrite, excepts) then
+							depth = depth + 1
 						end
-						
-						if overwrite or self[y][x].type == VOID then
-							self:assignTemplate(x, y, template)
-						end
-						
-						depth = depth + 1
 					end
 				end
 			end

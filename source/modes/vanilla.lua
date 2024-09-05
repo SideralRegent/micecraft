@@ -95,18 +95,6 @@ Module:newMode("vanilla", function(this, g)
 				[1] = {type = blockMetadata.maps.sandstone}
 			}
 		}, stoneLayerMap)
-
-		for i = 1, 8 do
-			local caveMap = math.heightMap(
-				math.random(28, 40), math.random(12, 20), width, (i-1)*18, 1, height, true)
-			field:setLayer({
-				overwrite = true,
-				dir = {
-					[1] = {type=0},
-					[math.random(4, 6)] = {type=-1}
-				}
-			}, caveMap)
-		end
 		
 		field:setLayer({
 			overwrite = false,
@@ -116,6 +104,21 @@ Module:newMode("vanilla", function(this, g)
 				[1] = {type = blockMetadata.maps.water}
 			}
 		})
+	
+		for i = 1, 8 do
+			local caveMap = math.heightMap(
+				math.random(28, 40), math.random(12, 20), width, (i-1)*18, 1, height, true)
+			field:setLayer({
+				overwrite = true,
+				dir = {
+					[1] = {type=blockMetadata._C_VOID},
+					[math.random(4, 6)] = {type=-1},
+					excepts = {
+						[blockMetadata.maps.water] = true
+					}
+				}
+			}, caveMap)
+		end
 		
 		do
 			local x = 4

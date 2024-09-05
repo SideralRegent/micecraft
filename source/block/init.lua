@@ -13,7 +13,7 @@ do
 	local setmetatable = setmetatable
 --	local blockMetadata = blockMetadata
 	function Block:new(uniqueId, type, MapX, MapY, displayX, displayY, width, height)
-		local meta = blockMetadata[type]
+		local meta = blockMetadata:get(type)
 		
 		local this = setmetatable({ -- Define this way to save some table acceses.
 			uniqueId = uniqueId,
@@ -94,6 +94,7 @@ do
 	
 	--- Sets the Block to a **void** state.
 	-- @name Block:setVoid
+	-- @param Boolean:update Whether it should update nearby blocks or not
 	function Block:setVoid(update)
 		local meta = blockMetadata:get(0)
 		
@@ -162,36 +163,67 @@ function Block:setRelativeCoordinates(xInChunk, yInChunk, idInChunk, chunkX, chu
 	self.dyc = self.dy + (self.height / 2)
 end
 
+
+
 -- REFERENCE FOR METHODS (also failsafe in case it is NIL for some reason)
 
-function Block:onCreate() -- Declare as `onCreate = function(self)`.
+--- Triggers when the Block is "created" to the world.
+-- Declare as `onCreate = function(self)`.
+-- @name Block:onCreate
+function Block:onCreate()
 	print("Block has been created.")
 end
 
-function Block:onPlacement(player) -- Declare as `onPlacement = function(self, player)`.
+--- Triggers when the Block is placed by a **player**.
+-- Declare as `onPlacement = function(self, player)`.
+-- @name Block:onPlacement
+-- @param Player:player The player object who placed this block
+function Block:onPlacement(player)
 	print("Block has been placed by " .. player.name .. ".")
 end
 
-function Block:onDestroy() -- Declare as `onDestroy = function(self)`.
+--- Triggers when the Block is destroyed.
+-- Declare as `onDestroy = function(self)`.
+-- @name Block:onDestroy
+function Block:onDestroy()
 	print("Block has been destroyed.")
 end
 
-function Block:onInteract(player) -- Declare as `onInteract = function(self, player)`.
+--- Triggers when the Block gets interaction with a **player**.
+-- Declare as `onInteract = function(self, player)`.
+-- @name Block:onInteract
+-- @param Player:player The player object who interacted with this block
+function Block:onInteract(player)
 	print(player.name .. " interacted with a block.")
 end
 
-function Block:onHit(player) -- Declare as `onHit = function(self, player)`.
+--- Deprecated.
+-- @name Block:onHit
+function Block:onHit(player)
 	print("Block has been hit by " .. player.name .. ".")
 end
 
-function Block:onDamage(amount, player) -- Declare as `onDamage = function(self, amount, player)`.
+--- Triggers when the Block gets damaged.
+-- Declare as `onDamage = function(self, amount, player)`.
+-- @name Block:onDamage
+-- @param Int:amount The damage received from this block.
+-- @param Player:player The player object who damaged this block
+function Block:onDamage(amount, player)
 	print("Block has been damaged.")
 end
 
-function Block:onContact(player) -- Declare as `onContact = function(self, player)`.
+--- Triggers when the Block gets touched by a **player**.
+-- Declare as `onContact = function(self, player)`.
+-- @name Block:onContact
+-- @param Player:player The player object who touched this block
+function Block:onContact(player)
 	print("Block has been contacted by " .. player.name .. ".")
 end
 
-function Block:onUpdate(block) -- Declare as `onUpdate = function(self, block)`.
+--- Triggers when the Block gets updated by the actions of another block.
+-- Declare as `onUpdate = function(self, block)`.
+-- @name Block:onUpdate
+-- @param Block:block The block that requests this one to be updated
+function Block:onUpdate(block)
 	print("Block has been updated by another block.")
 end

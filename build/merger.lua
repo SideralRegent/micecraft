@@ -3,7 +3,7 @@ local buildpath = './build/micecraft.lua'
 
 local shouldLog = false
 local releaseBuild = false
-local preview = false
+local preview = true
 
 local fileList = {
     {
@@ -134,9 +134,9 @@ local fileList = {
 		__name = "Launch",
 		__directory = "source/launch",
 		__docs = false,
-		"debug",
+		--"debug",
 		"launch",
-		"visualizator"
+	--	"visualizator"
 	}
 }
 
