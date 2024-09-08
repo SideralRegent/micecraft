@@ -16,7 +16,7 @@ do
 			end
 		})
 		
-		for playerName, player in next, Room.playerList do
+		for _, player in next, Room.playerList do
 			player:init()
 		end
 	end)

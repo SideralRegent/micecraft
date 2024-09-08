@@ -45,7 +45,6 @@ do
 		return self.__templates[identifier] or self.__default
 	end
 	
-	local tobase = math.tobase
 	--- Sets a new object under the Meta Data storage.
 	-- An object can inherit properties from a template or from another object.
 	-- @param Any:index The index to storage this object into

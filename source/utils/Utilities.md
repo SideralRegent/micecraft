@@ -195,7 +195,7 @@ Appends two numerical tables
 ---
 
 ### **table.inherit** ( `t`: table, `ex`: table )
-Inhertis all values to a table, from the specified one. It does not modify the original tables, but copies them, to avoid inconsistencies. All values to inherit will overwrite values on the target table.
+Inhertis all values to a table, from the specified one. It does not modify the original tables, but copies them, to avoid links. All values to inherit will overwrite values on the target table.
 
 
 **Parameters:**
@@ -295,7 +295,7 @@ Copies all the keys from the table and assigns them the value given.
 ---
 
 ### **table.random** ( `t`: table, `associative`: boolean )
-Gives the value of a random entry from the table. If the table is associative it converts the keys to an array and picks one of them randomly.
+Gives the value of a random entry from the table. If the table is associative it converts the keys to an array.
 
 
 **Parameters:**
@@ -310,13 +310,13 @@ Gives the value of a random entry from the table. If the table is associative it
 ---
 
 ### **table.tostring** ( `value`: table|any, `tb`: int, `seen`: table )
-Converts a table to a string, in a reasonable format. 
+Converts a table to a string, in a reasonable format. TODO: Add special parsing for keys.
 
 
 **Parameters:**
 - **value** (`Table|Any`) : The table to convert to string
 - **tb** (`Int`) : The depth in the table
-- **seen** (`Table`) : A list of tables that have been seen when iterating over the table (useful to avoid table recursion)
+- **seen** (`Table`) : A list of tables that have been seen when iterating
 
 
 **Returns:**

@@ -1,6 +1,6 @@
-Module:newMode("vanilla", function(this, g)
+Module:newMode("vanilla", function(this, _)
 	function this:init(Map)
-		Map:setVariables(32, 32, 12, 8, 80, 18, 0, 200)
+		Map:setVariables(32, 32, 12, 8, 60, 18, 0, 200)
 		Map:setPhysicsMode("rectangle_detailed")
 	end
 	
@@ -53,7 +53,7 @@ Module:newMode("vanilla", function(this, g)
 				[10] = {type = -1},
 			}
 		}, heightMap)
-
+		
 		field:setLayer({
 			overwrite = true,
 			exclusive = true,

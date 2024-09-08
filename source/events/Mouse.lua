@@ -43,21 +43,21 @@ do
 	
 	do
 		-- (-1) : No key active
-		Mousebinds:new(-1, true, function(player, block, xPosition, yPosition)
+		Mousebinds:new(-1, true, function(_, block)
 			block:damage(24, true, true, true)
 		end)	
 		
-		Mousebinds:new(keys.SHIFT, true, function(player, block, xPosition, yPosition)
+		Mousebinds:new(keys.SHIFT, true, function(player, block, ...)
 			if block.type ~= blockMetadata.maps.bedrock then
-				--if player.selected then
-					--block:create(player.selected, not player.keys[enum.keys.SPACE], true, true, true)
-				--end
+				if player.selected then
+					block:create(player.selected, true, true, true)
+				end
 				
-				block:createAsFluidWith("10", 4, true, true, true, true)
+				--block:createAsFluidWith(blockMetadata.maps.water, 4, true, true, true, true)
 			end
 		end)
 		
-		Mousebinds:new(keys.one, true, function(player, block, xPosition, yPosition)
+		Mousebinds:new(keys.one, true, function(_, block, ...)
 			block:create(blockMetadata.maps.stone, true, true, true)	
 		end)
 		
@@ -65,11 +65,11 @@ do
 			player:move(xPosition, yPosition, false)
 		end)
 	
-		Mousebinds:new(keys.C, true, function(player, block, xPosition, yPosition)
+		Mousebinds:new(keys.C, true, function(player, ...)
 			tfm.exec.chatMessage("This keybind is no longer supported.", player.name)
 		end)
 	
-		Mousebinds:new(keys.M, true, function(player, block, xPosition, yPosition)
+		Mousebinds:new(keys.M, true, function(_, block, ...)
 			Map:spawnStructure("SandPiramidSmall", block.x, block.y, 0.6, 1.0)
 		end)
 	end

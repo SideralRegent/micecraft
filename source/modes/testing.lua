@@ -1,14 +1,11 @@
-Module:newMode("test", function(this, g)
+Module:newMode("test", function(this, _)
 	function this:init(Map)
 		Map:setVariables(32, 32, 10, 6, 20, 2, 80, 16)
 		Map:setPhysicsMode("rectangle_detailed")
 	end
 	
-	function this:setMap(field)
-		local barrierGround = math.line(1, 1, 20, nil, nil, nil, true)
-		
-		
-		local width, height = Map:getBlocks()
+	function this:setMap(field)		
+		local _, height = Map:getBlocks()
 		
 		field:setLayer({
 			overwrite = false,

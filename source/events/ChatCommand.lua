@@ -23,9 +23,9 @@ do
 		
 		return this
 	end
-
-	function Command:isAllowed(player) -- To Do: change
-		return true
+	
+	function Command:isAllowed(player) -- TODO: Check player data
+		return not not player
 	end
 	
 	function Command:execute(args)
@@ -41,7 +41,7 @@ do
 		self.issues:insert({error = result, raw = raw_args})
 	
 		Module:throwException(2, message)
-		print(message)
+		--print(message)
 	end
 	
 	function Commands:new(commandName, callback, ...)
@@ -57,18 +57,18 @@ do
 	-- For all commands, the first argument passed is the player
 	-- that invoked it.
 	
-	Commands:new("select", function(player, type)
-		player:setSelected(tostring(type))
+	Commands:new("select", function(player, t)
+		player:setSelected(tonumber(t, 10))
 	end, "s")
 
-	Commands:new("list", function(player, type)
+	Commands:new("list", function(player, _)
 		tfm.exec.chatMessage("<J>List of Registered Blocks</J>", player.name)
 		for index, info in next, blockMetadata do
-			if info.name then
+			if type(info) == "table" and info.name then
 				tfm.exec.chatMessage(("<CEP>%s</CEP> - <VP>%s</VP>"):format(index, info.name), player.name)
 			end
 		end
-	end, "s")
+	end)
 	
 	Commands:new("time", function(player, time)
 		if time then
@@ -95,7 +95,7 @@ do
 		
 		if p2 then -- Move target 1 to target2
 			if target1 == "*" then
-				for playerName, p in next, Room.playerList do
+				for _, p in next, Room.playerList do
 					p:move(p2.x, p2.y, false)
 				end
 			else
@@ -109,6 +109,12 @@ do
 			end
 		end
 	end, "teleport")
+	
+	Commands:new("funny", function(_)
+		Block.a = Map
+		print(Map)
+	end)
+	local M = {}
 	
 	Commands:new("api", function(player, func, ...)
 		local env = {
@@ -138,25 +144,25 @@ do
 			end
 		end
 		
-		local retvl
+		local returnValue = nil
 		
 		if type(obj) == "function" then
-			retvl = obj(...)
+			returnValue = obj(...)
 		else
-			retvl = obj
+			returnValue = obj
 		end
 		
 		print(obj)
 		
-		if retvl ~= nil then
-			local ms = table.tostring(retvl, 0, nil, true)
-			local ps = 950
-			local sb = math.ceil(#ms / ps)
+		if returnValue ~= nil then -- This ensures that the whole text will be printed
+			local returnText = table.tostring(returnValue, 0, nil, true)
+			local textSlideSize = 950
+			local textSlides = math.ceil(#returnText / textSlideSize)
 			local lead = ""
-			for i=1, sb do
-				local partition = lead .. ms:sub(
-					((i - 1) * ps) + 1,
-					math.min(#ms, i * ps)
+			for slide=1, textSlides do
+				local partition = lead .. returnText:sub(
+					((slide - 1) * textSlideSize) + 1,
+					math.min(#returnText, slide * textSlideSize)
 				)
 				local message
 				message, lead = partition:match("^(.*)(<[^<]-)$")
@@ -186,7 +192,6 @@ do
 		["false"] = false,
 		["no"] = false
 	}
-	local remove = table.remove
 	local tonumber, tostring = tonumber, tostring
 	
 	function Commands:parse(message)

@@ -6,9 +6,9 @@ do
 	local ipairs,next = ipairs, next
 	local abs = math.abs
 	local min, max = math.min, math.max
-	local keys, copykeys = table.keys, table.copykeys
+	local copykeys = table.copykeys
 	
-	function Segment:new(description, block, chunk)
+	function Segment:new(description, block)
 		local this = setmetatable({
 			uniqueId = block.chunkUniqueId,
 			presenceId = block.uniqueId,
@@ -50,7 +50,7 @@ do
 		[enum.category.crystals] = {type=14, friction=0.10, restitution=0.20, collides=true, y_offset = 0}, -- Crystal
 		-- [enum.category.other] = {type=14, friction=0.50, restitution=0.00, collides=true, y_offset = 0}, -- Others (leaves, wool)
 		[enum.category.water] = {type=09, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Water
-		[enum.category.lava] = {type=14, friction=2.00, restitution=5.00, collides=true, y_offset = 0}, -- Lava
+		[enum.category.lava] = {type=19, friction=2.00, restitution=500.00, collides=true, y_offset = 0}, -- Lava
 		[enum.category.cobweb] = {type=15, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Cobweb
 		[enum.category.acid]= {type=19, friction=20.0, restitution=0.00, collides=true, y_offset = 0}, -- Acid
 	}
@@ -267,7 +267,6 @@ do
 	-- @param Table:origin A table with the strucutre `{xStart=Int, xEnd=Int, yStart=Int, yEnd=Int, category=Int}` that corresponds to the Block(s) that asked for refresh
 	function Chunk:refreshPhysics(mode, segmentList, update, origin)
 		segmentList = segmentList or copykeys(self.segments, true)
-		local segment
 		
 		local xs, ys, xe, ye, catlist = self.xb, self.yb, self.xf, self.yf, {}
 		if origin then
@@ -312,7 +311,7 @@ do
 			end
 		end
 		
-		for segmentId, segment in next, self.segments do
+		for _, segment in next, self.segments do
 			segment:free()
 		end
 		

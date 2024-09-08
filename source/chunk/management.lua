@@ -1,6 +1,4 @@
 do
-	local ceil = math.ceil
-	local unloadingTime = 120 -- Magic number !! 
 	local copykeys = table.copykeys
 	local isEmpty = table.isEmpty
 	--- Sets the Time that the Chunk should wait before unloading.
@@ -178,32 +176,32 @@ do
 			local s1x = xx - 1
 			local p1y = yy + 1
 			local s1y = yy - 1
-			ap(list, Map:getChunk(p1x, yy, CD_MTX))
-			ap(list, Map:getChunk(s1x, yy, CD_MTX))
-			ap(list, Map:getChunk(xx, p1y, CD_MTX))
-			ap(list, Map:getChunk(xx, s1y, CD_MTX))
+			ap(list, map:getChunk(p1x, yy, CD_MTX))
+			ap(list, map:getChunk(s1x, yy, CD_MTX))
+			ap(list, map:getChunk(xx, p1y, CD_MTX))
+			ap(list, map:getChunk(xx, s1y, CD_MTX))
 			
-			ap(list, Map:getChunk(s1x, p1y, CD_MTX))
-			ap(list, Map:getChunk(p1x, p1y, CD_MTX))
-			ap(list, Map:getChunk(p1x, s1y, CD_MTX))
-			ap(list, Map:getChunk(s1x, s1y, CD_MTX))
+			ap(list, map:getChunk(s1x, p1y, CD_MTX))
+			ap(list, map:getChunk(p1x, p1y, CD_MTX))
+			ap(list, map:getChunk(p1x, s1y, CD_MTX))
+			ap(list, map:getChunk(s1x, s1y, CD_MTX))
 			
-			ap(list, Map:getChunk(p1x + 1, yy, CD_MTX))
-			ap(list, Map:getChunk(s1x - 1, yy, CD_MTX))
-			ap(list, Map:getChunk(p1x + 1, s1y, CD_MTX))
-			ap(list, Map:getChunk(s1x - 1, p1y, CD_MTX))
+			ap(list, map:getChunk(p1x + 1, yy, CD_MTX))
+			ap(list, map:getChunk(s1x - 1, yy, CD_MTX))
+			ap(list, map:getChunk(p1x + 1, s1y, CD_MTX))
+			ap(list, map:getChunk(s1x - 1, p1y, CD_MTX))
 			
-			ap(list, Map:getChunk(xx, p1y + 1, CD_MTX))
+			ap(list, map:getChunk(xx, p1y + 1, CD_MTX))
 		elseif mode == SH_CRS then
-			ap(list, Map:getChunk(xx - 1, yy, CD_MTX))
-			ap(list, Map:getChunk(xx, yy - 1, CD_MTX))
-			ap(list, Map:getChunk(xx + 1, yy, CD_MTX))
-			ap(list, Map:getChunk(xx, yy + 1, CD_MTX))
+			ap(list, map:getChunk(xx - 1, yy, CD_MTX))
+			ap(list, map:getChunk(xx, yy - 1, CD_MTX))
+			ap(list, map:getChunk(xx + 1, yy, CD_MTX))
+			ap(list, map:getChunk(xx, yy + 1, CD_MTX))
 		elseif mode == SH_SQR then
 			for y = -1, 1 do
 				for x=-1, 1 do
 					if not (x == 0 and y == 0) then
-						ap(list, Map:getChunk(xx + x, yy + y, CD_MTX))
+						ap(list, map:getChunk(xx + x, yy + y, CD_MTX))
 					end
 				end
 			end

@@ -4,6 +4,8 @@ local REFERENCE_SCALE = 1.0
 local REFERENCE_SCALE_X = 1.0
 local REFERENCE_SCALE_Y = 1.0
 
+local VOID = 0
+
 -- Shape constants for fetching stuff
 local SH_SQR = 1 -- Square
 local SH_CRS = 2 -- Cross

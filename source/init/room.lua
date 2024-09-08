@@ -49,8 +49,8 @@ function Room:init()
 	
 	
 	self.playerList = {}
-	for playerName, playerData in next, this.playerList do
-		eventNewPlayer(playerName)
+	for playerName, _ in next, this.playerList do
+		_G.eventNewPlayer(playerName)
 	end
 end
 
@@ -74,7 +74,7 @@ do
 			
 			bindMouse(playerName, true)
 			
-			for keyId, keyName in next, enum.keys do
+			for keyId, _ in next, enum.keys do
 				bindKeyboard(playerName, keyId, true, true)
 				bindKeyboard(playerName, keyId, false, true)
 			end

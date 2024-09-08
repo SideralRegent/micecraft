@@ -1,6 +1,4 @@
-local LOCAL_EPOCH = os.time()
-
-local bit32, coroutine, math, os, string, table = _G.bit32, _G.coroutine, _G.math, _G.os, _G.string, _G.table
+local math, os, string, table =_G.math, _G.os, _G.string, _G.table
 local debug, system, tfm, ui = _G.debug, _G.system, _G.tfm, _G.ui
 
 local next, pcall, tonumber, tostring, type, setmetatable = _G.next, _G.pcall, _G.tonumber, _G.tostring, _G.type, _G.setmetatable
@@ -71,7 +69,7 @@ local Mode = {}
 
 local enum = {}
 
-local Ui = {}
+-- local Ui = {}
 
 local Block = {}
 Block.__index = Block
@@ -125,9 +123,11 @@ local Timer = {
 	counter = 0
 }
 
+--[[
 local Debug = {
 	fields = {}
 }
+]]
 
 Timer.__index = Timer
 local Tick = {

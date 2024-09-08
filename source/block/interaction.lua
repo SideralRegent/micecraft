@@ -59,7 +59,7 @@ do
 				self:refreshDisplay()
 			end
 			
-			self:updateEvent(update, updatePhysics)
+			self:updateEvent(update, updatePhysics, meta.category)
 			
 			self:onCreate()
 		end
@@ -88,23 +88,22 @@ end
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically
 do
 	local time = os.time
-	local abs = math.abs
 	function Block:destroy(display, update, updatePhysics)
-		if self.type ~= blockMetadata._C_VOID then
+		if self.type ~= VOID then
 			self.timestamp = time()
+					
+			self:removeEventTimer()
+			local oldCat = self.category
+			self.category = 0
 			
 			self:onDestroy()
-			
-			self:removeEventTimer()
-			
-			self.category = 0
 			self:setVoid()
 
 			if display then
 				self:refreshDisplay()
 			end
 			
-			self:updateEvent(update, updatePhysics)
+			self:updateEvent(update, updatePhysics, oldCat)
 		end
 	end
 end
@@ -205,7 +204,7 @@ end
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
 -- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:damage(amount, add, display, update, updatePhysics, player)
-	if self.type ~= blockMetadata._C_VOID then
+	if self.type ~= VOID then
 		self:onHit(player)
 		
 		local success = self:setDamageLevel(amount, add, display, update, updatePhysics)
@@ -213,7 +212,7 @@ function Block:damage(amount, add, display, update, updatePhysics, player)
 		if success then
 			self:onDamage(amount, player)
 			
-			self:setRepairDelay(true, 2, 10000, add, display, update, updatePhysics)
+			-- self:setRepairDelay(true, 2, 10000, add, display, update, updatePhysics)
 		end
 	
 		return success
@@ -232,7 +231,7 @@ end
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case its state changes)
 -- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:repair(amount, add, display, update, updatePhysics)
-	if self.type ~= blockMetadata._C_VOID then
+	if self.type ~= VOID then
 		return self:setDamageLevel(-amount, add, display, update, updatePhysics)
 	end
 	
@@ -249,6 +248,7 @@ do
 	function Block:interact(player)
 		if self.interactable then
 			local x, y = self:getPixelCenter()
+			local width, height = Map:getBlockDimensions()
 			
 			local xd = dist(player.x, x)
 			local yd = dist(player.y, y)
@@ -266,11 +266,11 @@ do
 end
 
 function Block:removeEventTimer()
-	if self.eventTimer ~= NULL then
+	if self.eventTimer ~= T_NULL then
 		Tick:removeTask(self.eventTimer)
 	end
 	
-	self.eventTimer = NULL
+	self.eventTimer = T_NULL
 end
 
 function Block:setTask(delay, shouldLoop, callback, ...)
@@ -295,10 +295,10 @@ function Block:setFluidState(level, isSource, display, update, updatePhysics)
 	end
 	
 	if display and self.sprite then
-		self.sprite = meta.fluidImages[self.fluidLevel]
+		self.sprite = meta.fluidImages and meta.fluidImages[self.fluidLevel] or meta.sprite
 		
 		self:refreshDisplay()
 	end
 
-	self:updateEvent(update, updatePhysics)
+	self:updateEvent(update, updatePhysics, meta.category)
 end

@@ -22,8 +22,12 @@ Creates a new Block object.
 
 ---
 
-### **Block:setVoid** (  )
+### **Block:setVoid** ( `update`: boolean )
 Sets the Block to a **void** state. 
+
+
+**Parameters:**
+- **update** (`Boolean`) : Whether it should update nearby blocks or not
 
 ---
 
@@ -38,6 +42,67 @@ Sets the Block relative coordinates to its chunk.
 - **chunkX** (`Int`) : The horizontal position of the Chunk in the Map
 - **chunkY** (`Int`) : The vertical position of the Chunk in the Map
 - **chunkId** (`Int`) : The unique identifier of the Chunk in the Map
+
+---
+
+### **Block:onCreate** (  )
+Triggers when the Block is "created" to the world. Declare as `onCreate = function(self)`.
+
+---
+
+### **Block:onPlacement** ( `player`: player )
+Triggers when the Block is placed by a **player**. Declare as `onPlacement = function(self, player)`.
+
+
+**Parameters:**
+- **player** (`Player`) : The player object who placed this block
+
+---
+
+### **Block:onDestroy** (  )
+Triggers when the Block is destroyed. Declare as `onDestroy = function(self)`.
+
+---
+
+### **Block:onInteract** ( `player`: player )
+Triggers when the Block gets interaction with a **player**. Declare as `onInteract = function(self, player)`.
+
+
+**Parameters:**
+- **player** (`Player`) : The player object who interacted with this block
+
+---
+
+### **Block:onHit** (  )
+Deprecated. 
+
+---
+
+### **Block:onDamage** ( `amount`: int, `player`: player )
+Triggers when the Block gets damaged. Declare as `onDamage = function(self, amount, player)`.
+
+
+**Parameters:**
+- **amount** (`Int`) : The damage received from this block.
+- **player** (`Player`) : The player object who damaged this block
+
+---
+
+### **Block:onContact** ( `player`: player )
+Triggers when the Block gets touched by a **player**. Declare as `onContact = function(self, player)`.
+
+
+**Parameters:**
+- **player** (`Player`) : The player object who touched this block
+
+---
+
+### **Block:onUpdate** ( `block`: block )
+Triggers when the Block gets updated by the actions of another block. Declare as `onUpdate = function(self, block)`.
+
+
+**Parameters:**
+- **block** (`Block`) : The block that requests this one to be updated
 
 ---
 
@@ -186,6 +251,40 @@ Interface for handling when a block state gets updated.
 **Parameters:**
 - **update** (`Boolean`) : Whether the blocks around should be updated (method: `Block:onUpdate`)
 - **updatePhysics** (`Boolean`) : Whether the physics of the Map should be updated
+
+---
+
+### **Block:display** ( `nil`:  )
+Displays the sprite that corresponds to this block, if any. 
+
+
+**Parameters:**
+- **nil** (`nil`) : nil
+
+---
+
+### **Block:hide** (  )
+Removes the sprite from the corresponding block, if any. 
+
+---
+
+### **Block:refreshDisplay** (  )
+Hides and shows the sprite from the block. 
+
+---
+
+### **Block:setSprite** ( `sprite`: string, `refresh`: boolean )
+Establishes the sprite for the designed block. 
+
+
+**Parameters:**
+- **sprite** (`String`) : The sprite URL from the Atelier801 servers
+- **refresh** (`Boolean`) : Whether it should refresh the sprite in the world or not
+
+---
+
+### **Block:pulse** (  )
+Makes a visible pulse. 
 
 ---
 

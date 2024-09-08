@@ -6,7 +6,7 @@
 function Tick:step(amount)
 	amount = amount or 1
 	if amount > 1 then
-		for i=1, amount do
+		for _ = 1, amount do
 			self:handle()
 		end
 	else
@@ -16,9 +16,7 @@ end
 
 do
 	local setmetatable = setmetatable
-	local max = math.max
 	local copy = table.copy
-	local keys = table.keys
 	local next = next
 	
 	local Task = {

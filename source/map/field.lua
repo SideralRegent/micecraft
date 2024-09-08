@@ -21,7 +21,7 @@ function Field:checkAssign(x, y, template, overwrite, excepts)
 	
 	local cell = self[y][x]
 	
-	if overwrite or cell.type == "0" then -- blockMetadata._C_VOID
+	if overwrite or cell.type == VOID then -- blockMetadata._C_VOID
 		if not (excepts and excepts[cell.type]) then
 			self:assignTemplate(x, y, template)
 			return true
@@ -68,9 +68,7 @@ do
 	local max = math.max
 	local min = math.min
 	
-	function Field:setLayer(layer, heightMap)
-		local VOID = blockMetadata._C_VOID
-		
+	function Field:setLayer(layer, heightMap)		
 		local width, height = Map:getBlocks()
 		local dir = layer.dir
 		local overwrite = layer.overwrite
@@ -140,7 +138,7 @@ do
 		local mod = 1
 		
 		if loops then
-			for k, v in next, dir do
+			for k, _ in next, dir do
 				mod = max(k, mod)
 			end
 		end
@@ -168,11 +166,9 @@ do
 		end
 	end
 end
--- To Do: Add 2D Noise parser
+-- TODO: Add 2D Noise parser
 
-function Field:setNoiseMap(mapInfo)
-	local VOID = blockMetadata._C_VOID
-	
+function Field:setNoiseMap(mapInfo)	
 	local noiseMap = mapInfo.noiseMap
 	local dir = mapInfo.dir
 
@@ -214,7 +210,7 @@ do
 		randomseed(0x132B7F7) -- Magic number which provides randomness to the random seed.
 		
 		local width, height = Map:getBlocks()
-		local BEDROCK = blockMetadata._C_BEDROCK
+		local BEDROCK = blockMetadata.maps.bedrock
 		
 		for x = 1, width do
 			self:assignTemplate(x, height, {type = BEDROCK})

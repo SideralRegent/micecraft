@@ -1,7 +1,7 @@
 do
 	local next = next
 
-	function Player:queueNearChunks(centralChunk, include, forceUpdate)
+	function Player:queueNearChunks(centralChunk) -- , include, forceUpdate)
 		centralChunk = centralChunk or Map:getChunk(self.bx, self.by, CD_BLK)
 		local chunkList = centralChunk:getChunksAround(CD_SPC, true)
 		

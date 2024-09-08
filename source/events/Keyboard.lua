@@ -53,21 +53,21 @@ do
 	end
 	
 	do
-		Keybinds:new("UP", true, function(player, down, x, y, vx, vy)
+		Keybinds:new("UP", true, function(player, _, x, y, vx, vy)
 			player:updateInformation(x, y, vx, vy)
 		end)
 		
 		Keybinds:new("DOWN", true, "UP")
 		
-		Keybinds:new("LEFT", true, function(player, down, x, y, vx, vy)
+		Keybinds:new("LEFT", true, function(player, _, x, y, vx, vy)
 			player:updateInformation(x, y, vx, vy, false)
 		end)
 	
-		Keybinds:new("RIGHT", true, function(player, down, x, y, vx, vy)
+		Keybinds:new("RIGHT", true, function(player, _, x, y, vx, vy)
 			player:updateInformation(x, y, vx, vy, true)
 		end)
 	
-		Keybinds:new("F3", true, function(player)
+		Keybinds:new("F3", true, function(_)
 			print("debug")
 		end)
 	
@@ -76,26 +76,26 @@ do
 		end)
 	end
 	
-	local kdl = {
+	local kdl = { -- For list
 		[true] = true,
 		[false] = nil,
 	}
 	
 	function Keybinds:event(player, keyId, down, ...)
-		player.keys[keyId] = kdl[down]
+		local pk = player.keys
+		local keybind = self[down][keyId]
+		pk[keyId] = kdl[down]
 		
 		if down then
-			player.keys.last = keyId
+			pk.last = keyId
 		else
-			if keyId == player.keys.last then
-				player.keys.last = -1
+			if keyId == pk.last then
+				pk.last = -1
 			end
 		end
 		
-		local keybind = self[down][keyId]
-		
 		if keybind then
-			-- keybind:trigger or keybind.callback?
+			-- keybind:trigger or keybind.callback:
 			-- **trigger** uses pcall but protected call can impact on performance
 			-- **callback** is more straighforward but errors can be propagated
 			keybind.callback(player, down, ...)

@@ -37,7 +37,7 @@ function Chunk:setDisplayState(active, targetPlayer)
 	return self.displayActive
 end
 
-function Chunk:setDebugDisplay(active, delay)
+function Chunk:setDebugDisplay(active)
 	if self.debugImageId then
 		self.debugImageId = tfm.exec.removeImage(self.debugImageId, false)
 	end

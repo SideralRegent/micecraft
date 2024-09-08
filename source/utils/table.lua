@@ -2,17 +2,15 @@ do
 	local type = type
 	local tostring = tostring
 	local print = print
-	local ipairs, pairs, next = ipairs, pairs, next
+	local next = next
 	local setmetatable = setmetatable
 	local getmetatable = getmetatable
-
-	local insert = table.insert
+	
 	local remove = table.remove
 	local concat = table.concat
 	local sort = table.sort
 	
 	local min = math.min
-	local max = math.max
 	local random = math.random
 	
 	--- Checks if the Table has no elements.
@@ -20,14 +18,7 @@ do
 	-- @param Table:t The table to check
 	-- @return `Boolean` Whether the Table is empty or not.
 	table.isEmpty = function(t)
-		local isEmpty = true
-		
-		for k, v in next, t do
-			isEmpty = false
-			break
-		end
-		
-		return isEmpty
+		return not next(t)
 	end
 	
 	--- Copies a table and all its values recursively.
@@ -71,7 +62,7 @@ do
 	end
 	
 	--- Inhertis all values to a table, from the specified one.
-	-- It does not modify the original tables, but copies them, to avoid inconsistencies.
+	-- It does not modify the original tables, but copies them, to avoid links.
 	-- All values to inherit will overwrite values on the target table.
 	-- @name table.inherit
 	-- @param Table:t The table for which values will be inherited.
@@ -152,7 +143,7 @@ do
 	table.keys = function(t)
 		local array = {}
 		
-		for k, v in next, t do
+		for k, _ in next, t do
 			array[#array + 1] = k
 		end
 		
@@ -165,8 +156,10 @@ do
 	-- @return `Int` The amount of entries
 	table.count = function(t)
 		local count = 0
+		local index = next(t)
 		
-		for k, v in next, t do
+		while index do
+			index = next(t, index)
 			count = count + 1
 		end
 		
@@ -189,7 +182,7 @@ do
 	end
 	
 	--- Gives the value of a random entry from the table.
-	-- If the table is associative it converts the keys to an array and picks one of them randomly.
+	-- If the table is associative it converts the keys to an array.
 	-- @name table.random
 	-- @param Table:t The table to get the random element from
 	-- @param Boolean:associative Wheter the table is associative or numerical
@@ -212,11 +205,12 @@ do
 	-- @name table.tostring
 	-- @param Table|Any:value The table to convert to string
 	-- @param Int:tb The depth in the table
-	-- @param Table:seen A list of tables that have been seen when iterating over the table (useful to avoid table recursion)
+	-- @param Table:seen A list of tables that have been seen when iterating
 	-- @return `String` The value converted to string
+	-- TODO: Add special parsing for keys.
 	table.tostring = function(value, tb, seen, pretty)
 		tb = tb or 0
-		if tb > 8 then return end
+		if tb > 8 then return end -- Max depth is 8, unlike Tig's broken print.
 		
 		local tv = type(value)
 		if tv == "table" then
@@ -235,10 +229,14 @@ do
 						vv = table.tostring(v, p1, seen, pretty)
 					end
 					
-					args[#args + 1] = ("%s%s"):format(("\t"):rep(p1), ("[%s] = %s"):format(kk, vv))
+					args[#args + 1] = ("%s%s"):format(
+						("\t"):rep(p1),
+						("[%s] = %s"):format(kk, vv)
+					)
 				end
 			end
 			
+			-- Sorts alphabetically
 			sort(args, function(a, b)
 				local ca, cb 
 				
@@ -257,9 +255,15 @@ do
 			end)
 			args = concat(args, ",\n")
 			
-			return (pretty and "<N>{\n%s\n%s}</N>" or "{\n%s\n%s}"):format(args, ("\t"):rep(tb))
-		elseif tv == "string" then
-			local vvv = ('"%s"'):format(value:gsub("<", "&lt;"):gsub(">", "&gt;"))
+			if pretty then -- Less uglier than `X and A or B`
+				return ("<N>{\n%s\n%s}</N>"):format(args, ("\t"):rep(tb))
+			else
+				return ("{\n%s\n%s}"):format(args, ("\t"):rep(tb))
+			end
+		elseif tv == "string" then -- <> are for tags that get parsed in-game
+			local vvv = ('"%s"'):format(
+				value:gsub("<", "&lt;"):gsub(">", "&gt;")
+			)
 			return pretty and ("<CEP>%s</CEP>"):format(vvv) or vvv
 		else
 			if pretty then

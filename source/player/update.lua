@@ -7,8 +7,8 @@ function Player:updatePosition(x, y, vx, vy)
 	self.vx = vx or self.vx
 	self.vy = vy or self.vy
 	
-	self.bx = (self.x - Map.horizontalOffset) / Map.blockWidth
-	self.by = (self.y - Map.verticalOffset) / Map.blockHeight
+	self.bx = (self.x - map.horizontalOffset) / map.blockWidth
+	self.by = (self.y - map.verticalOffset) / map.blockHeight
 end
 
 do
@@ -46,7 +46,6 @@ do
 	end
 	
 	function Player:updateChunkArea()
-		local map = Map
 		local chunk = Map:getChunk(self.bx, self.by, CD_BLK)
 		
 		if chunk then
@@ -71,12 +70,16 @@ do
 	end
 	
 	function Player:setClock(time, add, runEvents)
-		time = time or (add and 500 or self.internalTime)
-		self.internalTime = (add and self.internalTime + time or time)
+		if add then
+			time = time or 500
+			self.internalTime = self.internalTime + time
+		else
+			self.internalTime = time
+		end
 
 		if runEvents then
 			-- if self.internalTime % 1000 == 0 then
-				if self.internalTime % 2000 == 0 then -- Every 2 seconds
+				if self.internalTime % 2500 == 0 then -- Every 2.5 seconds
 					self:updateChunkArea()
 				end
 			-- end

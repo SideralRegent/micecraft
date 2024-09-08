@@ -1,5 +1,4 @@
 do
-	local setmetatable = setmetatable
 	local max = math.max
 	local time = os.time
 	local print, tostring = print, tostring
@@ -14,7 +13,7 @@ do
 	-- @param Function:callback The function to call when the Timer triggers
 	-- @param Any:... Extra arguments for callback
 	-- @return `Int` The internal identifier of the Timer
-	function Timer:new(awaitTime, loop, callback, ...)
+	function Timer:new(awaitTime, loop, _, ...)
 		local ms = max(awaitTime, 500)
 		self.counter = self.counter + 1
 		
@@ -85,9 +84,7 @@ end
 
 do
 	local time = os.time
-	local unpack = table.unpack
-	local next, ipairs = next, ipairs
-	local pcall = pcall
+	local ipairs = ipairs
 	local keys = table.keys
 	
 	--- Handles the execution of all Timers present on the stack.
@@ -97,7 +94,6 @@ do
 	-- @return `Int` The amount of timers executed in this cycle.
 	-- @return `Int` The amount of timers that had an error in this cycle.
 	function Timer:handle()
-		local rm = {}
 		local ok
 		
 		local array = keys(self.list)

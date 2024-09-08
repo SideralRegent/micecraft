@@ -5,101 +5,118 @@ function Block:getChunk()
 	return Map:getChunk(self.chunkX, self.chunkY, CD_MTX)
 end
 
+function Block:requestPhysicsUpdate(segmentList)
+	self:getChunk():refreshPhysics(Map.physicsMode, segmentList, true, {
+		xStart = self.x, 
+		xEnd = self.x, 
+		yStart = self.y, 
+		yEnd = self.y, 
+		category = self.category
+	})
+end
+
 do
 --- Retrieves a list with the blocks adjacent to the Block.
 -- @name Block:getBlocksAround
 -- @param String:shape The shape to retrieve the blocks {cross: only adjacents, square: adjacents + edges}
 -- @param Boolean:include Whether the Block itself should be included in the list.
 -- @return `Table` An array with the adjacent blocks (in no particular order)
-	local ti = function(t, v) -- Stands for [t]able [i]nclude
+	local ti = function(t, v) -- Stands for [t]able [i]nsert
 		t[#t + 1] = v
 	end
 	function Block:getBlocksAround(shape, include)
+		local x, y = self.x, self.y
 		local map = Map
 		local blocks = {}
 		if include then ti(blocks, self) end
 		
 		if shape == SH_CRS then
-			ti(blocks, Map:getBlock(self.x - 1, self.y, CD_MTX))
-			ti(blocks, Map:getBlock(self.x, self.y - 1, CD_MTX))
-			ti(blocks, Map:getBlock(self.x + 1, self.y, CD_MTX))
-			ti(blocks, Map:getBlock(self.x, self.y + 1, CD_MTX))
+			local x = self.x
+			ti(blocks, map:getBlock(x - 1, 	y, 		CD_MTX))
+			ti(blocks, map:getBlock(x, 		y - 1, 	CD_MTX))
+			ti(blocks, map:getBlock(x + 1, 	y, 		CD_MTX))
+			ti(blocks, map:getBlock(x, 		y + 1, 	CD_MTX))
 		elseif shape == SH_CRN then
-			ti(blocks, Map:getBlock(self.x-1, self.y-1, CD_MTX))
-			ti(blocks, Map:getBlock(self.x+1, self.y-1, CD_MTX))
-			ti(blocks, Map:getBlock(self.x-1, self.y+1, CD_MTX))
-			ti(blocks, Map:getBlock(self.x+1, self.y+1, CD_MTX))
+			ti(blocks, map:getBlock(x - 1, y - 1, CD_MTX))
+			ti(blocks, map:getBlock(x + 1, y - 1, CD_MTX))
+			ti(blocks, map:getBlock(x - 1, y + 1, CD_MTX))
+			ti(blocks, map:getBlock(x + 1, y + 1, CD_MTX))
 		elseif shape == SH_SQR then
-			for y = -1, 1 do
-				for x = -1, 1 do
-					if not (x == 0 and y == 0) then
-						ti(blocks, Map:getBlock(self.x + x, self.y + y, CD_MTX))
+			for sy = -1, 1 do
+				for sx = -1, 1 do
+					if not (sx == 0 and sy == 0) then
+						ti(blocks, map:getBlock(x + sx, y + sy, CD_MTX))
 					end
 				end
 			end
 		elseif shape == SH_UND then
-			local y = self.y + 1
-			local x = self.x
+			local sy = y + 1
 			
-			ti(blocks, Map:getBlock(x, y, CD_MTX))
-			ti(blocks, Map:getBlock(x - 1, y, CD_MTX))
-			ti(blocks, Map:getBlock(x + 1, y, CD_MTX))
+			ti(blocks, map:getBlock(x, sy, CD_MTX))
+			ti(blocks, map:getBlock(x - 1, sy, CD_MTX))
+			ti(blocks, map:getBlock(x + 1, sy, CD_MTX))
 		elseif shape == SH_LNR then
-			ti(blocks, Map:getBlock(self.x - 1, self.y, CD_MTX))
-			ti(blocks, Map:getBlock(self.x + 1, self.y, CD_MTX))
+			ti(blocks, map:getBlock(x - 1, y, CD_MTX))
+			ti(blocks, map:getBlock(x + 1, y, CD_MTX))
 		end
 		
 		return blocks
 	end
 end
 
+function Block:requestNeighborUpdate(inquireShape)
+	local segmentList = {}
+	local blocks = self:getBlocksAround(inquireShape, false)
+	
+	for _, block in next, blocks do
+		if block.chunkId == self.chunkId then
+			segmentList[block.segmentId] = true
+		end
+		
+		block:onUpdate(self)
+		-- block:pulse()
+	end
+	
+	return segmentList
+end
 
 --- Interface for handling when a block state gets updated.
 -- @name Block:updateEvent
 -- @param Boolean:update Whether the blocks around should be updated (method: `Block:onUpdate`)
 -- @param Boolean:updatePhysics Whether the physics of the Map should be updated
-function Block:updateEvent(update, updatePhysics)
+function Block:updateEvent(update, updatePhysics, lookupCategory)
 	do
 		local blocks = self:getBlocksAround(SH_CRS, false)
-		local segmentList = {
-			[self.segmentId] = true
-		}
+		local segmentList = {}
 		if update ~= false then
-			for position, block in next, blocks do
-				if block.chunkId == self.chunkId then
-					segmentList[block.segmentId] = true
-				end
-				block:onUpdate(self)
-				-- tfm.exec.removeImage(tfm.exec.addImage("1817dc55c70.png", "!9999999", block.dx, block.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
-			end
+			segmentList = self:requestNeighborUpdate(SH_CRS)
 			
 			self:assertStateActions()
 		end
 		
+		segmentList[self.segmentId] = true
+		
 		if updatePhysics ~= false then
 			local xBlocks = self:getBlocksAround(SH_CRN, false)
-			for position, block in next, xBlocks do
+			for _, block in next, xBlocks do
 				if block.chunkId == self.chunkId then
-					segmentList[block.segmentId] = true
+					if not (lookupCategory and block.category ~= lookupCategory) then
+						segmentList[block.segmentId] = true
+					end
 				end
 			end
-
-			self:getChunk():refreshPhysics(Map.physicsMode, segmentList, true, {
-					xStart = self.x, 
-					xEnd = self.x, 
-					yStart = self.y, 
-					yEnd = self.y, 
-					category = self.category
-				}
-			)
+			
+			self:requestPhysicsUpdate(segmentList)
 		end
 	end
 end
 
 function Block:assertStateActions()
-	return self:assertFallAction()
-		or self:assertCascadeDestroyAction()
-		or self:flowAction()
+	local fall = self:assertFallAction()
+	local cascade = self:assertCascadeDestroyAction()
+	local flow = self:flowAction()
+	
+	return (fall or cascade or flow)
 end
 
 function Block:assertCascadeDestroyAction()
@@ -107,7 +124,7 @@ function Block:assertCascadeDestroyAction()
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
 		
 		if lowerBlock then
-			if lowerBlock.type == blockMetadata._C_VOID then
+			if lowerBlock.type == VOID then
 				self:cascadeAction()
 			end
 		end
@@ -118,29 +135,54 @@ function Block:assertCascadeDestroyAction()
 	return false
 end
 
-function Block:cascadeAction()
+function Block:cascadeAction() -- TODO: Test
 	local type = self.type
 	
 	local y = self.y
 	local block
+	
+	local segmentList = {}
+	
 	while y > 0 do
 		block = Map:getBlock(self.x, y, CD_MTX)
 			
-		if block.type == type then
-			block:setTask(1 + (self.y - y), false, function(xPoint, yPoint)
-				-- Can't pass 'block' because, for some reason, it will only send the last block checked
-				-- So I have to grab the block in the anonymous call instead
-				-- Can't pass 'block' into the arguments because the referece is lost and modifying it makes a new table.
-				-- Lua issue or Java implementation issue?
-				local target = Map:getBlock(xPoint, yPoint, CD_MTX)
-				target:destroy(true, true, true)
-			end, self.x, y)
+		if block.type == type and not block:hasActiveTask() then
+			block:pulse()
+			
+			block:destroy(true, false, false)
+			block:requestNeighborUpdate(SH_LNR)
+			segmentList[block.segmentId] = true
 		else
 			break
 		end
 		
 		y = y - 1
 	end
+	
+	
+	self:getChunk():refreshPhysics(Map.physicsMode, segmentList, true, {
+		xStart = self.x, 
+		xEnd = self.x, 
+		yStart = self.y, 
+		yEnd = self.y, 
+		category = self.category
+	})
+
+
+	if updatePhysics ~= false then
+			local xBlocks = self:getBlocksAround(SH_CRN, false)
+			for _, block in next, xBlocks do
+				if block.chunkId == self.chunkId then
+					if not (lookupCategory and block.category ~= lookupCategory) then
+						print(block.category)
+						segmentList[block.segmentId] = true
+					end
+				end
+			end
+			
+			
+	
+	block:onUpdate()
 end
 
 function Block:assertFallAction()
@@ -148,7 +190,7 @@ function Block:assertFallAction()
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
 		
 		if lowerBlock then
-			if (lowerBlock.type == blockMetadata._C_VOID) or (lowerBlock.fluidRate > 0) then
+			if (lowerBlock.type == VOID) or (lowerBlock.fluidRate > 0) then
 				self:fallAction(lowerBlock)
 			end
 		end
@@ -159,18 +201,19 @@ function Block:assertFallAction()
 	return false
 end
 
-function Block:fallAction(lowerBlock) -- To do: fix
+function Block:fallAction(lowerBlock)
 	if not lowerBlock then return end
 	if self:hasActiveTask(-1) then return end
 
 	local type = self.type
 	
 	local y = self.y - 1
+	local x = self.x
 	local objective = self
 	local block
 	
 	while y > 0 do
-		block = Map:getBlock(self.x, y, CD_MTX)
+		block = Map:getBlock(x, y, CD_MTX)
 		if block.type == type then -- Objective is the block that should get deleted
 			objective = block 
 			
@@ -182,7 +225,7 @@ function Block:fallAction(lowerBlock) -- To do: fix
 	
 	lowerBlock:setTask(1, false, function()
 		objective:destroy(true, true, true)
-		objective:setVoid(true)
+		-- objective:setVoid(true)
 		
 		lowerBlock:create(type, true, true, true)
 		
@@ -196,7 +239,7 @@ function Block:scheduleFluidCreation(delay, type, flowLevel, asSource, display, 
 	end)
 end
 
--- To do: Add conndition for blocks which are not source
+-- TODO: Add condition for non-source
 function Block:flowVerticalAction()
 	local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
 	if not lowerBlock then return false end
@@ -222,7 +265,6 @@ function Block:flowVerticalAction()
 end
 
 do
-local max = math.max
 	function Block:checkSidesFluidHeight(sides) -- Assumes that [self] is already a fluid
 		sides = sides or self:getBlocksAround(SH_LNR, false)
 		local count = 0
@@ -269,7 +311,7 @@ end
 function Block:hFlowContinous(sides, nextLevel)
 	local flowLevel = FL_EMPTY
 	
-	for index, block in next, sides do
+	for _, block in next, sides do
 		flowLevel = self:hFlowCheckTo(block, nextLevel)
 		
 		if flowLevel > 0 then

@@ -2,7 +2,7 @@ do
 	local atan2 = math.atan2
 	local sin = math.sin
 	local cos = math.cos
-	Module:on("ContactListener", function(playerName, groundId, ci)
+	Module:on("ContactListener", function(playerName, _, ci)
 		local player = Room.playerList[playerName]
 		
 		if player then

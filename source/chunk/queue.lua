@@ -156,7 +156,7 @@ do
 		steps = steps or 1
 		
 		local info
-		for i=1, steps do
+		for _ = 1, steps do
 			info = self:get(1)
 			if info then
 				local chunk = Map:getChunk(info.x, info.y, CD_MTX)

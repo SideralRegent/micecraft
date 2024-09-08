@@ -13,7 +13,7 @@
 -- @param Int:dy The vertical position of the Chunk, in pixels
 -- @param Int:biome An identifier of the biome that corresponds to this Chunk
 -- @return `Chunk` A new Chunk object.
-function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome)
+function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, _)
 	local blockWidth, blockHeight = Map:getBlockDimensions()
 	local this = setmetatable({
 		uniqueId = uniqueId,

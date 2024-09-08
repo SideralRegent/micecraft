@@ -1,5 +1,5 @@
 do -- TODO
-	local tobase = math.tobase
+	-- local tobase = math.tobase
 	local tonumber = tonumber
 	local lchar = {[true] = "+", [false] = "-", ["+"] = true, ["-"] = false}
 	local concat = table.concat
@@ -18,7 +18,8 @@ do -- TODO
 				tangible = lchar[tchar]
 				
 				if tinfo:find("|", 2, true) then
-					type, repeats = tinfo:match("^([%d:]+)|([%w]+)$")
+					type, repeats = tinfo:match("^([d%d]+)|([%w]+)$")
+					type = tonumber(type, 16)
 					repeats = tonumber(repeats)
 					
 					for xi = x, x + (repeats - 1) do
@@ -27,7 +28,7 @@ do -- TODO
 						field[y][x] = {type=type}
 					end
 				else
-					field[y][x] = {type=tinfo}
+					field[y][x] = {type=tonumber(tinfo, 16)}
 				end
 				
 				x = x + 1

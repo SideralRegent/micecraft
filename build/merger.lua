@@ -3,7 +3,8 @@ local buildpath = './build/micecraft.lua'
 
 local shouldLog = false
 local releaseBuild = false
-local preview = true
+local preview = false
+local shouldCreateFile = false
 
 local fileList = {
     {
@@ -35,12 +36,12 @@ local fileList = {
 		"prestart"
 	},
 	{
-		__name = "Interface",
+	--[[	__name = "Interface",
 		__directory = "source/interface",
 		__docs = true,
 		"ui",
 		"object",
-		"template"
+		"template"]]
 	},
 	{
 		__name = "Map",
@@ -250,6 +251,8 @@ local buildModule = function(modulo, log)
 				if modulo.__docs then docs[#docs + 1] = generateDocs(fileContent, modulo.__name) end
                 print(("[success] %s (%d)"):format(path, #fileContent))
 
+				-- So the extension doesn't annoy me about it
+				fileContent = fileContent:gsub("%-%-%s-[T]ODO:.-\n", "\n")
                 if releaseBuild then
                     fileContent = fileContent:gsub("[^%p ]print", "--%1")
 					fileContent = fileContent:gsub("%-%-%[%[.-%]%]", "")
@@ -312,34 +315,44 @@ do
         end
 	end
     
-    local File, result = io.open(buildpath, "w")
+    
+	
+	if shouldCreateFile then
+		local File, result = io.open(buildpath, "w")
+		
+		if File then
+			File:write(build)
+			File:close()
+			
+			print("SUCCESS! Module succesfully written at " .. buildpath .. ". (" .. build:len() .. " characters)")
+		else
+			print(("Failure on writing the final file on %s: %s"):format(buildpath, result))
+		end
+	else
+		os.remove(buildpath)
+	end
 
-    if File then
-        File:write(build)
-        File:close()
-
-        print("SUCCESS! Module succesfully written at " .. buildpath .. ". (" .. build:len() .. " characters)")
-
-        -- Assert
+    do -- Assert
 
         load = loadstring or load
 		
         local success, code = load('package.path = "build/?.lua;" .. package.path; require("tfmenv");' .. build .. "\n\nreturn Field", "micecraft")
         if success then
-            print("[TEST] File syntax is correct. Testing execution...")
+            print("[TEST] File syntax is correct. Testing execution...\n")
+			
             local assertion, result = pcall(success)
             if assertion then
-                print("[TEST] Module executes correctly !")
+                print("\n[TEST] Module executes correctly !")
             else
-                print("[FAILURE] " .. result)
+                print("\n[FAILURE] " .. result)
             end
 			
 			return result, {source=build, preview=preview}
         else
             print("[TEST] File fails at executing: " .. code)
         end
-    else
-        print("Failure on writing the final file on " .. buildpath ..  ": " ..  result)
+    -- else
+     --   
     end
 	
 	if shouldLog then

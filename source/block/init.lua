@@ -11,9 +11,8 @@
 -- @return `Block` The Block object
 do
 	local setmetatable = setmetatable
---	local blockMetadata = blockMetadata
 	function Block:new(uniqueId, type, MapX, MapY, displayX, displayY, width, height)
-		local meta = blockMetadata:get(type)
+		local meta = blockMetadata[type] or blockMetadata[0]
 		
 		local this = setmetatable({ -- Define this way to save some table acceses.
 			uniqueId = uniqueId,
@@ -81,9 +80,9 @@ do
 			onDamage = meta.onDamage,
 			onContact = meta.onContact,
 			onUpdate = meta.onUpdate
-		}, self)
+		}, {__index = self})
 
-		this.__index = self
+		--this.__index = self
 		
 		return this, this.category
 	end
@@ -96,9 +95,8 @@ do
 	-- @name Block:setVoid
 	-- @param Boolean:update Whether it should update nearby blocks or not
 	function Block:setVoid(update)
-		local meta = blockMetadata:get(0)
 		
-		self.type = blockMetadata._C_VOID
+		self.type = VOID
 		
 		self.isSolid = false
 		
@@ -171,7 +169,7 @@ end
 -- Declare as `onCreate = function(self)`.
 -- @name Block:onCreate
 function Block:onCreate()
-	print("Block has been created.")
+	print("created")
 end
 
 --- Triggers when the Block is placed by a **player**.
@@ -179,14 +177,14 @@ end
 -- @name Block:onPlacement
 -- @param Player:player The player object who placed this block
 function Block:onPlacement(player)
-	print("Block has been placed by " .. player.name .. ".")
+	print(player.name)
 end
 
 --- Triggers when the Block is destroyed.
 -- Declare as `onDestroy = function(self)`.
 -- @name Block:onDestroy
 function Block:onDestroy()
-	print("Block has been destroyed.")
+	print("destroyed")
 end
 
 --- Triggers when the Block gets interaction with a **player**.
@@ -194,13 +192,13 @@ end
 -- @name Block:onInteract
 -- @param Player:player The player object who interacted with this block
 function Block:onInteract(player)
-	print(player.name .. " interacted with a block.")
+	print(player.name)
 end
 
 --- Deprecated.
 -- @name Block:onHit
 function Block:onHit(player)
-	print("Block has been hit by " .. player.name .. ".")
+	print(player.name)
 end
 
 --- Triggers when the Block gets damaged.
@@ -209,7 +207,7 @@ end
 -- @param Int:amount The damage received from this block.
 -- @param Player:player The player object who damaged this block
 function Block:onDamage(amount, player)
-	print("Block has been damaged.")
+	print(amount, player)
 end
 
 --- Triggers when the Block gets touched by a **player**.
@@ -217,7 +215,7 @@ end
 -- @name Block:onContact
 -- @param Player:player The player object who touched this block
 function Block:onContact(player)
-	print("Block has been contacted by " .. player.name .. ".")
+	print(player.name)
 end
 
 --- Triggers when the Block gets updated by the actions of another block.
@@ -225,5 +223,5 @@ end
 -- @name Block:onUpdate
 -- @param Block:block The block that requests this one to be updated
 function Block:onUpdate(block)
-	print("Block has been updated by another block.")
+	print(block.uniqueId)
 end

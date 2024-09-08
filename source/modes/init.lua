@@ -12,6 +12,7 @@ function Mode:new(name, constructor)
 end
 
 function Mode:constructor(g) -- Default
+	print("dumb dumb, define this func !" .. tostring(g))
 	-- Here you define the functions init, setMap, etc
 	return {}  -- ...
 end
@@ -28,6 +29,6 @@ end
 function Mode:run()
 	-- Start your mode
 	Module:on("NewPlayer", function(playerName)
-		tfm.exec.chatMessage("I'm a default message. Say hi!")
+		tfm.exec.chatMessage("I'm a default message. Say hi " .. playerName .."!")
 	end)
 end

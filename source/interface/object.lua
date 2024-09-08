@@ -26,7 +26,9 @@ function Ui.Object:new(id)
             Image = 0,
             Popup = 0
         }
-    }, self)
+    }, {__index = self})
+
+	return this
 end
 
 function Ui.Object:copyFrom(parent)
@@ -50,7 +52,6 @@ end
 
 do
     local remove = table.remove
-    local ipairs = ipairs
     local assert = assert
     local type = type
     function Ui.Object:removeElement(identifier)
@@ -142,7 +143,7 @@ do
         return self
     end
     
-    function Ui.Object:addPopup(identifier, type, text, targetPlayer, xPosition, yPosition, width, fixedPos, anchorX)        
+    function Ui.Object:addPopup(identifier, type, text, _, xPosition, yPosition, width, fixedPos, anchorX)        
         self:newElement("Popup", identifier, {
             type = type or 0,
             text = text or "",
@@ -243,7 +244,7 @@ do
     end
     
     function Ui.Object:render(targetPlayer)
-        for position, elementId in ipairs(self.renderPosition) do
+        for _, elementId in ipairs(self.renderPosition) do
             self:renderElement(elementId, targetPlayer)
         end
         
@@ -279,7 +280,7 @@ do
     end
     
     function Ui.Object:hide(targetPlayer)
-        for position, elementId in ipairs(self.renderPosition) do
+        for _, elementId in ipairs(self.renderPosition) do
             self:hideElement(elementId, targetPlayer)
         end
         

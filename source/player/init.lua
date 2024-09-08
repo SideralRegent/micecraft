@@ -36,7 +36,7 @@ function Player:new(playerName)
 end
 
 function Player:init()
-	local this = tfm.get.room.playerList[self.name] or {}
+-- 	local this = tfm.get.room.playerList[self.name] or {}
 	
 	self.isMoving = false
 	self.isJumping = false
@@ -75,6 +75,6 @@ function Player:init()
 	end
 end
 
-function Player:assertValidity() -- To Do
+function Player:assertValidity() -- TODO: Implement persistent data checking
 	return not self.isBanned
 end

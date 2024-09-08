@@ -1,8 +1,8 @@
 local data = {}
 
-do -- Localize variables to reduce workload
+do
 	local type = type
-	local ipairs, pairs, next = ipairs, pairs, next
+	local next = next
 	local concat = table.concat
 	local char = string.char
 	
@@ -115,7 +115,7 @@ do -- Localize variables to reduce workload
 		depth = depth or 0
 		if type(this) == "table" then
 			local concat = {}
-			for k, v in next, this do
+			for _, v in next, this do
 				concat[#concat + 1] = data.serialize(v, depth + 1)
 			end
 			value = ("{%s}"):format(concat(concat, char(17 + depth)))

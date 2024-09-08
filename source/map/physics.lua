@@ -7,7 +7,6 @@ do
 		[6] = true
 	}
 	local abs = math.abs
-	local ipairs = ipairs
 	local next = next
 	
 	local PM = {}
@@ -43,8 +42,6 @@ do
 		return list
 	end
 	
-	local max = math.max
-	local min = math.min
 	function PM:rectangle(xStart, xEnd, yStart, yEnd)
 		local x, y = 0, 0
 		local xs, xe, ys, ye
@@ -52,7 +49,6 @@ do
 		local axisv = 0
 		
 		local list = {}
-		local block 
 		
 		repeat
 			matches = 0
@@ -116,7 +112,6 @@ do
 		
 		catlist = catlist or default_cats
 		local list = {}
-		local block 
 		
 		for cat, _ in next, catlist do -- There should be a better way to do this. At the moment I wrote it I couldn't think of one.
 			repeat

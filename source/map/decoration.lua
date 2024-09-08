@@ -52,7 +52,7 @@ do
 		if self.displayList then
 			local rlist = self.removalList
 			local rindex
-			for index, sprite in next, self.displayList do
+			for _, sprite in next, self.displayList do
 				rindex = #rlist + 1
 				
 				rlist[rindex] = addImage(

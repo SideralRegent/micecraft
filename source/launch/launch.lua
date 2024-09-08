@@ -1,8 +1,8 @@
 function Module:start()
 	Room:init()
 	
-	local mode = self:setMode(Room.mode)
-		--self:setMode("test")	
+	--local mode = self:setMode(Room.mode)
+	local mode = self:setMode("test")	
 	
 	World:init()
 	mode:init(Map)

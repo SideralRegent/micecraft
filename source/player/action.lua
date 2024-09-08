@@ -57,6 +57,6 @@ do
 	end
 	
 	function Player:setSelected(selected)
-		self.selected = selected or "0"
+		self.selected = selected or VOID
 	end
 end

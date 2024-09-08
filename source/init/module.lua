@@ -6,11 +6,7 @@
 -- @name Module:init
 -- @param Unknown:apiVersion The **Module API** version were this Module was last updated to
 -- @param Unknown:tfmVersion The **Transformice** version were this Module was last updated to
-function Module:init(apiVersion, tfmVersion)
-	self.apiVersion = ""
-	self.tfmVersion = ""
-	self:assertVersion(apiVersion, tfmVersion)
-	
+function Module:init()
 	self.modeList = {}
 	
 	self.eventList = {}
@@ -85,8 +81,6 @@ do
 	-- @param Boolean:handled Wheter the unloading is caused by a handled situation or not.
 	-- @param String:errorMessage The reason of the error.
 	-- @param Any:... Extra arguments
-	local newTimer = system.newTimer
-	local exit = system.exit
 	function Module:unload(handled, errorMessage, ...)
 		if handled then
 			self:emitWarning(1, errorMessage, ...)
@@ -209,7 +203,7 @@ do
 	function Event:triggerUncount(...)
 		local ok, result
 		
-		for index, instance in next, self.calls do
+		for _, instance in next, self.calls do
 			if not Module.isPaused then
 				--ok = true
 				--instance(...)
@@ -226,7 +220,7 @@ do
 	
 	function Event:triggerCount(...)
 		local ok, result, startTime
-		for index, instance in next, self.calls do
+		for _, instance in next, self.calls do
 			if not Module.isPaused then
 				startTime = time()
 				--ok = true
@@ -366,7 +360,7 @@ do
 		
 		self:trigger("Pause")
 		
-		newTimer(function(id)
+		newTimer(function(_)
 			self:continue()
 		end, time, false)
 
@@ -411,7 +405,7 @@ do
 		
 		return self.currentCycle
 	end
-
+	--[[
 	function Module:setPercentageCounter()
 		
 	end
@@ -420,9 +414,9 @@ do
 
 	end
 
-	function Module:getDebugInfo(asText)
+	function Module:getDebugInfo()
 		
-	end
+	end]]
 
 	--- Seeks for the player with the lowest latency to make them the sync, or establishes the selected one.
 	-- @name Module:setSync
@@ -471,10 +465,10 @@ do
 		
 		if mode then
 			mode:constructor({ -- Proxy table
-				__index = function(t, k)
+				__index = function(_, k)
 					return rawget(mode.environment, k)
 				end,
-				__newindex = function(t, k, v)
+				__newindex = function(_, k, v)
 					rawset(mode.environment, k, v)
 				end
 			})

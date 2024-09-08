@@ -1,7 +1,17 @@
 do	
+	--- Makes a visible pulse.
+	-- @name Block:pulse
+	
+	function Block:pulse(image)
+		image = image or "1817dc55c70.png"
+		tfm.exec.removeImage(tfm.exec.addImage(image, "!9999999", self.dx, self.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
+	end
+	
 	--- Spreads particles from the Block.
 	-- @name Block:spreadParticles
 	-- @return `Boolean` Whether the particles were successfully spreaded or not
+	
+	-- This code is crap.
 	local displayParticle = tfm.exec.displayParticle
 	local random = math.random
 	function Block:spreadParticles()
@@ -17,7 +27,7 @@ do
 			
 			local xt, xf, xv, yv
 			
-			for i = 1, amount do
+			while amount > 0 do
 				xt = random(tw)
 				xf = random(2) == 1 and -1 or 1
 				xv = (random(40,60) / 10) * xf * REFERENCE_SCALE_X
@@ -29,6 +39,7 @@ do
 					xv, yv,
 					-xv/10, -yv/10
 				)
+				amount = amount - 1
 			end
 			
 			return true
@@ -37,7 +48,7 @@ do
 		return false
 	end
 	
-	-- To do: Particles should spread differently according to a specified 'mode'
+	-- TODO: Particles should spread differently according to a specified 'mode'
 end
 
 do
@@ -54,8 +65,8 @@ do
 			local sound = self.sound[soundKey] or self.sound.default
 			playSound(
 				sound, 100,
-				player and (player.x - self.dxc) * REFERECE_SCALE_X or self.dxc,
-				player and (player.y - self.dyc) * REFERECE_SCALE_Y or self.dyc,
+				player and (player.x - self.dxc) * REFERENCE_SCALE_X or self.dxc,
+				player and (player.y - self.dyc) * REFERENCE_SCALE_Y or self.dyc,
 				player and player.name or nil
 			)
 			

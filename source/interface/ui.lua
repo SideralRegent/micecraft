@@ -17,11 +17,11 @@ do
 	
 	local addPopup = ui.addPopup
 	
-	local setBackgroundColor = ui.setBackgroundColor
-	local setMapName = ui.setMapName
-	local setShamanName = ui.setShamanName
+	-- local setBackgroundColor = ui.setBackgroundColor
+	-- local setMapName = ui.setMapName
+	-- local setShamanName = ui.setShamanName
 	
-	local showColorPicker = ui.showColorPicker
+	-- local showColorPicker = ui.showColorPicker
 	
 	
 	function Ui:addImage(...)
@@ -54,7 +54,6 @@ do
 end
 
 do
-	local copy = table.copy
 	local keys = table.keys
 	local type = type
 	local next = next

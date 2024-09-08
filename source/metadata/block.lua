@@ -3,7 +3,7 @@ do
 	blockMetadata = MetaData:newMetaData({
 		name = "null", -- Block Name, used for translations
 		
-		drop = "0", -- When broken, identifier of what it drops
+		drop = "void", -- When broken, identifier of what it drops
 		
 		state = {
 			fallable = false,
@@ -61,7 +61,7 @@ blockMetadata:newTemplate("Dirt", {
 	name = "dirt",
 	
 	category = enum.category.grains,
-	drop = "1",
+	drop = "dirt",
 	durability = 14,
 	hardness = 0,
 	
@@ -96,7 +96,7 @@ blockMetadata:newTemplate("Grass", "Dirt", {
 	
 	sprite = "17dd4b0a359.png",
 	
-	drop = "1",
+	drop = "dirt",
 	durability = 18,
 	
 	color = 0x44AA44,
@@ -123,7 +123,7 @@ blockMetadata:newTemplate("Fluid", {
 	name = "x_flow",
 	
 	category = enum.category.water,
-	drop = "0",
+	drop = "void",
 	
 	glow = 0,
 	
@@ -140,7 +140,7 @@ blockMetadata:newTemplate("Fluid", {
 	color = 0x0000FF,
 	particles = {7},
 	
-	onUpdate = function(self, block)
+	onUpdate = function(self, _)
 		self:assertStateActions()
 	end
 })
@@ -149,7 +149,7 @@ blockMetadata:newTemplate("Granular", {
 	name = "granular",
 	
 	category = enum.category.grains,
-	drop = "0",
+	drop = "void",
 	
 	glow = 0,
 	translucent = false,
@@ -168,11 +168,11 @@ blockMetadata:newTemplate("Granular", {
 	color = 0xFFAA00,
 	particles = {24},
 	
-	onContact = function(self, player)
+	--[[onContact = function(self, _)
 		self:assertStateActions()
-	end,
+	end,]]
 	
-	onUpdate = function(self, block)
+	onUpdate = function(self, _)
 		self:assertStateActions()
 	end
 })
@@ -181,7 +181,7 @@ blockMetadata:newTemplate("Stone", {
 	name = "stone",
 	
 	category = enum.category.rocks_n_metals,
-	drop = 0, -- To define
+	drop = "void", -- To define
 	
 	glow = 0,
 	translucent = false,
@@ -202,52 +202,60 @@ blockMetadata:newTemplate("Ore", "Stone", {
 	durability = 42,
 	particles = {3, 4},
 	glow = 0,
-	onHit = function(self, entity)
+--[[onHit = function(self, entity)
 		-- Emit particles
-	end
+	end]]
 })
 
-blockMetadata:setConstant("void", "0")
+blockMetadata:setConstant("void", VOID)
 
-blockMetadata:set("0", "Void", {
+-- Assign block IDs to avoid clashes:
+-- 0x [general identifier] d [specific identifier]
+-- General identifier is just the type. It doesn't really matter for it to be consistent. 
+-- Specific identifier is among that type.
+-- Always separe them with D.
+-- Write both in decimal even tho we're using hexa
+
+blockMetadata:set(VOID, "Void", {
 	name = "void", 
-	category = 0
+	category = VOID,
+	sprite = nil
 })
 
-blockMetadata:set("1", "Dirt", {
+blockMetadata:set(0x1, "Dirt", {
 	name = "dirt"
 }) -- dirt
 
-blockMetadata:set("1:1", "Dirt", {
+blockMetadata:set(0x1d1, "Dirt", {
 	name = "dirtcelium", 
 	sprite = "17dd4ae8f5b.png"
 }) -- dirtcelium
 
 
-blockMetadata:set("2", "Grass", {
+blockMetadata:set(0x2, "Grass", {
 	name = "grass"
 }) -- grass
 
-blockMetadata:set("2:1", "Grass", {
+blockMetadata:set(0x2d1, "Grass", {
 	name = "mycelium", 
 	sprite = "17dd4b1875c.png"
 }) -- mycelium
 
-blockMetadata:set("2:2", "Grass", {
+blockMetadata:set(0x2d2, "Grass", {
 	name = "snowed_grass", 
 	sprite = "17dd4aedb5d.png"
 }) -- snowed grass
 
-blockMetadata:set("3", "Stone", {
+blockMetadata:set(0x3, "Stone", {
 	name = "stone"
 }) -- regular stone
 
-blockMetadata:set("3:1", "Ore", {
+blockMetadata:set(0x3d1, "Ore", {
 	name = "coal_ore", 
 	sprite = "17dd4b26b5d.png"
 })
 
-blockMetadata:set("3:2", "Ore", {
+blockMetadata:set(0x3d2, "Ore", {
 	name = "iron_ore", 
 	sprite = "17dd4b39b5c.png", 
 	durability = 48, 
@@ -255,7 +263,7 @@ blockMetadata:set("3:2", "Ore", {
 	particles = {3,2,1}
 })
 
-blockMetadata:set("3:3", "Ore", {
+blockMetadata:set(0x3d3, "Ore", {
 	name = "gold_ore", 
 	sprite = "17dd4b34f5a.png", 
 	durability = 48, 
@@ -263,7 +271,7 @@ blockMetadata:set("3:3", "Ore", {
 	particles = {2,3,11,24}
 })
 
-blockMetadata:set("3:4", "Ore", {
+blockMetadata:set(0x3d4, "Ore", {
 	name = "diamond_ore", 
 	sprite = "17dd4b2b75d.png", 
 	durability = 56, 
@@ -271,7 +279,7 @@ blockMetadata:set("3:4", "Ore", {
 	particles = {3, 1, 9, 23}
 })
 
-blockMetadata:set("3:5", "Ore", {
+blockMetadata:set(0x3d5, "Ore", {
 	name = "emerald_ore", 
 	sprite = "17dd4b3035f.png", 
 	durability = 48, 
@@ -279,7 +287,7 @@ blockMetadata:set("3:5", "Ore", {
 	particles = {3,11,22}
 })
 
-blockMetadata:set("3:6", "Ore", {
+blockMetadata:set(0x3d6, "Ore", {
 	name = "lazuli_ore", 
 	sprite = "17e46514c5d.png", 
 	durability = 48, 
@@ -287,7 +295,7 @@ blockMetadata:set("3:6", "Ore", {
 	particles = {3, 1, 9, 23}
 })
 
-blockMetadata:set("3:7", "Ore", {
+blockMetadata:set(0x3d7, "Ore", {
 	name = "redstone_ore", 
 	sprite = "18149e3425f.png", 
 	durability = 48, 
@@ -295,24 +303,24 @@ blockMetadata:set("3:7", "Ore", {
 	particles = {3, 1, 9, 23}
 })
 
-blockMetadata:set("4", "Stone", {
+blockMetadata:set(0x4, "Stone", {
 	name = "cobblestone", 
 	sprite = "17dd4adf75b.png", 
 	durability = 28
 })
 
-blockMetadata:set("5", "Granular", {
+blockMetadata:set(0x5, "Granular", {
 	name = "sand",
 	drop = "5",
 	sprite = "17dd4b5635b.png"
 })
-blockMetadata:set("5:1", "Stone", {
+blockMetadata:set(0x5d1, "Stone", {
 	name = "sandstone", 
 	sprite = "17dd4b5af5c.png",
 	drop = "5:1"
 })
 
-blockMetadata:set("6", {
+blockMetadata:set(0x6, {
 	name = "cactus",
 	drop = "6",
 	state = {
@@ -322,11 +330,15 @@ blockMetadata:set("6", {
 	glow = false,
 	category = enum.category.other,
 	placeable = true,
-	sprite = "17e4651985c.png"
+	sprite = "17e4651985c.png",
+	
+	onUpdate = function(self, block)
+		self:assertCascadeDestroyAction()
+	end
 })
 
-blockMetadata:setConstant("bedrock", "256")
-blockMetadata:set("256", {
+blockMetadata:setConstant("bedrock", 256)
+blockMetadata:set(0x256, {
 	name = "bedrock", 
 	sprite = "17dd4adaaf0.png", 
 	durability = 0x141D6A4, 
@@ -337,15 +349,15 @@ blockMetadata:set("256", {
 	end
 })
 
-blockMetadata:set("10", "Fluid", {
+blockMetadata:set(0x10, "Fluid", {
 		name = "water",
 		sprite = false
 		--[[sprite = "182076fc21b.png", 
 		fluidImages = {"17dd4b26b5d.png", "17dd4b39b5c.png", "17dd4b34f5a.png", "17dd4b2b75d.png"}]]
 })
-blockMetadata:set("10:1", "Fluid", {
+blockMetadata:set(0x10d1, "Fluid", {
 	name = "lava", 
-	sprite = "187ee766e73.png",
+	sprite = false,--"187ee766e73.png",
 	category = enum.category.lava,
-	fluidRate = 2
+	fluidRate = 4
 })

@@ -88,9 +88,7 @@ function Map:setCounter(counterName, value, add)
 	end
 end
 
-function Map:getSpawn()
-	local VOID, BEDROCK = blockMetadata._C_VOID, blockMetadata._C_BEDROCK
-	
+function Map:getSpawn()	
 	local x = math.ceil(self.totalBlockWidth / 2)
 	
 	local block 
