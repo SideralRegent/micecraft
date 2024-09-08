@@ -345,6 +345,22 @@ do
                 print("\n[TEST] Module executes correctly !")
             else
                 print("\n[FAILURE] " .. result)
+				
+				local line = tonumber(result:match(":(%d+):"))
+				
+				local cline = 1
+				local target = 1
+				local previous = 1
+				
+				while cline < line do
+					previous = target
+					target = build:find("\n", target + 1)
+					cline = cline + 1
+				end
+				-- source/utils/math.lua <<
+				local fileName = build:match("-- source/([%w/%.]+) <<", target)
+				local fileInfo = build:match("%s*([^\n]+)\n", target)
+				print(("[FAILURE] At file %s\nline: %s"):format(fileName, fileInfo))
             end
 			
 			return result, {source=build, preview=preview}

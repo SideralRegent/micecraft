@@ -74,13 +74,17 @@ do
 		Keybinds:new("L", true, function(player)
 			ui.showColorPicker(0x838, player.name, 0x888888, "Background Color")
 		end)
+	
+		Keybinds:new("X", true, function(player)
+			player:queueNearChunks(nil, true)	
+		end)
 	end
 	
 	local kdl = { -- For list
 		[true] = true,
 		[false] = nil,
 	}
-	
+	-- TODO: Seek ways to optimize.
 	function Keybinds:event(player, keyId, down, ...)
 		local pk = player.keys
 		local keybind = self[down][keyId]

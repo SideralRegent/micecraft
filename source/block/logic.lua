@@ -86,7 +86,6 @@ end
 -- @param Boolean:updatePhysics Whether the physics of the Map should be updated
 function Block:updateEvent(update, updatePhysics, lookupCategory)
 	do
-		local blocks = self:getBlocksAround(SH_CRS, false)
 		local segmentList = {}
 		if update ~= false then
 			segmentList = self:requestNeighborUpdate(SH_CRS)
@@ -135,7 +134,7 @@ function Block:assertCascadeDestroyAction()
 	return false
 end
 
-function Block:cascadeAction() -- TODO: Test
+function Block:cascadeAction()
 	local type = self.type
 	
 	local y = self.y
@@ -145,13 +144,14 @@ function Block:cascadeAction() -- TODO: Test
 	
 	while y > 0 do
 		block = Map:getBlock(self.x, y, CD_MTX)
-			
-		if block.type == type and not block:hasActiveTask() then
-			block:pulse()
+		if block.type == type and not block:hasActiveTask() then		
+			if not segmentList[block.chunkId] then
+				segmentList[block.chunkId] = {}
+			end
 			
 			block:destroy(true, false, false)
 			block:requestNeighborUpdate(SH_LNR)
-			segmentList[block.segmentId] = true
+			segmentList[block.chunkId][block.segmentId] = true
 		else
 			break
 		end
@@ -159,28 +159,17 @@ function Block:cascadeAction() -- TODO: Test
 		y = y - 1
 	end
 	
-	
-	self:getChunk():refreshPhysics(Map.physicsMode, segmentList, true, {
-		xStart = self.x, 
-		xEnd = self.x, 
-		yStart = self.y, 
-		yEnd = self.y, 
-		category = self.category
-	})
-
-
-	if updatePhysics ~= false then
-			local xBlocks = self:getBlocksAround(SH_CRN, false)
-			for _, block in next, xBlocks do
-				if block.chunkId == self.chunkId then
-					if not (lookupCategory and block.category ~= lookupCategory) then
-						print(block.category)
-						segmentList[block.segmentId] = true
-					end
-				end
-			end
-			
-			
+	local chunk
+	for chunkId, segments in next, segmentList do
+		chunk = Map:getChunk(chunkId, CD_UID)
+		chunk:refreshPhysics(Map.physicsMode, segments, true, {
+			xStart = self.x, 
+			xEnd = self.x, 
+			yStart = block.y, 
+			yEnd = self.y, 
+			category = self.category
+		})
+	end
 	
 	block:onUpdate()
 end

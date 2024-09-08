@@ -1,6 +1,6 @@
 Module:newMode("test", function(this, _)
 	function this:init(Map)
-		Map:setVariables(32, 32, 10, 6, 20, 2, 80, 16)
+		Map:setVariables(32, 32, 2, 2, 30, 20, 0, 0)
 		Map:setPhysicsMode("rectangle_detailed")
 	end
 	
@@ -11,7 +11,7 @@ Module:newMode("test", function(this, _)
 			overwrite = false,
 			exclusive = true,
 			dir = {
-				min = height,
+				min = 4,
 				[1] = {type = blockMetadata.maps.cobblestone}
 			}
 		})

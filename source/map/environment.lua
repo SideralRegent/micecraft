@@ -39,8 +39,19 @@ function Map:setVariables(blockWidth, blockHeight, chunkWidth, chunkHeight, MapC
 	self.leftEdge = self.horizontalOffset
 	self.rightEdge = (2 * self.horizontalOffset) + self.pixelWidth
 	
-	self.upperEdge = self.verticalOffset
-	self.lowerEdge = (2 * self.verticalOffset) + self.pixelHeight
+	self.upperEdge = self.verticalOffset + 16
+	self.lowerEdge = (2 * self.verticalOffset) + self.pixelHeight + 16
+	
+	
+	self.chunkFieldViewX = math.ceil(FIELD_VIEW_X / self.chunkPixelWidth)
+	self.chunkFieldViewY = math.ceil(FIELD_VIEW_Y / self.chunkPixelHeight)
+	
+	self.chunkFieldViewNormX = math.ceil((FIELD_VIEW_X / 2) / self.chunkPixelHeight)
+	self.chunkFieldViewNormY = math.ceil((FIELD_VIEW_Y / 2) / self.chunkPixelHeight)
+	
+	-- 400 is the max amount of blocks that should get queued for operations
+	-- in respect to their chunks
+	ChunkQueue:setDefaultStep(math.floor(400 / (self.chunkWidth * self.chunkHeight)))
 	
 	self:setCounter("chunks_collide", 0, false)
 	self:setCounter("chunks_display", 0, false)
@@ -81,4 +92,12 @@ end
 
 function Map:getEdges()
 	return self.leftEdge, self.upperEdge, self.rightEdge, self.lowerEdge
+end
+
+function Map:getFieldChunkRanges()
+	return self.chunkFieldViewX, self.chunkFieldViewY
+end
+
+function Map:getFieldNormRanges()
+	return self.chunkFieldViewNormX, self.chunkFieldViewNormY
 end

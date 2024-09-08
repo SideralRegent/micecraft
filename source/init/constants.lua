@@ -4,6 +4,9 @@ local REFERENCE_SCALE = 1.0
 local REFERENCE_SCALE_X = 1.0
 local REFERENCE_SCALE_Y = 1.0
 
+local FIELD_VIEW_X = 800 * 1.5
+local FIELD_VIEW_Y = 400 * 1.5
+
 local VOID = 0
 
 -- Shape constants for fetching stuff

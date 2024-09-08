@@ -109,12 +109,11 @@ do
 			end
 		end
 	end, "teleport")
-	
-	Commands:new("funny", function(_)
-		Block.a = Map
-		print(Map)
+
+	Commands:new("reload", function()
+		print("Reloading map.")
+		Module:loadMap()
 	end)
-	local M = {}
 	
 	Commands:new("api", function(player, func, ...)
 		local env = {

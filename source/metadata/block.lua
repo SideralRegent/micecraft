@@ -341,11 +341,11 @@ blockMetadata:setConstant("bedrock", 256)
 blockMetadata:set(0x256, {
 	name = "bedrock", 
 	sprite = "17dd4adaaf0.png", 
-	durability = 0x141D6A4, 
-	hardness = 0x141D6A4, 
+	durability = 0x2000, 
+	hardness = 0x2000, 
 	particles = {3},
 	onDamage = function(self)
-		self:repair(0x141D6A4, true, true, true, true)
+		self:repair(0x800, true, true, true, true)
 	end
 })
 
@@ -359,5 +359,5 @@ blockMetadata:set(0x10d1, "Fluid", {
 	name = "lava", 
 	sprite = false,--"187ee766e73.png",
 	category = enum.category.lava,
-	fluidRate = 4
+	fluidRate = 3
 })

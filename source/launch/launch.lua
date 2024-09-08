@@ -1,8 +1,15 @@
+function Module:loadMap()
+	local spawn = Map:getSpawn()
+	local width, height = Map:getMapPixelDimensions()
+	
+	tfm.exec.newGame(xmlLoad:format(width, height, spawn.dx, spawn.dy))
+end
+
 function Module:start()
 	Room:init()
 	
-	--local mode = self:setMode(Room.mode)
-	local mode = self:setMode("test")	
+	local mode = self:setMode(Room.mode)
+	--local mode = self:setMode("test")	
 	
 	World:init()
 	mode:init(Map)
@@ -18,11 +25,7 @@ function Module:start()
 	
 	mode:run()
 	
-	do
-		local spawn = Map:getSpawn()
-		local width, height = Map:getMapPixelDimensions()
-		tfm.exec.newGame(xmlLoad:format(width, height, spawn.dx, spawn.dy))
-	end
+	self:loadMap()
 end
 
 

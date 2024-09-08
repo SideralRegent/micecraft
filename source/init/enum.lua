@@ -184,10 +184,10 @@ enum.biome = { -- T: Temperatura (-1 - 2)	H: Humedad (0 - 2)		R: Rareza (0 _1_ 2
 -- **Can't use:**
 -- (AZERTY/QWERTY issues): A, D, S, Q, W, Z
 -- (Mac issues): CONTROL
--- (Interface issues): TAB, I, M, R, T, Y, E
-
+-- (Interface issues): TAB, I, M, R, T, Y, E, C
 -- TAB, CONTROL		A, D, I, M, Q, R, S, T, W, Y, Z
--- Else				B, C, F, G, H, J, K, L, N, O, P, U, V, X, 
+
+-- Else	(good)		B, F, G, H, J, K, L, N, O, P, U, V, X, 
 
 enum.keys = {
 	[0] = "LEFT",
@@ -218,6 +218,7 @@ enum.keys = {
 	
 	[76] = "L",
 	[77] = "M",
+	[88] = "X",
 	
 	[114] = "F3"
 }

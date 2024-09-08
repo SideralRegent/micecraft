@@ -7,9 +7,9 @@ function World:setTime(time, add, display)
 	
 	self.currentTime = ((time - 1) % 2400) + 1
 	
-	if display and self.currentTime % 5 == 0 then
+	--[[if display and self.currentTime % 5 == 0 then
 		self:setSkyColor()
-	end
+	end]]
 end
 
 function World:setSkyColor()

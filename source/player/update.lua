@@ -45,27 +45,34 @@ do
 		end
 	end
 	
+	function Player:checkForCurrentChunk(chunk)
+		chunk = chunk or Map:getChunk(self.bx, self.by, CD_BLK)
+		if not chunk then return end
+		
+		if chunk.uniqueId ~= self.currentChunk then
+			self.lastChunk = self.currentChunk
+		end
+		
+		self.currentChunk = chunk.uniqueId
+			
+		if chunk.collidesTo[self.name] then
+			if self.isFrozen then
+				self:freeze(false, true)
+			end
+		else
+			if not self.isFrozen then
+				self:freeze(true, false, 0, 0)
+			end
+		end
+		
+		return chunk
+	end
+	
 	function Player:updateChunkArea()
-		local chunk = Map:getChunk(self.bx, self.by, CD_BLK)
+		local chunk = self:checkForCurrentChunk()
 		
 		if chunk then
-			if chunk.uniqueId ~= self.currentChunk then
-				self.lastChunk = chunk.uniqueId
-			end
-			
-			if chunk.collidesTo[self.name] then
-				if self.isFrozen then
-					self:freeze(false, true)
-				end
-			else
-				if not self.isFrozen then
-					self:freeze(true, false, 0, 0)
-				end
-			end
-			
-			self:queueNearChunks(chunk, true)
-			
-			self.currentChunk = chunk.uniqueId
+			self:queueNearChunks(chunk, false)
 		end
 	end
 	
@@ -78,11 +85,11 @@ do
 		end
 
 		if runEvents then
-			-- if self.internalTime % 1000 == 0 then
-				if self.internalTime % 2500 == 0 then -- Every 2.5 seconds
+			if self.internalTime % 2500 == 0 then -- Every 2.5 seconds
 					self:updateChunkArea()
-				end
-			-- end
+			else
+				self:checkForCurrentChunk()
+			end
 		end
 	end
 end

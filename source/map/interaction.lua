@@ -16,15 +16,7 @@ do
 			fy = ceil(y / by)
 		end
 		
-		if self.blocks[fy] then
-			--[[
-			-- This will pulse when the block is fetched
-			local block = self.blocks[fy][fx]
-			tfm.exec.removeImage(
-					tfm.exec.addImage("1817dc55c70.png", "!21321321", block.dx, block.dy, nil, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 1.0, 0, 0, false), 
-				true)
-			]]
-			
+		if self.blocks[fy] then			
 			return self.blocks[fy][fx]
 		end
 	end

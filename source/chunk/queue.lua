@@ -18,6 +18,14 @@ do
 		self.entries = {}
 	end
 	
+	function ChunkQueue:setDefaultStep(number)
+		self.defaultStep = number
+	end
+	
+	function ChunkQueue:getDefaultStep()
+		return self.defaultStep
+	end
+	
 	function ChunkQueue:addBuffer(chunkInfo)
 		local uniqueId = chunkInfo.uniqueId
 		local buffer = self.buffer
@@ -153,7 +161,7 @@ do
 	function ChunkQueue:step(steps)
 		if #self.stack == 0 then return end
 		
-		steps = steps or 1
+		steps = steps or self.defaultStep or 4
 		
 		local info
 		for _ = 1, steps do
@@ -169,6 +177,6 @@ do
 	end
 	
 	ChunkQueue.tickId = Tick:newTask(1, true, function()
-		ChunkQueue:step(4)
+		ChunkQueue:step()
 	end)
 end

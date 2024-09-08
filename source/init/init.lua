@@ -82,7 +82,8 @@ local ChunkQueue = {
 	duplicates = false,
 	stack = {},
 	entries = {},
-	buffer = {}
+	buffer = {},
+	defaultStep = 4
 }
 ChunkQueue.__index = ChunkQueue
 
