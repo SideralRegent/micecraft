@@ -3,27 +3,19 @@ function Field:generateNew(width, height)
 	for y = 1, height do
 		self[y] = {}
 		for x = 1, width do
-			self[y][x] = {type = VOID}
+			self[y][x] = VOID
 		end
 	end
 end
 
-
-function Field:assignTemplate(x, y, template)
-	-- local this = self[y][x]
-	if template.type ~= nil then
-		self[y][x].type = template.type
-	end
-end
-
-function Field:checkAssign(x, y, template, overwrite, excepts)
-	if template.type == -1 then return false end
+function Field:checkAssign(x, y, type, overwrite, excepts)
+	if type == -1 then return false end
 	
 	local cell = self[y][x]
 	
-	if overwrite or cell.type == VOID then -- blockMetadata._C_VOID
-		if not (excepts and excepts[cell.type]) then
-			self:assignTemplate(x, y, template)
+	if overwrite or cell == VOID then
+		if not (excepts and excepts[cell]) then
+			self[y][x] = type or VOID
 			return true
 		end
 	end
@@ -32,85 +24,112 @@ function Field:checkAssign(x, y, template, overwrite, excepts)
 end
 
 do
-	function Field:setStructure(structure, x, y, xAnchor, yAnchor)
-		xAnchor = xAnchor or 0.5
-		yAnchor = yAnchor or 0.5
-		
-		local xStart = math.round(x - (structure.width * xAnchor))
-		local yStart = math.round(y - (structure.height * yAnchor))
-		
-		self:setMatrix(structure.matrix, xStart, yStart)
-	end
-	
+	local restrict = math.restrict
 	function Field:setMatrix(matrix, xStart, yStart)
-		local VOID = blockMetadata._C_VOID
 		local maxWidth, maxHeight = Map:getBlocks()
 		local height, width = #matrix, #matrix[1]
 		
-		xStart = math.restrict(xStart, 1, maxWidth)
-		yStart = math.restrict(yStart, 1, maxHeight)
+		xStart = restrict(xStart, 1, maxWidth)
+		yStart = restrict(yStart, 1, maxHeight)
 		
 		
-		local xEnd = math.restrict(xStart + (width - 1), 1, maxWidth)
-		local yEnd = math.restrict(yStart + (height - 1), 1, maxHeight)
+		local xEnd = restrict(xStart + (width - 1), 1, maxWidth)
+		local yEnd = restrict(yStart + (height - 1), 1, maxHeight)
 		
-		local template
+		local type
 		for y = yStart, yEnd do
 			for x = xStart, xEnd do 
-				template = matrix[(y - yStart) + 1][(x - xStart) + 1]
-				if not (template.type == VOID) then
-					self:assignTemplate(x, y, template)
+				type = matrix[(y - yStart) + 1][(x - xStart) + 1]
+				if type ~= VOID then
+					self:assignTypeTo(x, y, type)
 				end
 			end
 		end
 	end
 	
+	local round = math.round
+	function Field:setStructure(structure, x, y, xAnchor, yAnchor)
+		xAnchor = xAnchor or 0.5
+		yAnchor = yAnchor or 0.5
+		
+		local xStart = round(x - (structure.width * xAnchor))
+		local yStart = round(y - (structure.height * yAnchor))
+		
+		self:setMatrix(structure.matrix, xStart, yStart)
+	end
+end
+
+do
 	local max = math.max
 	local min = math.min
 	
+	function Field:setFunction(config)
+		local width, height = Map:getBlocks()
+		local solve = config.dir
+		local overwrite = config.overwrite
+		local excepts = config.excepts
+		
+		local minx = max(1, config.startX or 1)
+		local maxx = min(width, config.startX or width)
+		
+		local miny = max(1, config.startY or 1)
+		local maxy = min(height, config.startY or height)
+		
+		local type = VOID
+		
+		for y = miny, maxy do
+			for x = minx, maxx do
+				type = solve(x, y)
+				
+				self:checkAssign(x, y, type, overwrite, excepts)
+			end
+		end
+	end
+		
 	function Field:setLayer(layer, heightMap)		
 		local width, height = Map:getBlocks()
+		
 		local dir = layer.dir
 		local overwrite = layer.overwrite
 		local exclusive = layer.exclusive
 		
 		local excepts = dir.excepts
 		
-		local minc, maxc, start
-		
-		local template = dir[1]
+		local type = dir[1]
 		local depth = 1
 		
-		if layer.vertical then
-			minc = max(dir.min or 1, 1) -- X Start
-			maxc = min(dir.max or width, width) -- X End
-			
+		local limit = layer.vertical and width or height
+		
+		local minc = max(dir.min or 1, 1)
+		local maxc = min(dir.max or limit, limit)
+		
+		local start
+		
+		if layer.vertical then			
 			for y = 1, height do
 				depth = 1
-				template = dir[depth]
+				type = dir[1]
 				start = (heightMap and heightMap[y] or minc)
 				if not (exclusive and start < minc) then
 					for x = max(start, minc), maxc do
-						template = dir[depth] or template
+						type = dir[depth] or type
 						
-						if self:checkAssign(x, y, template, overwrite, excepts) then
+						if self:checkAssign(x, y, type, overwrite, excepts) then
 							depth = depth + 1
 						end
 					end
 				end
 			end
 		else
-			minc = max(dir.min or 1, 1) -- Y Start
-			maxc = min(dir.max or height, height) -- Y End
 			for x = 1, width do
 				depth = 1
-				template = dir[depth]
+				type = dir[1]
 				start = (heightMap and heightMap[x] or minc)
 				if not (exclusive and start < minc) then
 					for y = max(start, minc), maxc do
-						template = dir[depth] or template
+						type = dir[depth] or type
 						
-						if self:checkAssign(x, y, template, overwrite, excepts) then
+						if self:checkAssign(x, y, type, overwrite, excepts) then
 							depth = depth + 1
 						end
 					end
@@ -143,25 +162,25 @@ do
 			end
 		end
 		
-		local template = {type = VOID}
+		local type = VOID
 		
 		for x = xs, xe do
 			xo = (x - xs) + 1
 			
 			ys = heightMap[xo] or 1
 			
-			template = {type = VOID}
+			type = VOID
 			
 			for y = ys, height do
 				yo = loops and ((y - ys) % mod) or (y - ys) + 1 -- I have no idea what 'mod' is supposed to do now.
 				
-				template = dir[yo] or template
+				type = dir[yo] or VOID
 				
-				if template.type == -1 then
+				if type == -1 then
 					break
 				end
 				
-				self:assignTemplate(x, y, template)
+				self:assignTypeTo(x, y, type)
 			end
 		end
 	end
@@ -196,32 +215,10 @@ function Field:setNoiseMap(mapInfo)
 				sqr = noiseMap[yo][xo] or 0
 				
 				if sqr > threshold then
-					self:assignTemplate(x, y, dir)
+					self:assignTypeTo(x, y, dir)
 				end
 			end
 		end
 	end
 end
 
-do
-	local random = math.random
-	local randomseed = math.randomseed
-	function Field:applyBedrockLayer()
-		randomseed(0x132B7F7) -- Magic number which provides randomness to the random seed.
-		
-		local width, height = Map:getBlocks()
-		local BEDROCK = blockMetadata.maps.bedrock
-		
-		for x = 1, width do
-			self:assignTemplate(x, height, {type = BEDROCK})
-		end
-		
-		for x = 1, width do
-			for y = height - 2, height - 1 do
-				if random(20) > 7 then
-					self:assignTemplate(x, y, {type = BEDROCK})
-				end
-			end
-		end
-	end
-end

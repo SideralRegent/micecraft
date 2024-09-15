@@ -46,7 +46,7 @@ function Map:setVariables(blockWidth, blockHeight, chunkWidth, chunkHeight, MapC
 	self.chunkFieldViewX = math.ceil(FIELD_VIEW_X / self.chunkPixelWidth)
 	self.chunkFieldViewY = math.ceil(FIELD_VIEW_Y / self.chunkPixelHeight)
 	
-	self.chunkFieldViewNormX = math.ceil((FIELD_VIEW_X / 2) / self.chunkPixelHeight)
+	self.chunkFieldViewNormX = math.ceil((FIELD_VIEW_X / 2) / self.chunkPixelWidth)
 	self.chunkFieldViewNormY = math.ceil((FIELD_VIEW_Y / 2) / self.chunkPixelHeight)
 	
 	-- 400 is the max amount of blocks that should get queued for operations

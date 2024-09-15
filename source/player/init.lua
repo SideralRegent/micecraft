@@ -78,3 +78,7 @@ end
 function Player:assertValidity() -- TODO: Implement persistent data checking
 	return not self.isBanned
 end
+
+function Player:__eq(other)
+	return self.name == other.name
+end

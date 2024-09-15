@@ -46,6 +46,10 @@ do
 		return sqrt((bx - ax)^2 + (by - ay)^2)
 	end
 	
+	math.magnitude = function(x, y)
+		return sqrt(x^2 + y^2)
+	end
+	
 	--- Returns the absolute difference between two numbers.
 	-- @name math.udist
 	-- @param Number:a The first number

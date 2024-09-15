@@ -35,6 +35,7 @@ do
 			
 			glow = meta.glow,
 			translucent = meta.translucent,
+			particle = meta.particle,
 			
 			drop = meta.drop,
 			
@@ -73,10 +74,8 @@ do
 			-- setSprite = self.setSprite,
 			
 			onCreate = meta.onCreate,
-			onPlacement = meta.onPlacement,
 			onDestroy = meta.onDestroy,
 			onInteract = meta.onInteract,
-			onHit = meta.onHit,
 			onDamage = meta.onDamage,
 			onContact = meta.onContact,
 			onUpdate = meta.onUpdate
@@ -115,15 +114,15 @@ do
 		self.durability = 0
 		self.hardness = 0
 		
+		self.particle = nil
+		
 		self.timestamp = 0
 		self:removeEventTimer()
 		self:setRepairDelay(false)
 		
 		self.onCreate = void
-		self.onPlacement = void
 		self.onDestroy = void
 		self.onInteract = void
-		self.onHit = void
 		self.onDamage = void
 		self.onContact = void
 		self.onUpdate = void
@@ -161,7 +160,22 @@ function Block:setRelativeCoordinates(xInChunk, yInChunk, idInChunk, chunkX, chu
 	self.dyc = self.dy + (self.height / 2)
 end
 
+function Block:meta(field)
+	local metadata = blockMetadata:get(self.type)
+	if field then
+		return metadata[field]
+	else
+		return metadata
+	end
+end
 
+--- Compares with another block object.
+-- @name Block:__eq
+-- @param Block:other Another block
+-- @return `Boolean` Whether they are equal or not
+function Block:__eq(other)
+	return self.uniqueId == other.uniqueId
+end
 
 -- REFERENCE FOR METHODS (also failsafe in case it is NIL for some reason)
 
@@ -170,14 +184,6 @@ end
 -- @name Block:onCreate
 function Block:onCreate()
 	print("created")
-end
-
---- Triggers when the Block is placed by a **player**.
--- Declare as `onPlacement = function(self, player)`.
--- @name Block:onPlacement
--- @param Player:player The player object who placed this block
-function Block:onPlacement(player)
-	print(player.name)
 end
 
 --- Triggers when the Block is destroyed.
@@ -192,12 +198,6 @@ end
 -- @name Block:onInteract
 -- @param Player:player The player object who interacted with this block
 function Block:onInteract(player)
-	print(player.name)
-end
-
---- Deprecated.
--- @name Block:onHit
-function Block:onHit(player)
 	print(player.name)
 end
 

@@ -1,9 +1,23 @@
 Module:newMode("vanilla", function(this, _)
 	function this:init(Map)
-		Map:setVariables(32, 32, 12, 8, 60, 18, 0, 200)
+		Map:setVariables(
+		--	X	Y
+			32, 32, -- Block size (in pixels)
+			12, 8, -- Chunk size (in blocks) 
+			48, 24, -- World size (in chunks)
+			800, 400 -- Offset (in pixels) [applies to both sides]
+		)
+		
 		Map:setPhysicsMode("rectangle_detailed")
 	end
 	
+	function this:setMap(field)
+		local width, height = Map:getBlocks()
+		
+		local baseMap = math.heightMap()
+	end
+	
+	--[[
 	function this:setMap(field)
 		local width, height = Map:getBlocks()
 		
@@ -132,6 +146,7 @@ Module:newMode("vanilla", function(this, _)
 		end
 		field:applyBedrockLayer()
 	end
+	]]
 	
 	function this:run()
 		Module:on("NewGame", function()

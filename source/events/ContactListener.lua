@@ -12,13 +12,18 @@ do
 			)
 			
 			local block = Map:getBlock(
-				ci.contactX + (cos(angle) * 5),
-				ci.contactY + (sin(angle) * 5),
+				ci.contactX + (5 * cos(angle) * REFERENCE_SCALE_X),
+				ci.contactY + (5 * sin(angle) * REFERENCE_SCALE_Y),
 				CD_MAP
 			)
 			
 			if block then
+				-- IDK why, but this wont execute sometimes. It doesn't matter.
 				block:onContact(player)
+				block:displayTouchParticles(
+					ci.contactX, ci.contactY,
+					ci.speedX, ci.speedY
+				)
 			end
 		end
 	end)

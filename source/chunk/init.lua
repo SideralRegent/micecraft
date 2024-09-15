@@ -85,3 +85,7 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, _)
 	
 	return this
 end
+
+function Chunk:__eq(other)
+	return self.uniqueId == other.uniqueId
+end

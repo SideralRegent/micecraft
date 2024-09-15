@@ -26,7 +26,7 @@ do
 		category = 1, -- The physics category the block belongs to. Different restitution and friction will be applied according to the category
 		placeable = true, -- If an entity should be able to place this block
 		
-		particles = {}, -- Particles that this block should emit when destroyed
+		particle = 0, -- Particles that this block should emit when destroyed
 		interactable = false, -- if it's possible to interact with this block (relevant for method onInteract), BOOLEAN (false) or NUMBER (TRUE), number denotes distance. Use block distance
 		
 		color = 0xFFFFFF, -- Misc
@@ -34,22 +34,12 @@ do
 		fixedId = 0, -- Misc
 		
 		onCreate = void, -- Triggers when this block is created in the Map 
-		onPlacement = void, -- Triggers when this block is placed by an entity
 		onDestroy = void, -- Triggers when this block is destroyed
-		-- Note: Generally, onCreate and onPlacement might act as the same, however,
-		-- onCreate is always triggered first, and onPlacement is triggered after the
-		-- actual creation. onPlacement will only be triggered by ENTITIES.
-		-- Note 2: onCreate will not trigger when a block tile is created (block:new)
+		-- Note: onCreate will not trigger when a block tile is created (block:new)
 		
 		onInteract = void, -- Triggers when an entity tries to interact with this block
 		
-		onHit = void, -- Triggers when a block has been hit
 		onDamage = void, -- Triggers when a block has been damaged
-		-- Note: While both methods could act as the same almost all times, onHit
-		-- will always trigger when an entity cause it and before the actual damage
-		-- happens, while onDamage will trigger after the damage is applied, however,
-		-- if the block is destroyed because of a Hit, then onDamage will not trigger.
-		-- onHit only triggers with entities, onDamage does always.
 		
 		onContact = void, -- Triggers when a Player makes contact with the Block
 		
@@ -138,7 +128,7 @@ blockMetadata:newTemplate("Fluid", {
 	
 	placeable = true,
 	color = 0x0000FF,
-	particles = {7},
+	particle = 7,
 	
 	onUpdate = function(self, _)
 		self:assertStateActions()
@@ -166,7 +156,7 @@ blockMetadata:newTemplate("Granular", {
 	interactable = false,
 	
 	color = 0xFFAA00,
-	particles = {24},
+	particle = 24,
 	
 	--[[onContact = function(self, _)
 		self:assertStateActions()
@@ -193,18 +183,15 @@ blockMetadata:newTemplate("Stone", {
 	placeable = true,
 	interactable = false,
 	color = 0xA0A0A0,
-	particles = {4}
+	particle = 4
 })
 
 blockMetadata:newTemplate("Ore", "Stone", {
 	name = "default_ore",
 	sprite = "17dd4b39b5c.png",
 	durability = 42,
-	particles = {3, 4},
-	glow = 0,
---[[onHit = function(self, entity)
-		-- Emit particles
-	end]]
+	particle = 3,
+	glow = 0
 })
 
 blockMetadata:setConstant("void", VOID)
@@ -260,7 +247,7 @@ blockMetadata:set(0x3d2, "Ore", {
 	sprite = "17dd4b39b5c.png", 
 	durability = 48, 
 	hardness = 2, 
-	particles = {3,2,1}
+	particle = 2
 })
 
 blockMetadata:set(0x3d3, "Ore", {
@@ -268,7 +255,7 @@ blockMetadata:set(0x3d3, "Ore", {
 	sprite = "17dd4b34f5a.png", 
 	durability = 48, 
 	hardness = 2, 
-	particles = {2,3,11,24}
+	particle = 2
 })
 
 blockMetadata:set(0x3d4, "Ore", {
@@ -276,7 +263,7 @@ blockMetadata:set(0x3d4, "Ore", {
 	sprite = "17dd4b2b75d.png", 
 	durability = 56, 
 	hardness = 3, 
-	particles = {3, 1, 9, 23}
+	particle = 9
 })
 
 blockMetadata:set(0x3d5, "Ore", {
@@ -284,7 +271,7 @@ blockMetadata:set(0x3d5, "Ore", {
 	sprite = "17dd4b3035f.png", 
 	durability = 48, 
 	hardness = 3, 
-	particles = {3,11,22}
+	particle = 3
 })
 
 blockMetadata:set(0x3d6, "Ore", {
@@ -292,7 +279,7 @@ blockMetadata:set(0x3d6, "Ore", {
 	sprite = "17e46514c5d.png", 
 	durability = 48, 
 	hardness = 2, 
-	particles = {3, 1, 9, 23}
+	particle = 3
 })
 
 blockMetadata:set(0x3d7, "Ore", {
@@ -300,7 +287,7 @@ blockMetadata:set(0x3d7, "Ore", {
 	sprite = "18149e3425f.png", 
 	durability = 48, 
 	hardness = 2, 
-	particles = {3, 1, 9, 23}
+	particle = 3
 })
 
 blockMetadata:set(0x4, "Stone", {
@@ -343,7 +330,7 @@ blockMetadata:set(0x256, {
 	sprite = "17dd4adaaf0.png", 
 	durability = 0x2000, 
 	hardness = 0x2000, 
-	particles = {3},
+	particle = 3,
 	onDamage = function(self)
 		self:repair(0x800, true, true, true, true)
 	end

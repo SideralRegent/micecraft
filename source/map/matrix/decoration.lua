@@ -76,7 +76,7 @@ do
 	--- Adds a new Display object to the Block.
 	-- There's no check if a previous display already exists, beware of
 	-- overwritting other of your displays when specifing its order.
-	-- @name Block:addDisplay
+	-- @name Tile:addDisplay
 	-- @param String:name The name of the Display object
 	-- @param Int:order The position in the stack for it to be rendered. The stack iteration is ascending
 	-- @param String:imageUrl The URL of the image in the domain `images.atelier801.com`.

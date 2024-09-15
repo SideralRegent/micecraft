@@ -45,17 +45,21 @@ Sets the Block relative coordinates to its chunk.
 
 ---
 
-### **Block:onCreate** (  )
-Triggers when the Block is "created" to the world. Declare as `onCreate = function(self)`.
-
----
-
-### **Block:onPlacement** ( `player`: player )
-Triggers when the Block is placed by a **player**. Declare as `onPlacement = function(self, player)`.
+### **Block:__eq** ( `other`: block )
+Compares with another block object. 
 
 
 **Parameters:**
-- **player** (`Player`) : The player object who placed this block
+- **other** (`Block`) : Another block
+
+
+**Returns:**
+- `Boolean` Whether they are equal or not
+
+---
+
+### **Block:onCreate** (  )
+Triggers when the Block is "created" to the world. Declare as `onCreate = function(self)`.
 
 ---
 
@@ -70,11 +74,6 @@ Triggers when the Block gets interaction with a **player**. Declare as `onIntera
 
 **Parameters:**
 - **player** (`Player`) : The player object who interacted with this block
-
----
-
-### **Block:onHit** (  )
-Deprecated. 
 
 ---
 
@@ -285,15 +284,6 @@ Establishes the sprite for the designed block.
 
 ### **Block:pulse** (  )
 Makes a visible pulse. 
-
----
-
-### **Block:spreadParticles** (  )
-Spreads particles from the Block. 
-
-
-**Returns:**
-- `Boolean` Whether the particles were successfully spreaded or not
 
 ---
 

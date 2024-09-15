@@ -35,26 +35,39 @@ local fileList = {
 		"enum",
 		"prestart"
 	},
-	{
+	--{
 	--[[	__name = "Interface",
 		__directory = "source/interface",
 		__docs = true,
 		"ui",
 		"object",
 		"template"]]
-	},
+	--},
+	-- >> MAP
 	{
 		__name = "Map",
 		__directory = "source/map",
 		__docs = true,
 		"init",
 		"environment",
-		"interaction",
+		"interaction"
+	},
+	{
+		__name = "Mapgen",
+		__directory = "source/map/generation",
+		__docs = true,
 		"field",
-		"physics",
+		"gen",
+		"physics"
+	},
+	{
+		__name = "Maptrix",
+		__directory = "source/map/matrix",
+		__docs = true,
 		"decoration",
 		"encoding"
 	},
+	-- << MAP
 	{
 		__name = "World",
 		__directory = "source/world",

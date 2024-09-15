@@ -54,7 +54,7 @@ function Map:initBlocks(width, height)
 			-- Creates a block and stores it in the lines
 			line[x], physicsLine[x] = block:new(
 				blockId,
-				fieldLine[x].type,
+				fieldLine[x],
 				x, y,
 				displayX[x], displayY,
 				blockWidth, blockHeight

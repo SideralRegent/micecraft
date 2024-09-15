@@ -7,13 +7,66 @@ do
 		tfm.exec.removeImage(tfm.exec.addImage(image, "!9999999", self.dx, self.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
 	end
 	
-	--- Spreads particles from the Block.
-	-- @name Block:spreadParticles
-	-- @return `Boolean` Whether the particles were successfully spreaded or not
-	
-	-- This code is crap.
 	local displayParticle = tfm.exec.displayParticle
 	local random = math.random
+	local atan2 = math.atan2
+	local abs = math.abs
+	
+	local pi = math.pi
+	local PIo4 = pi / 4
+	
+	local floor = math.floor
+	local magnitude = math.magnitude
+	
+	function Block:displayTouchParticles(x, y, vx, vy)
+		local angle = atan2(y - self.dyc, x - self.dxc)
+		local amount = random(2, floor(magnitude(vx, vy)))
+		
+		if abs(angle % pi) <= (pi / 4) then -- Horizontal
+			if abs(vx) > 4 then
+				local dir = (x < (self.dx + 1)) and -1 or 1
+				local xv
+				local ay
+				for _ = 1, amount do
+					xv = (random(40, 60) / 500) * REFERENCE_SCALE_X * vx
+					ay = -(random(20, 30) / 100) * REFERENCE_SCALE_Y
+					displayParticle(
+						self.particle,
+						x, y,
+						xv, vy
+						-xv / 15, ay
+					)
+				end
+			end
+		else -- Vertical
+			if vy < -2.5 or vy > 5.0 then
+				local ay, xv
+				for _ = 1, amount do
+					ay = (random(20, 30) / 120) * REFERENCE_SCALE_Y
+					xv = (random(7, 14) / 150) * vx * REFERENCE_SCALE_X
+					
+					displayParticle(
+						self.particle,
+						x, y,
+						xv, 0,
+						-xv / 15, ay 
+					)
+				end
+			end
+		end
+	end
+	
+	function Block:displayParticles(type, x, y, vx, vy)
+		if not self.particle then return end
+		
+		local amount
+		local PD = enum.particle_display
+		
+		if type == PD.touch then
+			self:displayTouchParticles(x, y, vx, vy)
+		end
+	end
+	
 	function Block:spreadParticles()
 		local par = self.particles
 		local pcount = #par

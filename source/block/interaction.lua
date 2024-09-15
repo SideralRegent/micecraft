@@ -13,7 +13,7 @@ do
 		if type == blockMetadata._C_VOID then
 			self:setVoid()
 		else
-			local meta = blockMetadata:get(type)
+			local meta = self:meta()
 			
 			self.timestamp = currentTime()
 			
@@ -40,16 +40,15 @@ do
 				
 				self.glow = meta.glow
 				self.translucent = meta.translucent
+				self.particle = meta.particle
 				
 				self.sprite = meta.sprite
 				self.shadow = meta.shadow
 				self.lighting  = meta.lighting
 				
 				self.onCreate = meta.onCreate
-				self.onPlacement = meta.onPlacement
 				self.onDestroy = meta.onDestroy
 				self.onInteract = meta.onInteract
-				self.onHit = meta.onHit
 				self.onDamage = meta.onDamage
 				self.onContact = meta.onContact
 				self.onUpdate = meta.onUpdate
@@ -204,9 +203,7 @@ end
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
 -- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:damage(amount, add, display, update, updatePhysics, player)
-	if self.type ~= VOID then
-		self:onHit(player)
-		
+	if self.type ~= VOID then		
 		local success = self:setDamageLevel(amount, add, display, update, updatePhysics)
 	
 		if success then
