@@ -43,8 +43,8 @@ do
 	
 	do
 		-- (-1) : No key active
-		Mousebinds:new(-1, true, function(_, block)
-			block:damage(100, true, true, true)
+		Mousebinds:new(-1, true, function(player, block)
+			block:damage(50, true, true, true, true, player)
 		end)	
 		
 		Mousebinds:new(keys.SHIFT, true, function(player, block, ...)

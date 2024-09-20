@@ -64,7 +64,7 @@ Triggers when the Block is "created" to the world. Declare as `onCreate = functi
 ---
 
 ### **Block:onDestroy** (  )
-Triggers when the Block is destroyed. Declare as `onDestroy = function(self)`.
+Triggers when the Block is destroyed. Declare as `onDestroy = function(self, player)`.
 
 ---
 
@@ -292,7 +292,7 @@ Plays the specified sound for the Block. A block can have different types of sou
 
 
 **Parameters:**
-- **soundKey** (`String`) : The key that identifies the event. If it doesn't exist, it will default to a regular sound.
+- **soundKey** (`String`) : The key that identifies the sound. If it doesn't exist, it will default to a regular sound.
 - **player** (`Player`) : The player that should hear this sound, if nil, applies to everyone.
 
 

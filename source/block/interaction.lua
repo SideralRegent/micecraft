@@ -13,7 +13,7 @@ do
 		if type == blockMetadata._C_VOID then
 			self:setVoid()
 		else
-			local meta = self:meta()
+			local meta = self:meta(nil, type)
 			
 			self.timestamp = currentTime()
 			
@@ -87,7 +87,7 @@ end
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically
 do
 	local time = os.time
-	function Block:destroy(display, update, updatePhysics)
+	function Block:destroy(player, display, update, updatePhysics)
 		if self.type ~= VOID then
 			self.timestamp = time()
 					
@@ -95,7 +95,7 @@ do
 			local oldCat = self.category
 			self.category = 0
 			
-			self:onDestroy()
+			self:onDestroy(player)
 			self:setVoid()
 
 			if display then
@@ -132,7 +132,7 @@ do
 	-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event (in case it's destroyed)
 	-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
 	-- @return `Boolean` Whether the Block has the specified amount of damage
-	function Block:setDamageLevel(amount, add, display, update, updatePhysics)
+	function Block:setDamageLevel(amount, add, player, display, update, updatePhysics)
 		if self.type ~= blockMetadata._C_VOID then
 			amount = amount or 1
 			local fx = (add and self.damageLevel + amount or amount)
@@ -142,10 +142,10 @@ do
 			self.damagePhase = ceil((self.damageLevel * 10) / self.durability)
 			
 			if self.damageLevel >= self.durability then
-				self:destroy(display, update, updatePhysics)
+				self:destroy(player, display, update, updatePhysics)
 				
 				if fx > self.durability then
-					self:setDamageLevel(fx - self.durability, true, display, update, updatePhysics)
+					self:setDamageLevel(fx - self.durability, true, player, display, update, updatePhysics)
 					self:setRepairDelay(true, 2, 10000, true, display, update, updatePhysics)
 				end
 				
@@ -204,7 +204,7 @@ end
 -- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:damage(amount, add, display, update, updatePhysics, player)
 	if self.type ~= VOID then		
-		local success = self:setDamageLevel(amount, add, display, update, updatePhysics)
+		local success = self:setDamageLevel(amount, add, player, display, update, updatePhysics)
 	
 		if success then
 			self:onDamage(amount, player)
@@ -227,9 +227,9 @@ end
 -- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event (in case its state changes)
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case its state changes)
 -- @return `Boolean` Whether the Block has the specified amount of damage
-function Block:repair(amount, add, display, update, updatePhysics)
+function Block:repair(amount, add, player, display, update, updatePhysics)
 	if self.type ~= VOID then
-		return self:setDamageLevel(-amount, add, display, update, updatePhysics)
+		return self:setDamageLevel(-amount, add, player, display, update, updatePhysics)
 	end
 	
 	return false

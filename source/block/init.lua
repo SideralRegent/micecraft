@@ -148,8 +148,8 @@ end
 -- @param Int:chunkY The vertical position of the Chunk in the Map
 -- @param Int:chunkId The unique identifier of the Chunk in the Map
 function Block:setRelativeCoordinates(xInChunk, yInChunk, idInChunk, chunkX, chunkY, chunkId)
-	self.cx = xInChunk or 0
-	self.cy = yInChunk or 0
+	self.cx = xInChunk
+	self.cy = yInChunk
 	self.chunkUniqueId = idInChunk
 	
 	self.chunkX = chunkX
@@ -160,7 +160,9 @@ function Block:setRelativeCoordinates(xInChunk, yInChunk, idInChunk, chunkX, chu
 	self.dyc = self.dy + (self.height / 2)
 end
 
-function Block:meta(field)
+function Block:meta(field, type)
+	self.type = type or self.type
+	
 	local metadata = blockMetadata:get(self.type)
 	if field then
 		return metadata[field]
@@ -187,7 +189,7 @@ function Block:onCreate()
 end
 
 --- Triggers when the Block is destroyed.
--- Declare as `onDestroy = function(self)`.
+-- Declare as `onDestroy = function(self, player)`.
 -- @name Block:onDestroy
 function Block:onDestroy()
 	print("destroyed")

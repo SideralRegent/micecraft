@@ -27,7 +27,7 @@ do
 		if ctype == CD_MTX then
 			fx = x
 			fy = y
-		elseif y  == CD_UID then
+		elseif ctype  == CD_UID then
 			local info = self.chunkLookup[x]
 			fx = info.x
 			fy = info.y

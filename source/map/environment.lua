@@ -49,13 +49,13 @@ function Map:setVariables(blockWidth, blockHeight, chunkWidth, chunkHeight, MapC
 	self.chunkFieldViewNormX = math.ceil((FIELD_VIEW_X / 2) / self.chunkPixelWidth)
 	self.chunkFieldViewNormY = math.ceil((FIELD_VIEW_Y / 2) / self.chunkPixelHeight)
 	
-	-- 400 is the max amount of blocks that should get queued for operations
+	-- The numeratoris the max amount of blocks that should get queued for operations
 	-- in respect to their chunks
-	ChunkQueue:setDefaultStep(math.floor(400 / (self.chunkWidth * self.chunkHeight)))
+	ChunkQueue:setDefaultStep(math.floor(384 / (self.chunkWidth * self.chunkHeight)))
 	
-	self:setCounter("chunks_collide", 0, false)
-	self:setCounter("chunks_display", 0, false)
-	self:setCounter("chunks_item", 0, false)
+	--self:setCounter("chunks_collide", 0, false)
+	--self:setCounter("chunks_display", 0, false)
+	--self:setCounter("chunks_item", 0, false)
 end
 
 function Map:getBlockDimensions()

@@ -149,7 +149,7 @@ function Block:cascadeAction()
 				segmentList[block.chunkId] = {}
 			end
 			
-			block:destroy(true, false, false)
+			block:destroy(nil, true, false, false)
 			block:requestNeighborUpdate(SH_LNR)
 			segmentList[block.chunkId][block.segmentId] = true
 		else
@@ -161,7 +161,7 @@ function Block:cascadeAction()
 	
 	local chunk
 	for chunkId, segments in next, segmentList do
-		chunk = Map:getChunk(chunkId, CD_UID)
+		chunk = Map:getChunk(chunkId, nil, CD_UID)
 		chunk:refreshPhysics(Map.physicsMode, segments, true, {
 			xStart = self.x, 
 			xEnd = self.x, 
@@ -213,7 +213,7 @@ function Block:fallAction(lowerBlock)
 	end	
 	
 	lowerBlock:setTask(1, false, function()
-		objective:destroy(true, true, true)
+		objective:destroy(nil, true, true, true)
 		-- objective:setVoid(true)
 		
 		lowerBlock:create(type, true, true, true)

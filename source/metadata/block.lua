@@ -5,6 +5,11 @@ do
 		
 		drop = "void", -- When broken, identifier of what it drops
 		
+		sound = {
+			destroy = "cite18/ballon-touche-1",
+			place = "cite18/bouton1"
+		},
+		
 		state = {
 			fallable = false,
 			cascadeDestroy = false
@@ -34,7 +39,9 @@ do
 		fixedId = 0, -- Misc
 		
 		onCreate = void, -- Triggers when this block is created in the Map 
-		onDestroy = void, -- Triggers when this block is destroyed
+		onDestroy = function(self, player)
+			self:playSound("destroy", player)
+		end, -- Triggers when this block is destroyed
 		-- Note: onCreate will not trigger when a block tile is created (block:new)
 		
 		onInteract = void, -- Triggers when an entity tries to interact with this block

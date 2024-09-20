@@ -158,13 +158,17 @@ do
 		return self.stack[index]
 	end
 	
+	local time = os.time
 	function ChunkQueue:step(steps)
 		if #self.stack == 0 then return end
 		
 		steps = steps or self.defaultStep or 4
 		
 		local info
+		local start = time()
 		for _ = 1, steps do
+			if (time() - start) >= 3 then break end
+			
 			info = self:get(1)
 			if info then
 				local chunk = Map:getChunk(info.x, info.y, CD_MTX)

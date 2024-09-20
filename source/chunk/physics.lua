@@ -99,7 +99,7 @@ do
 		}
 		
 		self.x = self.xtl + (w / 2)
-		self.y = self.ytl + (h / 2) + (catdef.y_offset * self.bw)
+		self.y = self.ytl + (h / 2) + (catdef.y_offset * self.bh)
 	end
 	
 	local addPhysicObject = tfm.exec.addPhysicObject
