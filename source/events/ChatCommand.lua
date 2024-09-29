@@ -13,15 +13,12 @@ do
 	local unpack = table.unpack
 	
 	function Command:new(commandName, callback, ...)
-		local this = setmetatable({
+		return setmetatable({
 			name = commandName,
 			callback = callback,
 			issues = setmetatable({}, {__index = table}),
 			aliases = {...}
 		}, self)
-		this.__index = self
-		
-		return this
 	end
 	
 	function Command:isAllowed(player) -- TODO: Check player data
@@ -63,7 +60,7 @@ do
 
 	Commands:new("list", function(player, _)
 		tfm.exec.chatMessage("<J>List of Registered Blocks</J>", player.name)
-		for index, info in next, blockMetadata do
+		for index, info in next, blockMeta do
 			if type(info) == "table" and info.name then
 				tfm.exec.chatMessage(("<CEP>%s</CEP> - <VP>%s</VP>"):format(index, info.name), player.name)
 			end

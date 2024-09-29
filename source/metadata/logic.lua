@@ -4,15 +4,11 @@
 -- @param Any:default The default object for this Meta Data handler.
 -- @return `MetaData` The Meta Data handler for this object
 function MetaData:newMetaData(default)
-	local this = setmetatable({}, self)
-	this.__index = self
-	
-	this.__templates = {}
-	this.__default = default or {}
-	
-	this.maps = {}
-	
-	return this
+	return setmetatable({
+		__templates = {},
+		__default = default or {},
+		maps = {},
+	}, self)
 end
 
 do
@@ -90,6 +86,33 @@ do
 	
 	function MetaData:setConstant(name, value)
 		self[("_C_%s"):format(name:upper())] = value
+	end
+	
+	local ipairs = ipairs
+	local next = next
+	function MetaData:import(otherMeta, config, dictionary)
+		local shift = config.shift or 0
+		local template = config.template
+		local auxTemplate = config.auxiliar
+		local name = config.name or "Import"
+		
+		if template then
+			self:newTemplate(name, template, auxTemplate)			
+		end
+		
+		local definition = {}
+		local targetKey
+		for index, object in ipairs(otherMeta) do
+			definition = {}
+			for key, value in next, object do -- Ouch
+				targetKey = dictionary[key]
+				if targetKey then
+					definition[targetKey] = value
+				end
+			end
+			
+			self:set(index + shift, template, definition)
+		end
 	end
 end
 

@@ -34,7 +34,6 @@ do
 			bodydef = {},
 			active = false,
 		}, self)
-		this.__index = self
 		
 		this:setBlocksState(true)
 		this:setBodydef()

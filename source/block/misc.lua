@@ -1,7 +1,7 @@
 do	
 	--- Makes a visible pulse.
 	-- @name Block:pulse
-	
+	-- @param String:image A image to make the pulse. If not given will default to white
 	function Block:pulse(image)
 		image = image or "1817dc55c70.png"
 		tfm.exec.removeImage(tfm.exec.addImage(image, "!9999999", self.dx, self.dy, nil, 1, 1, 0, 1, 0, 0, false), true)
@@ -18,13 +18,20 @@ do
 	local floor = math.floor
 	local magnitude = math.magnitude
 	
+	--- Displays particles when a block is touched.
+	-- They display from the contact point and try to follow a convincing
+	-- representation of real life dust and debris coming out of nature objects
+	-- life stones and such. 
+	-- @param Number:x X coordinate
+	-- @param Number:y Y coordinate
+	-- @param Number:vx X speed (player)
+	-- @param Number:vy Y speed (player)
 	function Block:displayTouchParticles(x, y, vx, vy)
 		local angle = atan2(y - self.dyc, x - self.dxc)
 		local amount = random(2, floor(magnitude(vx, vy)))
 		
-		if abs(angle % pi) <= (pi / 4) then -- Horizontal
+		if abs(angle % pi) <= PIo4 then -- Horizontal
 			if abs(vx) > 4 then
-				local dir = (x < (self.dx + 1)) and -1 or 1
 				local xv
 				local ay
 				for _ = 1, amount do
@@ -56,10 +63,16 @@ do
 		end
 	end
 	
+	--- Displays particles from the block according to a specified mode.
+	-- @param Number:type The spreading type
+	-- @param Number:x X coordinate
+	-- @param Number:y Y coordinate
+	-- @param Number:vx X speed (player)
+	-- @param Number:vy Y speed (player)
 	function Block:displayParticles(type, x, y, vx, vy)
 		if not self.particle then return end
 		
-		local amount
+	--	local amount
 		local PD = enum.particle_display
 		
 		if type == PD.touch then
@@ -95,10 +108,11 @@ do
 	end
 	
 	function Block:hasActiveTask(tick)
-		tick = tick or Tick.current 
 		local task = Tick:getTask(self.eventTimer)
 		
 		if task then
+			tick = tick or Tick.current 
+			
 			if tick ~= -1 then
 				return (task.tickTarget == tick)
 			else
@@ -111,6 +125,8 @@ do
 		return false
 	end
 	
+	--- Returns the decorative tile that lies in the same space grid as this block.
+	-- @return `Tile` The tile object
 	function Block:getDecoTile()
 		return Map:getDecoTile(self.x, self.y)
 	end

@@ -6,11 +6,8 @@ function Player:new(playerName)
 		
 		language = info.language,
 		
-		x = 0,
-		y = 0,
-		
-		vx = 0,
-		vy = 0,
+		x = 0, y = 0,
+		vx = 0, vy = 0,
 		
 		isMoving = false,
 		isJumping = false,
@@ -24,13 +21,19 @@ function Player:new(playerName)
 		
 		keys = {},
 		
+		inventory = ItemBank:new(4 * 10),
+		showingInventory = false,
+		hotbarActive = false,
+		selectedFrame = nil,
+		
 		internalTime = 0,
 		
 		dataFile = "",
 		awaitingData = false
 	}, self)
-
-	this.__index = self
+	-- ...
+	
+	this:setInventories()
 	
 	return this
 end

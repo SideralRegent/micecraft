@@ -9,14 +9,11 @@ do
 	
 	local setmetatable = setmetatable
 	function Mousebind:new(keyId, blockOperator, callback)
-		local this = setmetatable({
+		return setmetatable({
 			keyId = keyId,
 			isBlockOperator = blockOperator,
 			callback = callback
 		}, self)
-		this.__index = self
-		
-		return this
 	end
 	
 	local pcall = pcall
@@ -48,17 +45,17 @@ do
 		end)	
 		
 		Mousebinds:new(keys.SHIFT, true, function(player, block, ...)
---			if block.type ~= blockMetadata.maps.bedrock then
+--			if block.type ~= blockMeta.maps.bedrock then
 				if player.selected then
 					block:create(player.selected, true, true, true)
 				end
 				
-				--block:createAsFluidWith(blockMetadata.maps.water, 4, true, true, true, true)
+				--block:createAsFluidWith(blockMeta.maps.water, 4, true, true, true, true)
 	--		end
 		end)
 		
 		Mousebinds:new(keys.one, true, function(_, block, ...)
-			block:create(blockMetadata.maps.stone, true, true, true)	
+			block:create(blockMeta.maps.stone, true, true, true)	
 		end)
 		
 		Mousebinds:new(keys.ALT, false, function(player, _, xPosition, yPosition)

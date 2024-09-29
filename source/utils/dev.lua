@@ -1,5 +1,4 @@
 local devInstance = {}
-devInstance.__index = devInstance
 
 do
 	local setmetatable = setmetatable
@@ -22,7 +21,7 @@ do
 	]]
 	
 	function devInstance:new(debugFunction)
-		local this = setmetatable({
+		return setmetatable({
 			implementedFunction = dummyFunc,
 			debugFunction = debugFunction,
 			replacementFunction = dummyFunc,
@@ -31,8 +30,6 @@ do
 				textArea = {}
 			}
 		}, self)
-		
-		this.__index = self
 	end
 	
 	local next = next

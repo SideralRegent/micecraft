@@ -9,15 +9,12 @@ do
 	local setmetatable = setmetatable
 	
 	function Keybind:new(keyName, keyId, down, callback)
-		local this = setmetatable({
+		return setmetatable({
 			keyName = keyName,
 			keyId = keyId,
 			down = down,
 			callback = callback
 		}, self)
-		this.__index = self
-		
-		return this
 	end
 	
 	local pcall
@@ -75,8 +72,12 @@ do
 			ui.showColorPicker(0x838, player.name, 0x888888, "Background Color")
 		end)
 	
-		Keybinds:new("X", true, function(player)
+		Keybinds:new("V", true, function(player)
 			player:queueNearChunks(nil, true)	
+		end)
+	
+		Keybinds:new("X", true, function(player)
+			player:showInventory(not player.showingInventory)	
 		end)
 	end
 	

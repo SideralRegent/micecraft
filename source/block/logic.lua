@@ -5,6 +5,9 @@ function Block:getChunk()
 	return Map:getChunk(self.chunkX, self.chunkY, CD_MTX)
 end
 
+--- Triggers a recalculation of the physic body (segment) that concerns this block.
+-- @name Block:requestPhysicsUpdate
+-- @param Table:segmentList A list of other segments to take into consideration
 function Block:requestPhysicsUpdate(segmentList)
 	self:getChunk():refreshPhysics(Map.physicsMode, segmentList, true, {
 		xStart = self.x, 
@@ -64,6 +67,10 @@ do
 	end
 end
 
+--- Requests an update to its neighbours.
+-- @name Block:requestNeighborUpdate
+-- @param Int:inquireShape The type of shape to get the nearby blocks from.
+-- @return `Table` A list of segments
 function Block:requestNeighborUpdate(inquireShape)
 	local segmentList = {}
 	local blocks = self:getBlocksAround(inquireShape, false)
@@ -84,6 +91,7 @@ end
 -- @name Block:updateEvent
 -- @param Boolean:update Whether the blocks around should be updated (method: `Block:onUpdate`)
 -- @param Boolean:updatePhysics Whether the physics of the Map should be updated
+-- @param Int:lookupCategory A category to specifically lock segment updates to
 function Block:updateEvent(update, updatePhysics, lookupCategory)
 	do
 		local segmentList = {}
@@ -110,6 +118,9 @@ function Block:updateEvent(update, updatePhysics, lookupCategory)
 	end
 end
 
+--- Checks all possible actions that a Block could take based on its state metadata.
+-- @name Block:assertStateActions
+-- @return `Boolean` Whether anything happened or not
 function Block:assertStateActions()
 	local fall = self:assertFallAction()
 	local cascade = self:assertCascadeDestroyAction()
@@ -118,6 +129,11 @@ function Block:assertStateActions()
 	return (fall or cascade or flow)
 end
 
+--- Checks if a block meets the conditions to get destroyed.
+-- It will do the same with the above blocks and bulk destroy all of them.
+-- All considerations are handled on this function, so no need to update outside.
+-- @name Block:assertCascadeDestroyAction
+-- @return `Boolean` Whether it happened
 function Block:assertCascadeDestroyAction()
 	if self.stateAction.cascadeDestroy then
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
@@ -134,6 +150,8 @@ function Block:assertCascadeDestroyAction()
 	return false
 end
 
+--- Bulk deletes upwardly all blocks of equal type.
+-- @name Block:cascadeAction
 function Block:cascadeAction()
 	local type = self.type
 	
@@ -174,6 +192,11 @@ function Block:cascadeAction()
 	block:onUpdate()
 end
 
+--- Checks if a block meets the conditions to fall.
+-- It will check the above blocks as well, and at most two blocks will get shifted.
+-- All considerations are handled on this function, so no need to update outside.
+-- @name Block:assertCascadeDestroyAction
+-- @return `Boolean` Whether it happened
 function Block:assertFallAction()
 	if self.stateAction.fallable then
 		local lowerBlock = Map:getBlock(self.x, self.y + 1, CD_MTX)
@@ -190,6 +213,9 @@ function Block:assertFallAction()
 	return false
 end
 
+--- Deletes the upmost block of the same type and creates a new one on the expected downard position.
+-- @name Block:assertCascadeDestroyAction
+-- @return `Boolean` Whether it happened
 function Block:fallAction(lowerBlock)
 	if not lowerBlock then return end
 	if self:hasActiveTask(-1) then return end
@@ -203,8 +229,8 @@ function Block:fallAction(lowerBlock)
 	
 	while y > 0 do
 		block = Map:getBlock(x, y, CD_MTX)
-		if block.type == type then -- Objective is the block that should get deleted
-			objective = block 
+		if block.type == type then 
+			objective = block -- Objective is the block that should get deleted
 			
 			y = y - 1
 		else
@@ -222,10 +248,13 @@ function Block:fallAction(lowerBlock)
 	end)
 end
 
-function Block:scheduleFluidCreation(delay, type, flowLevel, asSource, display, update, updatePhysics)
-	return self:setTask(delay, false, function()
-		self:createAsFluidWith(type, flowLevel, asSource, display, update, updatePhysics)	
-	end)
+-- The rest of docs are irrelevant since it is written very verbosely
+
+--												flowLevel, asSource, display, update, updatePhysics
+function Block:scheduleFluidCreation(delay, type, ...)
+	return self:setTask(delay, false, function(...)
+		self:createAsFluidWith(type, ...)	
+	end, ...)
 end
 
 -- TODO: Add condition for non-source
@@ -235,7 +264,7 @@ function Block:flowVerticalAction()
 	
 	local mustFlow = false
 	
-	if lowerBlock.type == blockMetadata._C_VOID then
+	if lowerBlock.type == blockMeta._C_VOID then
 		mustFlow = true
 	elseif lowerBlock.fluidRate > 0 then
 		if lowerBlock.type == self.type then
@@ -282,7 +311,7 @@ end
 function Block:hFlowCheckTo(block, nextLevel)
 	local flowLevel = FL_EMPTY
 	
-	if block.type == blockMetadata._C_VOID then
+	if block.type == blockMeta._C_VOID then
 		flowLevel = nextLevel
 	elseif block.type == self.type then
 		if block.fluidLevel < (nextLevel - 1) then
@@ -316,12 +345,12 @@ function Block:hFlowIsolate(sides, maxIndex, minIndex, nextLevel)
 	
 	if (blockAbove and (blockAbove.type == self.type)) or self.isFluidSource then -- spills to both sides
 		for _, block in next, sides do
-			flowLevel = self:hFlowCheckTo(block, nextLevel)
-			
-			if flowLevel > 0 then
-				if not block:hasActiveTask() then 
+			if not block:hasActiveTask() then -- So it doesn't do unnecesary checks
+				flowLevel = self:hFlowCheckTo(block, nextLevel)
+				
+				if flowLevel > 0 then
 					block:scheduleFluidCreation(self.fluidRate, self.type, flowLevel, false, true, true, true)
-				end
+				end	
 			end
 		end
 	else -- not spilling to both sides
@@ -347,16 +376,13 @@ function Block:hFlowIsolate(sides, maxIndex, minIndex, nextLevel)
 end
 
 function Block:flowHorizontalAction()
-	if self.fluidLevel <= 1 then
-		return false
-	end
+	if self.fluidLevel <= 1 then return false end
 	
 	local nextLevel = self.fluidLevel - 1
 	
 	local sides = self:getBlocksAround(SH_LNR, false)
 	local higherLevel, maxIndex, minIndex = self:checkSidesFluidHeight(sides)
 	
-
 	if higherLevel == 2 then
 		local newLevel = self.fluidLevel + 1
 		local asSource = (newLevel == FL_FILL)

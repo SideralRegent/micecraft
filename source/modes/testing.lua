@@ -12,7 +12,7 @@ Module:newMode("test", function(this, _)
 			exclusive = true,
 			dir = {
 				min = 4,
-				[1] = blockMetadata.maps.cobblestone
+				[1] = blockMeta.maps.cobblestone
 			}
 		})]]
 		
@@ -20,17 +20,11 @@ Module:newMode("test", function(this, _)
 			overwrite = false,
 			exclusive = true,
 			dir = function(x, y)
-				if x % 3 == 0 then
-					if y % 4 == 0 then
-						return blockMetadata.maps.cobblestone
-					end
+				if (x%3) == (y%3) and x%2 ~= 1 then
+					return blockMeta.maps.cobblestone
 				else
-					if (y + 2) % 4 == 0 then
-						return blockMetadata.maps.cobblestone
-					end
+					return VOID
 				end
-				
-				return VOID
 			end
 		})
 		--field:applyBedrockLayer()

@@ -42,6 +42,6 @@ luac.out
 micecraft.lua
 main.lua
 
-world.png
+*.png
 
 .vscode/

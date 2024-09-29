@@ -1,5 +1,5 @@
 function Field:generateNew(width, height)
-	local VOID = blockMetadata._C_VOID
+	local VOID = blockMeta._C_VOID
 	for y = 1, height do
 		self[y] = {}
 		for x = 1, width do
@@ -139,7 +139,7 @@ do
 	end
 
 	function Field:setHeightMap(mapInfo)
-		local VOID = blockMetadata._C_VOID
+		local VOID = blockMeta._C_VOID
 		
 		local dir = mapInfo.dir
 		local heightMap = mapInfo.heightMap

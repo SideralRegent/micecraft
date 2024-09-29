@@ -62,8 +62,8 @@ Module:newMode("vanilla", function(this, _)
 			exclusive = false,
 			dir = {
 				--max = WATER_LEVEL - 1,
-				[1] = {type = blockMetadata.maps.grass},
-				[2] = {type = blockMetadata.maps.dirt},
+				[1] = {type = blockMeta.maps.grass},
+				[2] = {type = blockMeta.maps.dirt},
 				[10] = {type = -1},
 			}
 		}, heightMap)
@@ -73,7 +73,7 @@ Module:newMode("vanilla", function(this, _)
 			exclusive = true,
 			dir = {
 				max = ICE_LEVEL,
-				[1] = {type = blockMetadata.maps.snowed_grass},
+				[1] = {type = blockMeta.maps.snowed_grass},
 				[2] = {type = -1}
 			}
 		}, heightMap)
@@ -83,8 +83,8 @@ Module:newMode("vanilla", function(this, _)
 			exclusive = true,
 			dir = {
 				min = WATER_LEVEL - 8,
-				[1] = {type = blockMetadata.maps.sand},
-				--[6] = {type = blockMetadata.maps.sandstone},
+				[1] = {type = blockMeta.maps.sand},
+				--[6] = {type = blockMeta.maps.sandstone},
 				[10] = {type = -1}
 			}
 		}, heightMap)
@@ -97,7 +97,7 @@ Module:newMode("vanilla", function(this, _)
 			--exclusive = true,
 			dir = {
 				--max = WATER_LEVEL,
-				[1] = {type = blockMetadata.maps.stone}
+				[1] = {type = blockMeta.maps.stone}
 			}
 		}, stoneLayerMap)
 
@@ -106,7 +106,7 @@ Module:newMode("vanilla", function(this, _)
 			exclusive = true,	
 			dir = {
 				min = WATER_LEVEL - 5,
-				[1] = {type = blockMetadata.maps.sandstone}
+				[1] = {type = blockMeta.maps.sandstone}
 			}
 		}, stoneLayerMap)
 		
@@ -115,7 +115,7 @@ Module:newMode("vanilla", function(this, _)
 			exclusive = true,
 			dir = {
 				min = WATER_LEVEL,
-				[1] = {type = blockMetadata.maps.water}
+				[1] = {type = blockMeta.maps.water}
 			}
 		})
 	
@@ -125,10 +125,10 @@ Module:newMode("vanilla", function(this, _)
 			field:setLayer({
 				overwrite = true,
 				dir = {
-					[1] = {type=blockMetadata._C_VOID},
+					[1] = {type=blockMeta._C_VOID},
 					[math.random(4, 6)] = {type=-1},
 					excepts = {
-						[blockMetadata.maps.water] = true
+						[blockMeta.maps.water] = true
 					}
 				}
 			}, caveMap)

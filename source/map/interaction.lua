@@ -127,7 +127,7 @@ do
 	
 	function Map:spawnStructure(structureName, x, y, xAnchor, yAnchor)
 		local structure = Structures[structureName]
-		local VOID = blockMetadata._C_VOID
+		local VOID = blockMeta._C_VOID
 		
 		xAnchor = xAnchor or 0.5
 		yAnchor = yAnchor or 0.5

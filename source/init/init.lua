@@ -8,14 +8,14 @@ if tfm.get.room.name:lower():match("village") then
 	system.exit()
 end
 
-tfm.exec.chatMessage = print
+--tfm.exec.chatMessage = print
 
 math.randomseed(currentTime())
 
 --- Crashes on the slightlest sign of a global.
 -- We don't want globals in our code. They pollute the global environment,
 -- are prone to cause memory leaks on the Lua VM, make debugging harder,
--- and increases unnecessarily the table acceses. Only Transformice events
+-- and unnecessarily increase the table accesses. Only Transformice events
 -- should be globals, because that's the only way callbacks can be received.
 -- @name _G.__newindex
 -- @param Table:self Global space
@@ -43,7 +43,7 @@ local xmlLoad = '<C><P L="%d" H="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D>
 --local xmlLoad = '<C><P Ca="" L="%d" H="%d"  /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
 local Module = {
-	version = "0.2.0-alpha",
+	version = "0.3.1-alpha",
 	apiVersion = "",
 	tfmVersion = "",
 	
@@ -114,7 +114,20 @@ Structure.__index = Structure
 
 local MetaData = {}
 MetaData.__index = MetaData
-local blockMetadata = {}
+local blockMeta = {}
+local itemMeta = {}
+
+local Item = {}
+Item.__index = Item
+
+local ItemContainer = {}
+ItemContainer.__index = ItemContainer
+
+local ItemBank = {}
+ItemBank.__index = ItemBank
+
+local SelectFrame = {}
+SelectFrame.__index = SelectFrame
 
 local Player = {}
 Player.__index = Player
@@ -124,14 +137,8 @@ local Timer = {
 	list = {},
 	counter = 0
 }
-
---[[
-local Debug = {
-	fields = {}
-}
-]]
-
 Timer.__index = Timer
+
 local Tick = {
 	current = 0,
 	halted = 0,

@@ -4,8 +4,7 @@ local buildpath = './build/micecraft.lua'
 local shouldLog = false
 local releaseBuild = false
 local preview = false
-local shouldCreateFile = false
-
+local shouldCreateFile = true
 local fileList = {
     {
         __name = "Init",
@@ -18,12 +17,13 @@ local fileList = {
 		__name = "Utilities",
 		__directory = "source/utils",
 		__docs = true,
+		"tfm",
 		"math",
 		"table",
 		"data",
 		"timer",
 		"tick",
-		"color"
+		"color",
 	},
 	{
 		__name = "Head",
@@ -102,11 +102,20 @@ local fileList = {
 		"init"
 	},
 	{
+		__name = "Item",
+		__directory = "source/item",
+		__docs = false,
+		"item",
+		"container",
+		"bank"
+	},
+	{
 		__name = "Player",
 		__directory = "source/player",
 		__docs = true,
 		"init",
 		"data",
+		"inventory",
 		"update",
 		"action",
 		"handle",
@@ -117,7 +126,8 @@ local fileList = {
 		__directory = "source/metadata",
 		__docs = true,
 		"logic",
-		"block"
+		"block",
+		"item"
 	},
 	{
 		__name = "Modes",
@@ -186,12 +196,12 @@ local formatDoc = function(dt)
 	dlines[1] = ("### **%s** ( %s )"):format(dt.name, plist1) 
 	dlines[2] = dt.summary .. " " .. table.concat(dt.description, " "):gsub("  ", " ")
 	if plist2 ~= "" then
-		dlines[3] = "\n\n**Parameters:**"
+		dlines[3] = "\n**Parameters:**"
 		dlines[4] = plist2
 	end
 	
 	if #rlist > 0 then 
-		dlines[#dlines + 1] = "\n\n**Returns:**"
+		dlines[#dlines + 1] = "\n**Returns:**"
 		dlines[#dlines + 1] = table.concat(rlist, "\n")
 	end
 	

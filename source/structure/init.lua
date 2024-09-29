@@ -1,6 +1,4 @@
-function Structure:new(name, definition)
-	local this = setmetatable({}, self)
-	
+function Structure:new(name, definition)	
 	local td = type(definition)
 	local matrix
 	
@@ -20,12 +18,12 @@ function Structure:new(name, definition)
 		matrix = definition(self)
 	end
 	
-	this.name = name
-	this.matrix = matrix
-	this.height = #matrix
-	this.width = #matrix[1]
-	
-	Structures[name] = this
+	Structures[name] = setmetatable({
+		name = name,
+		matrix = matrix,
+		height = #matrix,
+		width = #matrix[1]
+	}, self)
 	
 	return Structures[name]
 end

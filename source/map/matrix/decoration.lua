@@ -8,7 +8,7 @@ do
 	local setmetatable = setmetatable
 	local next = next
 	function Tile:new(dx, dy)
-		local this = setmetatable({
+		return setmetatable({
 			dx = dx,
 			dy = dy,
 			
@@ -16,10 +16,6 @@ do
 			displayList = {},
 			removalList = {},
 		}, self)
-		
-		this.__index = self
-		
-		return this
 	end
 
 	--- Returns a display object from the Tile, given the index, if it exists.

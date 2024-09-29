@@ -1,7 +1,7 @@
 --- Creates a new Block object.
 -- @name Block:new
 -- @param Int:uniqueId The unique ID of the Block in the Map
--- @param Int:type The Block type. Data will be consulted on **blockMetadata** to apply for this object
+-- @param Int:type The Block type. Data will be consulted on **blockMeta** to apply for this object
 -- @param Int:MapX Horizontal position of the Block in the Map matrix
 -- @param Int:MapY Vertical position of the Block in the Map matrix
 -- @param Int:displayX Horizontal position of the Block in Transformice's map
@@ -12,9 +12,9 @@
 do
 	local setmetatable = setmetatable
 	function Block:new(uniqueId, type, MapX, MapY, displayX, displayY, width, height)
-		local meta = blockMetadata[type] or blockMetadata[0]
+		local meta = blockMeta[type] or blockMeta[0]
 		
-		local this = setmetatable({ -- Define this way to save some table acceses.
+		return setmetatable({ -- Define this way to save some table acceses.
 			uniqueId = uniqueId,
 			chunkId = 0,
 			segmentId = -1,
@@ -79,11 +79,8 @@ do
 			onDamage = meta.onDamage,
 			onContact = meta.onContact,
 			onUpdate = meta.onUpdate
-		}, {__index = self})
-
-		--this.__index = self
-		
-		return this, this.category
+		}, {__index = self}), 
+			meta.category	-- return value 2
 	end
 end
 
@@ -163,7 +160,7 @@ end
 function Block:meta(field, type)
 	self.type = type or self.type
 	
-	local metadata = blockMetadata:get(self.type)
+	local metadata = blockMeta:get(self.type)
 	if field then
 		return metadata[field]
 	else

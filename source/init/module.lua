@@ -182,8 +182,6 @@ do
 			isNative = nativeEvents[eventName],
 			calls = {}
 		}, self)
-
-		this.__index = self
 		
 		if this.isNative then
 			this.trigger = Event.triggerCount

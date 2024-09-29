@@ -51,8 +51,6 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, _)
 		
 		-- lc = {} -- Stands for  'Look-up Categories'
 	}, self)
-
-	this.__index = self
 	
 	local lc = {}
 	

@@ -42,7 +42,7 @@ do
 	-- @return `Task` A Task object.
 	function Task:new(awaitTicks, shouldLoop, callback, ...)
 		self.counter = self.counter + 1
-		local this = setmetatable({
+		return setmetatable({
 			uniqueId = self.counter,
 			sliceInternalId = 0,
 			awaitTicks = awaitTicks or 1,
@@ -53,9 +53,6 @@ do
 			callback = callback,
 			args = {...}
 		}, self)
-		this.__index = self
-		
-		return this
 	end
 	
 	--- Renews a Task execution time.

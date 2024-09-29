@@ -5,8 +5,6 @@ function Mode:new(name, constructor)
 		constructor = constructor,
 		settings = {}
 	}, self)
-
-	this.__index = this
 	
 	return this
 end

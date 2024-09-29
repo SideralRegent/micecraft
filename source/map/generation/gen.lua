@@ -10,7 +10,7 @@ do
 		randomseed(0x132B7F7) -- Magic number which provides randomness to the random seed.
 		
 		local width, height = Map:getBlocks()
-		local BEDROCK = blockMetadata.maps.bedrock
+		local BEDROCK = blockMeta.maps.bedrock
 		
 		for x = 1, width do
 			self:assignTemplate(x, height, BEDROCK)

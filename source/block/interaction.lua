@@ -10,7 +10,7 @@
 do
 	local currentTime = os.time
 	function Block:create(type, display, update, updatePhysics)
-		if type == blockMetadata._C_VOID then
+		if type == blockMeta._C_VOID then
 			self:setVoid()
 		else
 			local meta = self:meta(nil, type)
@@ -133,7 +133,7 @@ do
 	-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
 	-- @return `Boolean` Whether the Block has the specified amount of damage
 	function Block:setDamageLevel(amount, add, player, display, update, updatePhysics)
-		if self.type ~= blockMetadata._C_VOID then
+		if self.type ~= blockMeta._C_VOID then
 			amount = amount or 1
 			local fx = (add and self.damageLevel + amount or amount)
 			
@@ -284,7 +284,7 @@ function Block:setCategory(category)
 end
 
 function Block:setFluidState(level, isSource, display, update, updatePhysics)
-	local meta = blockMetadata:get(self.type)
+	local meta = blockMeta:get(self.type)
 	if self.fluidRate > 0 then
 		self.fluidLevel = level or 0
 		self.isFluidSource = isSource
