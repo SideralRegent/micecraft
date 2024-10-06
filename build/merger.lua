@@ -107,7 +107,8 @@ local fileList = {
 		__docs = false,
 		"item",
 		"container",
-		"bank"
+		"bank",
+		"selector",
 	},
 	{
 		__name = "Player",
@@ -153,6 +154,7 @@ local fileList = {
 		"PlayerRespawn",
 		"ChatCommand",
 		"ColorPicked",
+		"TextAreaCallback"
 	},
 	{
 		__name = "Launch",

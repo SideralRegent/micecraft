@@ -1,84 +1,144 @@
-function Player:setInventories()
-	self.inventory:setContainersDisplay("main", {
-		solve = function(index)
-			index = index - 1
-			return {
-				targetLayer = ":99999",
-				scaleX = 0.625,
-				scaleY = 0.625, -- 20 px
-				y = 40 + ((index % 4) * 27),
-				x = 100 + (((index * 4) % 10) * 27),
-				playerName = self.name,
-				angle = 0,
-				alpha = 1.0,
-				originX = 0,
-				originY = 0,
-				fade = false
+function PlayerInventory:new(ownerName)
+	return setmetatable({
+		owner = ownerName,
+		bank = ItemBank:new(4 * 10),
+		showing = {
+			hotbar = false,
+			remainder = false
+		},
+		map = {}
+	}, self)
+end
+
+do -- This is crap.
+	local floor = math.floor
+	local hotbarLim = 4
+	local line = hotbarLim
+	local collumn = 10
+	local scale = 0.625
+	local pxsize = scale * 32
+	local offset = 0.35 * pxsize
+	local pxoffset = pxsize + offset
+		
+	local X, Y = 15, 25
+		
+	function PlayerInventory:set()
+		local callback = ("Inv-%s-%%d"):format(self.owner)
+		self.bank:setContainersDisplay("remainder", {
+			lowerLimit = hotbarLim + 1,
+			solve = function(index)
+				local pos = index - 1
+				return {
+					targetLayer = ":99999",
+					scaleX = scale,
+					scaleY = scale, -- 20 px
+					y = Y + ((pos % line) * pxoffset),
+					x = X + (floor(pos / line) * pxoffset),
+					
+				--	x = X + (((index * line) % collumn) * pxoffset),
+					playerName = self.owner,
+					angle = 0,
+					alpha = 1.0,
+					originX = 0,
+					originY = 0,
+					fade = false,
+					callback = callback:format(index)
+				}
+			end
 			}
-		end
-		}
-	)
-	
-	self.inventory:setContainersDisplay("hotbar", {
-		upperLimit = 5,
-		solve = function(index)
-			index = index - 1
-			return {
-				targetLayer = ":99999",
-				scaleX = 0.625,
-				scaleY = 0.625, -- 20 px
-				y = 25 + ((index % 4) * 27),
-				x = 15,
-				playerName = self.name,
-				angle = 0,
-				alpha = 1.0,
-				originX = 0,
-				originY = 0,
-				fade = false
+		)
+		
+		self.bank:setContainersDisplay("hotbar", {
+			upperLimit = hotbarLim,
+			solve = function(index)
+				local pos = index - 1
+				return {
+					targetLayer = ":99999",
+					scaleX = scale,
+					scaleY = scale, -- 20 px
+					y = Y + ((pos % line) * pxoffset),
+					x = X,
+					playerName = self.owner,
+					angle = 0,
+					alpha = 1.0,
+					originX = 0,
+					originY = 0,
+					fade = false,
+					callback = callback:format(index)
+				}
+			end
 			}
-		end
-		}
-	)
-	
-	self.inventory:bulkFill(itemMeta.maps.dirt, false)
-	self.inventory:showContainers("hotbar")
-end
-
-function Player:setMainInventoryDisplay(display)
-	if display then
-		self.inventory:showContainers("main")
-	else
-		self.inventory:hideContainers("main")
-	end
-end
-
-function Player:setHotbarActive(isActive)
-	self.hotbarActive = isActive
-	if isActive then
-		self.inventory:showContainers("hotbar")
-	else
-		self.inventory:hideContainers("hotbar")
-	end
-end
-
-function Player:showInventory(show)
-	self.showingInventory = show
-	
-	if self.hotbarActive == show then
-		self:setHotbarActive(not show)
-	end
-	
-	self:setMainInventoryDisplay(show)
-end
-
-do
-	
-
-	function Player:setSelectedFrame(index)
-		if not self.selectedFrame then
-			self.selectedFrame = SelectFrame:new(self.name)
+		)
+		
+		for i = 1, hotbarLim do
+			self.map[i] = "hotbar"
 		end
 		
+		for i = hotbarLim + 1, #self.bank.containers do
+			self.map[i] = "remainder"
+		end
 		
+		self.bank:bulkFill(0x7A315A, false)
+		self.bank:showContainers("hotbar")
 	end
+end
+
+function PlayerInventory:setDisplay(key, display)
+	if display == nil then
+		self:setDisplay(key, not self.showing[key])
+	else
+		self.showing[key] = display
+		
+		if display then
+			self.bank:showContainers(key)
+		else
+			self.bank:hideContainers(key)
+		end
+	end
+end
+
+function PlayerInventory:setView(hotbar, remainder)
+	self:setDisplay("hotbar", hotbar)
+	self:setDisplay("remainder", remainder)	
+end
+
+function PlayerInventory:serialize()
+	
+end
+
+function PlayerInventory:deserialize()
+	
+end
+
+function PlayerInventory:checkIndex(index)
+	return not not self.bank.containers[index]
+end
+
+function Player:shiftHotbarSelector(value, updateDisplay)
+	value = value or 1
+	local selector = self.selectedFrame
+	
+	-- 1 to 4: size of hotbar
+	local success = selector:shiftPointer(value, 1, 4, "hotbar")
+	
+	selector:setView(success and updateDisplay)
+end
+
+function Player:setSelectedContainer(index, bank, updateDisplay)
+	bank = bank or self.inventory.bank
+	local selector = self.selectedFrame
+		
+	local isEqual = (bank == selector.bank) and (index == selector.pointer)
+	
+	selector:setReferenceBank(bank)
+	
+	if isEqual then -- Deselection
+		index = 0
+	end
+	
+	local success = selector:setPointer(index, self.inventory.map[index])
+	
+	selector:setView(success and updateDisplay)
+	
+	return not isEqual
 end

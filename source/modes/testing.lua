@@ -1,6 +1,6 @@
 Module:newMode("test", function(this, _)
 	function this:init(Map)
-		Map:setVariables(32, 32, 2, 2, 30, 20, 0, 0)
+		Map:setVariables(32, 32, 25, 12, 2, 2, 0, 0)
 		Map:setPhysicsMode("rectangle_detailed")
 	end
 	
@@ -20,7 +20,7 @@ Module:newMode("test", function(this, _)
 			overwrite = false,
 			exclusive = true,
 			dir = function(x, y)
-				if (x%3) == (y%3) and x%2 ~= 1 then
+				if y == 23 then
 					return blockMeta.maps.cobblestone
 				else
 					return VOID

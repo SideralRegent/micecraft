@@ -8,6 +8,10 @@ if tfm.get.room.name:lower():match("village") then
 	system.exit()
 end
 
+local printf = function(str, ...)
+	print(str:format(...))
+end
+
 --tfm.exec.chatMessage = print
 
 math.randomseed(currentTime())
@@ -131,6 +135,9 @@ SelectFrame.__index = SelectFrame
 
 local Player = {}
 Player.__index = Player
+
+local PlayerInventory = {}
+PlayerInventory.__index = PlayerInventory
 
 local Timer = {
 	uniqueId = -1,

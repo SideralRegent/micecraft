@@ -83,29 +83,34 @@ end
 function Map:getSpawn()	
 	local x = math.ceil(self.totalBlockWidth / 2)
 	
-	local block 
-	for y = #self.blocks, 1, -1 do
-		block = self.blocks[y][x]	
+	local block
+	local target
+	for y = 1, #self.blocks do
+		block = self.blocks[y][x]
 		
 		if block.type == VOID then
-			self.spawnPoint = {
-				x = x,
-				y = y,
-				dx = block.dxc,
-				dy = block.dyc
-			}
-			
+			target = block
+		else
 			break
 		end
 	end
 	
-	if self.spawnPoint then
+	target = target or block
+	
+	self.spawnPoint = {
+		x = target.x,
+		y = target.y,
+		dx = target.dxc,
+		dy = target.dyc
+	}
+	
+	--[[if self.spawnPoint then
 		local under = self:getBlock(self.spawnPoint.x, self.spawnPoint.y + 1, CD_MTX)
 		
 		if under then
 			--self:spawnStructure("SpawnPoint", under.x, under.y, 0.5, 0.8)
 		end
-	end
+	end]]
 	
 	return self.spawnPoint
 end

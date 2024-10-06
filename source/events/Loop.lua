@@ -5,7 +5,7 @@ do
 			
 		if elapsedTime >= 500 then
 			for _, player in next, Room.playerList do
-				player:updateInformation()
+				player:tfmUpdateInformation()
 				player:setClock(500, true, true)
 			end
 		end

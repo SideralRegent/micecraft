@@ -8,12 +8,14 @@ do
 	
 	local setmetatable = setmetatable
 	
+	local void = function() end
+	
 	function Keybind:new(keyName, keyId, down, callback)
 		return setmetatable({
 			keyName = keyName,
 			keyId = keyId,
 			down = down,
-			callback = callback
+			callback = callback or void
 		}, self)
 	end
 	
@@ -77,7 +79,16 @@ do
 		end)
 	
 		Keybinds:new("X", true, function(player)
-			player:showInventory(not player.showingInventory)	
+			player.inventory:setDisplay("remainder", nil)
+		end)
+	
+		-- Hotbar shift
+		Keybinds:new("K", true, function(player)
+			player:shiftHotbarSelector(-1, true)
+		end)
+	
+		Keybinds:new("L", true, function(player)
+			player:shiftHotbarSelector(1, true)
 		end)
 	end
 	
@@ -89,15 +100,17 @@ do
 	function Keybinds:event(player, keyId, down, ...)
 		local pk = player.keys
 		local keybind = self[down][keyId]
+		
 		pk[keyId] = kdl[down]
 		
-		if down then
+	--[[	if down then
 			pk.last = keyId
 		else
 			if keyId == pk.last then
 				pk.last = -1
 			end
-		end
+		end]]
+		
 		
 		if keybind then
 			-- keybind:trigger or keybind.callback:

@@ -7,7 +7,10 @@ do
 			item = nil,
 			displayInfo = {},
 			amount = 0,
-			maxAmount = 0--item:meta("maxAmount")
+			maxAmount = 0,--item:meta("maxAmount")
+			restrictedTo = {
+			-- category
+			}
 		}, {__index = self})
 	end
 	
@@ -21,13 +24,29 @@ do
 		end
 	end
 	
+	function ItemContainer:setRestriction(categoryName, value)
+		self.restrictedTo[categoryName] = value
+	end
+	
+	function ItemContainer:isCompatible(container)
+		if self.item then
+			return not container.restrictedTo[self.item.category]
+		else
+			return true
+		end
+	end
+	
+	function ItemContainer:isMutuallyCompatible(container)
+		return self:isCompatible(container) and container:isCompatible(self)
+	end
+	
 	function ItemContainer:setEmpty(updateDisplay)
 		self.item = nil
 		self.amount = 0
 		self.maxAmount = 0
 		
 		if updateDisplay then
-			self:hideAll(nil)
+			self:setHide(nil, true, true, true, false, nil)
 		end
 	end
 	
@@ -67,6 +86,18 @@ do
 		return self.displayInfo[key]
 	end
 	
+	function ItemContainer:getActiveDisplay(default)
+		for _, display in next, self.displayInfo do
+			if display.active then
+				return display
+			end
+		end
+		-- It will only come here if it didn't find any up there
+		if default then
+			return self.displayInfo[default] or next(self.displayInfo, nil)
+		end
+	end
+	
 	local abs = math.abs
 	
 	function ItemContainer:setDisplayInfo(key, info)
@@ -77,13 +108,15 @@ do
 		
 		info.textSize = 20 * info.scaleX
 		
-		info.selectX = info.x - (info.originX * TEXTURE_SIZE * info.scaleX)
-		info.selectY = info.y - (info.originY * TEXTURE_SIZE * info.scaleY)
+		info.selectWidth =  TEXTURE_SIZE * info.scaleX * 1.10
+		info.selectHeight = TEXTURE_SIZE * info.scaleY * 1.10
 		
-		info.selectWidth = abs(info.x - info.selectX) * 2
-		info.selectHeight = abs(info.y - info.selectY) * 2
+		info.selectX = info.x - (info.originX * info.selectWidth)
+		info.selectY = info.y - (info.originY * info.selectHeight)
 		
-		-- info.callback ...
+		info.active = false
+		
+		-- info.callback = ...
 		
 		self.displayInfo[key] = info
 	end
@@ -102,7 +135,7 @@ do
 	function ItemContainer:setUsageBarDisplay(key, show)
 		local i = self:gdisp(key)
 		
-		if not show and i.id_bar then
+		if i.id_bar then
 			i.id_bar = removeImage(i.id_bar, i.fade)
 		end
 		
@@ -133,50 +166,70 @@ do
 	
 	local counterText = "<font size='%d' color='#FFFFFF' face='Arial'>%d</font>"
 	local counterBack = "<font size='%d' color='#0' face='Arial'><b>%d</b></font>"
+	
+	function ItemContainer:removeCounterDisplay(key)
+		local i = self:gdisp(key)
+		
+		if i.id_counter then
+			removeTextArea(i.id_counter + 1, i.playerName)
+			removeTextArea(i.id_counter, i.playerName)
+			i.id_counter = nil
+		end
+	end
+	
+	function ItemContainer:showCounterDisplay(key)
+		local i = self:gdisp(key)
+		
+		i.id_counter = iaddTextArea(
+			"", i.playerName,
+			i.x + 1, i.y + 1,
+			0, 0,
+			0x0, 0x0,
+			1.0,
+			i.fixedPos
+		)
+		
+		iaddTextArea(
+			"", i.playerName,
+			i.x, i.y,
+			0, 0,
+			0x0, 0x0,
+			1.0,
+			i.fixedPos
+		)
+	end
+	
+	function ItemContainer:updateCounterDisplay(key)
+		local i = self:gdisp(key)
+		
+		if i.id_counter then
+			updateTextArea(
+				i.id_counter, 
+				counterBack:format(i.textSize, self.amount),
+				i.playerName
+			)
+			
+			updateTextArea(
+				i.id_counter + 1, 
+				counterText:format(i.textSize, self.amount),
+				i.playerName
+			)
+		end
+	end
+	
 	function ItemContainer:setCounterDisplay(key, show)
 		local i = self:gdisp(key)
 		
-		if show == false then
-			if i.id_counter then
-				removeTextArea(i.id_counter + 1, i.playerName)
-				i.id_counter = removeTextArea(i.id_counter, i.playerName)
-			end
+		if show == false or self.amount == 0 then
+			self:removeCounterDisplay(key)
 		else
-			if show == true then
-				i.id_counter = iaddTextArea(
-					"", i.playerName,
-					i.x + 1, i.y + 1,
-					0, 0,
-					0x0, 0x0,
-					1.0,
-					i.fixedPos
-				)
-				
-				iaddTextArea(
-					"", i.playerName,
-					i.x, i.y,
-					0, 0,
-					0x0, 0x0,
-					1.0,
-					i.fixedPos
-				)
+			if show and not self.id_counter then
+				self:showCounterDisplay(key)
 			end
 			
-			if i.id_counter then
-				updateTextArea(
-					i.id_counter, 
-					counterBack:format(i.textSize, self.amount),
-					i.playerName
-				)
-				updateTextArea(
-					i.id_counter + 1, 
-					counterText:format(i.textSize, self.amount),
-					i.playerName
-				)
-			end
+			self:updateCounterDisplay(key)
 		end
 	end
---	( id, text, targetPlayer, x, y, width, height, backgroundColor, borderColor, backgroundAlpha, fixedPos)
 	
 	local sel = ("<a href='event:%%s'>%s</a>"):format(('\n'):rep(15))
 	function ItemContainer:setSelectable(key, show)
@@ -187,13 +240,18 @@ do
 				i.playerName,
 				i.selectX, i.selectY,
 				i.selectWidth, i.selectHeight,
-				0x0, 0x0,
-				1.0,
+				0xff0000, 0xff0000,
+				0.25,
 				i.fixedPos
 			)
 		else
 			if i.id_select then
 				i.id_select = removeTextArea(i.id_select, i.playerName)
+			end
+			
+			if show == nil then
+				-- this is dangerous
+				self:setSelectable(key, true)
 			end
 		end
 	end
@@ -201,7 +259,6 @@ do
 	function ItemContainer:display(key)
 		local item = self.item
 		local display = self:gdisp(key)
-		display.active = true
 		
 		if item then
 			display.id_main = item:setImage(display)
@@ -215,52 +272,131 @@ do
 	
 	function ItemContainer:hide(key)
 		local display = self:gdisp(key)
-		display.active = false
 		
 		if display.id_main then
 			display.id_main = removeImage(display.id_main, display.fade)
 		end
 	end
 	
-	function ItemContainer:displayAll(key)
+	function ItemContainer:displayAll(key, selector)
 		if key then
-			self:display(key)
-			self:setUsageBarDisplay(key, true)
-			self:setCounterDisplay(key, true)
-			self:setSelectable(key, true)
+			self:setShow(key, true, true, true, true, true)
 		else
-			self:forEach("displayAll")
+			self:forEach("displayAll", selector)
 		end
 	end
 	
-	function ItemContainer:hideAll(key)
+	function ItemContainer:setShow(key, sprite, usageBar, counter, selector, state)
 		if key then
-			self:hide(key)
-			self:setUsageBarDisplay(key, false)
-			self:setCounterDisplay(key, false)
-			self:setSelectable(key, false)
-		else
-			self:forEach("hideAll")
-		end
-	end
-	
-	function ItemContainer:refreshDisplay(key, usageBar, counter)
-		if key then
-			self:hide(key)
-			self:setUsageBarDisplay(key, false)
-			if self.item then
+			if sprite then
 				self:display(key)
-				
-				if usageBar then
-					self:setUsageBarDisplay(key, true)
-				end
-				
-				if counter then
-					self:setCounterDisplay(key, nil)
-				end
+			end
+			
+			if usageBar then
+				self:setUsageBarDisplay(key, true)
+			end
+			
+			if counter then
+				self:setCounterDisplay(key, true)
+			end
+			
+			if selector then
+				self:setSelectable(key, true)
+			end
+			
+			if state ~= nil then
+				self.displayInfo[key].active = state
 			end
 		else
-			self:forEach("refreshDisplay", usageBar, counter)
+			if state == nil then
+				self:forEach("setShow", sprite, usageBar, counter, selector, nil)
+			end
+		end
+	end
+	
+	function ItemContainer:displayAll(key, selector)
+		if key then
+			self:setShow(key, true, true, true, selector, true)
+		else
+			self:forEach("displayAll", selector)
+		end
+	end
+	
+	function ItemContainer:setHide(key, sprite, usageBar, counter, selector, state)
+		if key then
+			if sprite then
+				self:hide(key)
+			end
+			
+			if usageBar then
+				self:setUsageBarDisplay(key, false)
+			end
+			
+			if counter then
+				self:setCounterDisplay(key, false)
+			end
+			
+			if selector then
+				self:setSelectable(key, false)
+			end
+			
+			if state ~= nil then
+				self.displaInfo[key].active = state
+			end
+		else
+			if state == nil then
+				self:forEach("setHide", sprite, usageBar, counter, selector, nil)
+			end
+		end
+	end
+	
+	function ItemContainer:hideAll(key, selector)
+		if key then
+			self:setHide(key, true, true, true, true, selector, false)
+		else
+			self:forEach("hideAll", selector)
+		end
+	end
+	
+	function ItemContainer:refreshDisplay(key, usageBar, counter, selector)
+		if key then
+			self:setHide(key, true, usageBar, counter, selector, nil)
+			
+			if self.item then
+				self:setShow(key, true, usageBar, counter, false, true)
+			end
+			
+			if selector then
+				self:setSelectable(key, true)
+			end
+		else
+			self:forEach("refreshDisplay", usageBar, counter, selector)
+		end
+	end
+	
+	function ItemContainer:refreshDisplay2(key, counter, usageBar, selector, status)
+		if key then
+			if selector then
+				self:setSelectable(key, nil)
+			end
+			
+			if self.item then
+				if (self.amount ~= 0) then
+					if counter then
+						self:setCounterDisplay(key, nil)
+					end
+					
+					if usageBar then
+						self:setUsageBarDisplay(key, nil)
+					end
+				end
+			else
+				self:setHide(key, true, true, true, false, nil)
+			end
+			
+			self.displayInfo[key].active = true
+		else
+			self:forEach("refreshDisplay2", counter, usageBar, selector, status)
 		end
 	end
 	
@@ -274,7 +410,7 @@ do
 	
 	local restrict = math.restrict
 	function ItemContainer:setValue(value)
-		self.amount = restrict(value, 1, self.maxAmount)
+		self.amount = restrict(value, 0, self.maxAmount)
 		
 		return abs(value - self.amount)
 	end
@@ -289,33 +425,52 @@ do
 			remainder = self:shiftValue(value)
 		else
 			if value == 0 then
-				self:setEmpty(updateDisplay)
+				self.amount = 0
 			else
 				remainder = self:setValue(value)
 			end
 		end
+				
+		if self.amount <= 0 then
+			self:setEmpty(false)
+		end
 		
 		if updateDisplay then
-			self:refreshDisplay(nil, true, true)
+			self:refreshDisplay2(nil, true, true, false)
 		end
 		
 		return remainder
 	end
 	
-	function ItemContainer:useItem(updateDisplay)
+	function ItemContainer:useItem(updateDisplay, ...)
 		local item = self.item
 		if not item then return false end
 		
 		local destroyed = item:checkUse(false)
 		if destroyed then
 			-- If self.amount is 1 then it will get erased
-			self:shiftValue(-1)
+			self:setAmount(-1, true, false)
 		end
 		
 		if updateDisplay then
-			self:refreshDisplay(nil, true, true)
+			self:refreshDisplay2(nil, true, true, false)
 		end
 		
 		return destroyed
+	end
+	
+	function ItemContainer:placeItem(updateDisplay, ...)
+		local item = self.item
+		if not item then return false end
+		
+		if item:place(...) then
+			self:setAmount(-1, true, false)
+			
+			if updateDisplay then
+				self:refreshDisplay2(nil, true, false, false)
+			end
+		end
+		
+		return false
 	end
 end

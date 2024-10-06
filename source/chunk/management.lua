@@ -131,7 +131,11 @@ do
 			
 			if goAhead then
 				local activeType = nil
-				if targetPlayer == nil then
+				
+				if not active then
+					activeType = false
+				end
+				--[[if targetPlayer == nil then
 					if active then
 						activeType = nil
 					else
@@ -139,7 +143,7 @@ do
 					end
 				else
 					activeType = active
-				end
+				end]]
 				
 				self:setQueue(true, "setDisplayState", activeType, targetPlayer)
 			end

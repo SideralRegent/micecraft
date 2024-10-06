@@ -7,8 +7,9 @@ function Player:loadData()
 end
 
 function Player:readData(rawdata)
-	table.print(rawdata)
---	local dat = data.decode(rawdata)
+--	print(("%s's data:"):format(self.name))
+	--table.print(rawdata)
+	--local dat = data.decode(rawdata)
 	
 	-- apply
 end

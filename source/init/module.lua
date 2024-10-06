@@ -84,6 +84,8 @@ do
 	function Module:unload(handled, errorMessage, ...)
 		if handled then
 			self:emitWarning(1, errorMessage, ...)
+			
+			while true do end
 		else
 			system.exit()
 			--self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.\nIssue: " .. (errorMessage or "Unknown"))
@@ -183,11 +185,7 @@ do
 			calls = {}
 		}, self)
 		
-		if this.isNative then
-			this.trigger = Event.triggerCount
-		else
-			this.trigger = Event.triggerUncount
-		end
+		this.trigger = this.isNative and Event.triggerCount or Event.triggerUncount
 		
 		return this
 	end
@@ -197,7 +195,15 @@ do
 		
 		return #self.calls
 	end
-	
+	function Event:triggerUncount(...)
+		for _, instance in next, self.calls do
+			if not Module.isPaused then
+				instance(...)
+			end
+		end
+	end
+	--[[
+	-- pcall is for little kids
 	function Event:triggerUncount(...)
 		local ok, result
 		
@@ -215,9 +221,25 @@ do
 		
 		return true, "success"
 	end
+	]]
 	
 	function Event:triggerCount(...)
+		local startTime
+		
+		for _, instance in next, self.calls do
+			if not Module.isPaused then
+				startTime = time()
+				instance(...)
+			--	print(("%s (%d) - %d"):format(self.keyName, _, time() - startTime))
+				Module:increaseRuntime(time() - startTime)
+			end
+		end
+	end
+	--[[
+	-- pcall is for little kids
+	function Event:triggerCount(...)		
 		local ok, result, startTime
+		
 		for _, instance in next, self.calls do
 			if not Module.isPaused then
 				startTime = time()
@@ -235,6 +257,7 @@ do
 		
 		return true, "success"
 	end
+	]]
 
 	-- Gets the Event object by the event name provided.
 	-- @name Module:getEvent
@@ -272,9 +295,9 @@ do
 			
 			if nativeEvents[eventName] then
 				rawset(_G, eventFullName, function(...)
-					if not self.isPaused then
+					--if not self.isPaused then
 						self:trigger(eventName, ...)
-					end
+					--end
 				end)
 			else
 				rawset(_G, eventFullName, function(...)
@@ -305,25 +328,21 @@ do
 	end
 	
 	--- Triggers the callbacks of an event emmited.
-	-- This function should not be called other than inside a true event
-	-- definition. For the sake of performance, it assumes that the event
-	-- provided already exists, and thus doesn't check for a nil listener.
+	-- This function should not be called manually. Also, since it only gets
+	-- called inside a Module:on, it is guaranteed that the eventlistener will
+	-- exist, thus no need to check for its validity.
 	-- @name Module:trigger
 	-- @param String:eventName The event to trigger.
 	-- @return `Boolean` Whether the Event triggered without errors.
 	function Module:trigger(eventName, ...)
-		local event = self:getEvent(eventName)
-		if event then
-			local ok, result = event:trigger(...)
-			
-			if not ok then
-				print(eventName)
-				local isFatal = not not critical[eventName]
-				self:throwException(isFatal, result)
-			end
-			
-			return ok
+		self:getEvent(eventName):trigger(...) -- dafuq?
+		--[[local ok, result =
+		if not ok then
+			local isFatal = not not critical[eventName]
+			self:throwException(isFatal, result)
 		end
+		
+		return ok]]
 	end
 	
 	--- Increases the runtime counter of the Module.
@@ -332,8 +351,11 @@ do
 	-- @name Module:increaseRuntime
 	-- @param Int:increment The amount of milliseconds to increment into the counter.
 	-- @return `Boolean` Whether the increment in runtime has caused the Module to pause.
+	local updateTextArea = ui.updateTextArea
 	function Module:increaseRuntime(increment)
 		self.currentRuntime = self.currentRuntime + increment
+		
+		updateTextArea(12, ("%d ms"):format(self.currentRuntime), nil)
 		
 		if self.currentRuntime >= self.runtimeLimit then
 			self:pause()

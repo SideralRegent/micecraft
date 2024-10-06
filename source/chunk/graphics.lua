@@ -25,7 +25,7 @@ function Chunk:setDisplayState(active, targetPlayer)
 	
 	for y = self.yf, self.yb do
 		for x = self.xf, self.xb do
-			mBlock(matrix[y][x], targetPlayer) -- Block:[method]()
+			mBlock(matrix[y][x]) -- Block:[method]()
 			mDeco(deco[y][x], targetPlayer)
 		end
 	end

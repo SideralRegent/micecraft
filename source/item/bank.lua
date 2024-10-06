@@ -53,11 +53,11 @@ do
 	end
 	
 	function ItemBank:showContainers(key)
-		self:forEachInDisp(key, "displayAll")
+		self:forEachInDisp(key, "displayAll", true)
 	end
 	
 	function ItemBank:hideContainers(key)
-		self:forEachInDisp(key, "hideAll")
+		self:forEachInDisp(key, "hideAll", true)
 	end
 	
 	function ItemBank:refreshContainers(key)
@@ -76,11 +76,79 @@ do
 	
 	function ItemBank:bulkFill(item, updateDisplay)
 		for _, container in next, self.containers do
-			container:setItemType(item, 99, updateDisplay)
+			container:setItemType(item, math.random(4000, 6000), updateDisplay)
 		end
 		
 		if updateDisplay then
 		--	self:refreshContainers(nil)
 		end
+	end
+	
+	function ItemBank:shiftContainers(A, B)
+		B:setItem(A.item, A.amount, false)
+		A:setEmpty()
+	end
+	
+	function ItemBank:exchangeContainers(A, B)
+		local X = {
+			item = A.item,
+			amount = A.amount
+		}
+		
+		A:setItem(B.item, B.amount)
+		B:setItem(X.item, X.amount)
+	end
+	
+	function ItemBank:pourContainer(A, B)
+		local leftover = B:setAmount(A.amount, true, false)
+		
+		if leftover == A.amount then
+			return false
+		else
+			A:setAmount(leftover, false, false)
+		end
+	end
+	
+	--- Moves an item from container S to container D
+	
+	local p = print
+	function ItemBank:moveItem(conS, conD, updateDisplay)
+		if conS == conD then return false end
+		
+		local S = self.containers[conS]
+		local D = self.containers[conD]
+		
+		local success = false
+		
+		if S.item then
+			if D.item then -- D has an item, need to perform checks
+				if S:isMutuallyCompatible(D) then
+					-- Same type, can just change amounts
+					if S.item.type == D.item.type then
+						success = self:pourContainer(S, D)
+					else -- Different types, just exchange
+						self:exchangeContainers(S, D)
+						
+						success = true
+					end
+				else -- Can't move
+					success = false
+				end
+			else -- D is empty, just copy contents
+				self:exchangeContainers(S, D)
+				
+				success = true
+			end
+		elseif D.item then -- if S is empty but not D
+			-- reuse same logic
+			return self:moveItem(conD, conS, updateDisplay)
+		end
+		
+		if updateDisplay then
+			S:refreshDisplay(nil, true, true, true)
+			D:refreshDisplay(nil, true, true, true)
+		end
+		
+		return success
 	end
 end

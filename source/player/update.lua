@@ -12,6 +12,12 @@ function Player:updatePosition(x, y, vx, vy)
 end
 
 do
+	function Player:tfmUpdateInformation()
+		local info = tfm.get.room.playerList[self.name] or {}
+		self:updatePosition(info.x, info.y, info.vx, info.vy)
+		self:updateDirection(nil, info.isJumping)
+	end
+	
 	function Player:updateInformation(x, y, vx, vy, facingRight)
 		local info = tfm.get.room.playerList[self.name] or {}
 		local k = self.keys
@@ -23,7 +29,7 @@ do
 			vy or info.vy
 		)
 		
-		self.isJumping = info.isJumping
+		--self.isJumping = info.isJumping
 		
 		self:updateDirection(facingRight, k[0] or k[2] or info.isJumping)
 	end
@@ -85,11 +91,15 @@ do
 		end
 
 		if runEvents then
-			if self.internalTime % 2500 == 0 then -- Every 2.5 seconds
-					self:updateChunkArea()
-			else
-				self:checkForCurrentChunk()
-			end
+			self:runEvents()
+		end
+	end
+	
+	function Player:runEvents()
+		if self.internalTime % 4000 == 0 then -- Every 4 seconds
+			self:updateChunkArea()
+		else
+			self:checkForCurrentChunk()
 		end
 	end
 end

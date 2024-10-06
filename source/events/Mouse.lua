@@ -40,18 +40,12 @@ do
 	
 	do
 		-- (-1) : No key active
-		Mousebinds:new(-1, true, function(player, block)
-			block:damage(50, true, true, true, true, player)
+		Mousebinds:new(-1, true, function(player, targetBlock)
+			player:damageBlock(targetBlock)
 		end)	
 		
-		Mousebinds:new(keys.SHIFT, true, function(player, block, ...)
---			if block.type ~= blockMeta.maps.bedrock then
-				if player.selected then
-					block:create(player.selected, true, true, true)
-				end
-				
-				--block:createAsFluidWith(blockMeta.maps.water, 4, true, true, true, true)
-	--		end
+		Mousebinds:new(keys.SHIFT, true, function(player, targetBlock, ...)
+			player:placeBlock(targetBlock)
 		end)
 		
 		Mousebinds:new(keys.one, true, function(_, block, ...)

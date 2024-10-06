@@ -3,13 +3,13 @@ do
 	--- Displays the sprite that corresponds to this block, if any.
 	-- @name Block:display
 	-- @param String:targetPlayer
-	function Block:display(targetPlayer)
+	function Block:display()
 		if self.sprite then
 			self.spriteId = addImage(
 				self.sprite,
 				"!100",
 				self.dx, self.dy,
-				targetPlayer,
+				nil,
 				REFERENCE_SCALE_X, REFERENCE_SCALE_Y,
 				0, -- rotation
 				1.0, -- alpha

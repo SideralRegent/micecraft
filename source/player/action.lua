@@ -56,7 +56,27 @@ do
 		respawnPlayer(self.name)
 	end
 	
-	function Player:setSelected(selected)
-		self.selected = selected or VOID
+	function Player:placeBlock(targetBlock)
+		if (targetBlock.type ~= 0) and (targetBlock.fluidRate == 0) then return end
+		
+		if self.selectedFrame:validatePointer() then
+			self.selectedFrame:placeItem(targetBlock, self)
+		end
+	end
+	
+	function Player:damageBlock(targetBlock)
+		if targetBlock.type == 0 then return end
+		
+		-- self.selectedFrame item in selected frame affects damage to blocks
+		-- TODO: Add a 'damage' field to Items
+		targetBlock:damage(50, true, true, true, true, self)
+	end
+	
+	function Player:moveItem(targetIndex)
+		local selector = self.selectedFrame
+		local inventory = self.inventory
+		if selector:validatePointer() and inventory:checkIndex(targetIndex) then
+			inventory.bank:moveItem(selector.pointer, targetIndex, true)
+		end
 	end
 end

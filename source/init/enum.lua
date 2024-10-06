@@ -1,3 +1,18 @@
+enum.icat = {
+	null = 0,
+	block = 1,
+	tool = 2
+}
+
+enum.iclass = { -- icat 2
+	null = 0,
+	block = 1,
+	sword = 21,
+	shovel = 22,
+	pickaxe = 23,
+	axe = 24
+}
+
 enum.community = { -- Based on Forum codes. Affects on nothing.
 	-- Community 0 is just current player community
 	["xx"] = 1,
@@ -101,6 +116,7 @@ enum.keys = {
 	
 	[67] = "C",
 	
+	[75] = "K",
 	[76] = "L",
 	[77] = "M",
 	[86] = "V",

@@ -3,6 +3,7 @@ function Player:new(playerName)
 	
 	local this = setmetatable({
 		name = playerName,
+		id = info.id,
 		
 		language = info.language,
 		
@@ -21,10 +22,8 @@ function Player:new(playerName)
 		
 		keys = {},
 		
-		inventory = ItemBank:new(4 * 10),
-		showingInventory = false,
-		hotbarActive = false,
-		selectedFrame = nil,
+		inventory = PlayerInventory:new(playerName, info.id),		
+		selectedFrame = SelectFrame:new(playerName, info.id),
 		
 		internalTime = 0,
 		
@@ -33,7 +32,8 @@ function Player:new(playerName)
 	}, self)
 	-- ...
 	
-	this:setInventories()
+	this.inventory:set()
+	this:setSelectedContainer(1, this.inventory.bank, true)
 	
 	return this
 end

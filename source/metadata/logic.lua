@@ -102,16 +102,17 @@ do
 		
 		local definition = {}
 		local targetKey
-		for index, object in ipairs(otherMeta) do
-			definition = {}
-			for key, value in next, object do -- Ouch
-				targetKey = dictionary[key]
-				if targetKey then
-					definition[targetKey] = value
+		for index, object in next, otherMeta do
+			if type(index) == "number" then
+				definition = {}
+				for key, value in next, object do -- Ouch
+					targetKey = dictionary[key]
+					if targetKey then
+						definition[targetKey] = value
+					end
 				end
+				self:set(index + shift, template, definition)
 			end
-			
-			self:set(index + shift, template, definition)
 		end
 	end
 end

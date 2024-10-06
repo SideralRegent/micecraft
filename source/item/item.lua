@@ -33,8 +33,9 @@ do
 	
 	function Item:meta(field, type)
 		self.type = type or self.type
-	
+		
 		local metadata = itemMeta:get(self.type)
+		
 		if field then
 			return metadata[field]
 		else
@@ -46,7 +47,6 @@ do
 		self.type = type or self.type
 		local meta = itemMeta:get(self.type)
 		
-		self.type = meta.type
 		self.category = meta.category
 		
 		self.sprite = meta.sprite
@@ -100,7 +100,7 @@ do
 	end
 	
 	local restrict = math.restrict
-	function Item:use(...)
+	function Item:use(user, ...)
 		local consumable = self.consumable
 		if consumable then
 			consumable.uses = consumable.uses + 1
@@ -108,7 +108,7 @@ do
 			return consumable.uses < consumable.maxUses
 		end
 		
-		self:onUse(...)
+		self:onUse(user, ...)
 		
 		return true
 	end
@@ -141,14 +141,19 @@ do
 		return destroyed
 	end
 	
-	function Item:place()
+	function Item:place(blockTarget, perpetrator)
 		if self.placeable then
+			blockTarget:create(self:meta("blockId"), true, true, true)
+			--blockTarget:onPlacement(perpetrator)
 			
+			return true
 		end
+		
+		return false
 	end
 	
-	function Item:destroy()
-		self:onDestroy()
+	function Item:destroy(...)
+		self:onDestroy(...)
 		
 		self:reset()
 	end

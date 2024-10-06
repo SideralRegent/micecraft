@@ -86,7 +86,7 @@ Adds an Event listener. It will create the Event object required, with the event
 ---
 
 ### **Module:trigger** ( `eventName`: string )
-Triggers the callbacks of an event emmited. This function should not be called other than inside a true event definition. For the sake of performance, it assumes that the event provided already exists, and thus doesn't check for a nil listener.
+Triggers the callbacks of an event emmited. This function should not be called manually. Also, since it only gets called inside a Module:on, it is guaranteed that the eventlistener will exist, thus no need to check for its validity.
 
 **Parameters:**
 - **eventName** (`String`) : The event to trigger.
