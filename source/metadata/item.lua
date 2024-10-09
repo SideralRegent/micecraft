@@ -14,6 +14,7 @@ local void = function() end
 		
 		placeable = false,
 		consumable = false,
+		durability = math.huge,
 		
 		properties = {},
 		
@@ -21,7 +22,11 @@ local void = function() end
 		onPlacement = void,
 		onDestroy = void,
 		
-		maxAmount = 9999 -- For ItemContainer
+		maxAmount = 9999, -- For ItemContainer
+		
+		damage = function(self, element, class)
+			return 2
+		end
 	})
 end
 
@@ -56,6 +61,10 @@ itemMeta:set(0x7A315A, {
 	name = "Test_Sigil",
 	category = enum.icat.null,
 	sprite = "1925f762ea4.png",
-	consumable = false,
-	placeable = false
+	consumable = 8,
+	onUse = function(self, user, targetBlock, x, y)
+		user:move(x, y, false, 0, 0, true)
+	end,
+	maxAmount = 3,
+	placeable = false,
 })

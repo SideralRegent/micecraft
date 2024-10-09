@@ -21,6 +21,7 @@ function Player:new(playerName)
 		lastChunk = -1,
 		
 		keys = {},
+		interface = {},
 		
 		inventory = PlayerInventory:new(playerName, info.id),		
 		selectedFrame = SelectFrame:new(playerName, info.id),
@@ -33,31 +34,14 @@ function Player:new(playerName)
 	-- ...
 	
 	this.inventory:set()
-	this:setSelectedContainer(1, this.inventory.bank, true)
+	this:setSelectedContainer(1, this.inventory.bank, false)
+	
+	this:freeze(true, true, 0, 0)
 	
 	return this
 end
 
-function Player:init()
--- 	local this = tfm.get.room.playerList[self.name] or {}
-	
-	self.isMoving = false
-	self.isJumping = false
-	self.isFacingRight = true
-	
-	self.isAlive = false
-	self.isActive = false
-	
-	if self:assertValidity() then
-		self.isActive = true
-		self:respawn()
-	else
-		self.isActive = false
-		self:kill()
-	end
-end
-
-function Player:init()
+function Player:init(enable)
 	local this = tfm.get.room.playerList[self.name] or {}
 	
 	self.isMoving = false
@@ -65,17 +49,44 @@ function Player:init()
 	self.isFacingRight = true
 	
 	self.isAlive = not this.isDead
+	
 	self.isActive = false
 	
-	if self:assertValidity() then
-		if not self.isAlive then
-			self.isActive = true
-			tfm.exec.respawnPlayer(self.name)
-		end
-	else
-		self.isActive = false
-		tfm.exec.killPlayer(self.name)
+	if enable then
+		self:checkEnable()
 	end
+end
+
+function Player:checkEnable()
+	--self.isActive = false
+	if self:assertValidity() then
+		self:enable()
+	else
+		self:disable()
+	end
+	
+	return self.isActive
+end
+
+function Player:enable()
+	if not self.isAlive then
+		self:respawn()
+	end
+	
+	if not self.isActive then
+		self.isActive = true
+			
+		self.inventory:setDisplay("hotbar", true)
+		self:freeze(false, false)
+	end
+end
+
+function Player:disable()
+	self.isActive = false
+	self:kill()
+	
+	self.inventory:setDisplay("hotbar", false)
+	self.inventory:setDisplay("remainder", false)
 end
 
 function Player:assertValidity() -- TODO: Implement persistent data checking

@@ -108,7 +108,7 @@ do
 	end, "teleport")
 
 	Commands:new("runtime", function(player)
-		ui.addTextArea(12, "NaN ms", player.name, 5, 384, 0, 0, 0x0, 0x0, 1.0, true)
+		ui.addTextArea(12, "NaN ms", player.name, 750, 384, 0, 0, 0x0, 0x0, 1.0, true)
 	end)
 
 	Commands:new("reload", function()

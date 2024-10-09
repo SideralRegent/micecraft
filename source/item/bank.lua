@@ -74,9 +74,9 @@ do
 		end
 	end
 	
-	function ItemBank:bulkFill(item, updateDisplay)
+	function ItemBank:bulkFill(item, amount, updateDisplay)
 		for _, container in next, self.containers do
-			container:setItemType(item, math.random(4000, 6000), updateDisplay)
+			container:setItemType(item +_, amount, updateDisplay)
 		end
 		
 		if updateDisplay then

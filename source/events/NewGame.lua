@@ -16,8 +16,10 @@ do
 			end
 		})
 		
-		for _, player in next, Room.playerList do
-			player:init()
-		end
+		
+		
+		--[[for _, player in next, Room.playerList do
+			player:showMainMenu(true)--player:init()
+		end]]
 	end)
 end

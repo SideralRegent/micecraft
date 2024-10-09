@@ -70,6 +70,10 @@ do
 			print("debug")
 		end)
 	
+		Keybinds:new("ESC", true, function(player)
+			player:promptMainMenu()
+		end)
+	
 		Keybinds:new("L", true, function(player)
 			ui.showColorPicker(0x838, player.name, 0x888888, "Background Color")
 		end)
@@ -123,7 +127,7 @@ do
 	Module:on("Keyboard", function(playerName, keyId, down, ...)
 		local player = Room:getPlayer(playerName)
 		
-		if player then
+		if player and player.isActive then
 			Keybinds:event(player, keyId, down, ...)
 		end
 	end)

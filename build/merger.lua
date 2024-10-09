@@ -1,5 +1,6 @@
 local logpath = ("./build/log/%s.lua"):format(os.date("%Y%m%d%H%M%S"))
 local buildpath = './build/micecraft.lua'
+local versionpath = "./build/version"
 
 local shouldLog = false
 local releaseBuild = false
@@ -19,6 +20,7 @@ local fileList = {
 		__docs = true,
 		"tfm",
 		"math",
+		"debug",
 		"table",
 		"data",
 		"timer",
@@ -35,14 +37,13 @@ local fileList = {
 		"enum",
 		"prestart"
 	},
-	--{
-	--[[	__name = "Interface",
+	{
+		__name = "Interface",
 		__directory = "source/interface",
 		__docs = true,
-		"ui",
-		"object",
-		"template"]]
-	--},
+		"def",
+		"menu"
+	},
 	-- >> MAP
 	{
 		__name = "Map",
@@ -120,7 +121,8 @@ local fileList = {
 		"update",
 		"action",
 		"handle",
-		"world"
+		"world",
+		"interface"
 	},
 	{
 		__name = "MetaData",
@@ -154,7 +156,9 @@ local fileList = {
 		"PlayerRespawn",
 		"ChatCommand",
 		"ColorPicked",
-		"TextAreaCallback"
+		"TextAreaCallback",
+		"Pause",
+		"Resume"
 	},
 	{
 		__name = "Launch",
@@ -176,6 +180,25 @@ os.readFile = function(fileName)
     end
 
     return raw, result
+end
+local VERSION = ""
+local setVersion = function()
+	local verFile = os.readFile(versionpath)
+	local major, minor, patch, tag = verFile:match("^major=(%d+),minor=(%d+),patch=(%d+),tag=(.+)$")
+	patch = tonumber(patch) + 1
+	
+	if tag ~= "null" then
+		VERSION = ("%s.%s.%d-%s"):format(major, minor, patch, tag)
+	else
+		VERSION = ("%s.%s.%d"):format(major, minor, patch)
+	end
+	
+	local File, result = io.open(versionpath, "w")
+		
+	if File then
+		File:write(("major=%s,minor=%s,patch=%d,tag=%s"):format(major, minor, patch, tag))
+		File:close()
+	end
 end
 
 local formatDoc = function(dt)
@@ -323,11 +346,16 @@ local buildModule = function(modulo, log)
 end
 
 do
+	setVersion()
+	
+	
 	local build
     local arrayModules = {}
     for index, modulo in ipairs(fileList) do
         arrayModules[index] = buildModule(modulo, true)
     end
+	
+	arrayModules[1] = arrayModules[1]:gsub("MODULE_VERSION", VERSION)
 
     local compModules = table.concat(arrayModules, "\n")
     do
@@ -336,6 +364,7 @@ do
             local license = licenseFile:read("*all")
             
             build = ("--[[\n\n%s\n]]--\n%s"):format(license, compModules)
+			
             licenseFile:close()
         end
 	end

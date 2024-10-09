@@ -6,14 +6,21 @@ function Module:loadMap()
 end
 
 function Module:start()
+	print("<T>Starting module...</T>")
 	Room:init()
 	
 	--local mode = self:setMode(Room.mode)
 	local mode = self:setMode("test")	
 	
-	World:init()
-	mode:init(Map)
-	Map:init()
+	debug.pmeasure("World: %s", World.init, World)
+	--World:init()
+	debug.pmeasure("Mode: %s", mode.init, mode, Map)
+	--mode:init(Map)
+	--Map:init()
+	debug.pmeasure("Map: %s", Map.init, Map)
+	
+	
+	print("<b>Setting room...</b>")
 	
 	tfm.exec.disableAfkDeath(true)
 	tfm.exec.disableAutoNewGame(true)
@@ -23,9 +30,15 @@ function Module:start()
 	tfm.exec.disablePhysicalConsumables(true)
 	system.disableChatCommandDisplay(nil)
 	
-	mode:run()
+	debug.pmeasure("Mode (run): %s", mode.run, mode)
+	
+	print("<b>Loading map...</b>")
 	
 	self:loadMap()
+	
+	printf("<J>Micecraft %s</J>", self.version)
+	
+	Room:initPlayers()
 end
 
 

@@ -8,7 +8,9 @@ Module:on("PlayerDataLoaded", function(playerName, rawdata)
 		player.awaitingData = false
 		
 		if not player.isActive then
-			player:init() -- For now it should be automatic
+			player:init()
+			
+			player:promptMainMenu()
 		end
 	end
 end)

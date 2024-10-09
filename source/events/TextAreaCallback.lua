@@ -34,8 +34,10 @@ do
 		if textbind then
 			local a = {}
 			
-			for arg in info:gmatch("[^%-]+") do
-				a[#a + 1] = tonumber(arg) or arg
+			if info then
+				for arg in info:gmatch("[^%-]+") do
+					a[#a + 1] = tonumber(arg) or arg
+				end
 			end
 			
 			textbind:trigger(player, a[1], a[2], a[3], a[4], a[5])
@@ -54,6 +56,25 @@ do
 				tfm.exec.chatMessage("Not implemented.", player.name)
 			end
 		end)
+	
+		TextAreaBinds:new("play", function(player, ...)			
+			if player:checkEnable() then
+				player:showMainMenu(false)
+			else
+				tfm.exec.chatMessage("Not implemented.", player.name)
+			end
+		end)
+		
+		TextAreaBinds:new("spectate", function(player, ...)
+			player:disable()
+			player:showMainMenu(false)
+			player:showMainMenuReturn(true)
+		end)
+	
+		TextAreaBinds:new("retmainmen", function(player, ...)
+			player:showMainMenuReturn(false)
+			player:showMainMenu(true)
+		end)
 	end
 	
 	
@@ -62,7 +83,7 @@ do
 		
 		if player then
 			local name, info = eventName:match("^(%a+)%-(.+)$")
-			
+			name = name or eventName
 			TextAreaBinds:event(player, name, info)
 		end
 	end)

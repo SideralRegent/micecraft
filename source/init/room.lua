@@ -49,9 +49,6 @@ function Room:init()
 	
 	
 	self.playerList = {}
-	for playerName, _ in next, this.playerList do
-		_G.eventNewPlayer(playerName)
-	end
 end
 
 function Room:hasPlayer(playerName)
@@ -62,10 +59,17 @@ function Room:getPlayer(playerName)
 	return self.playerList[playerName]
 end
 
+function Room:initPlayers()
+	for playerName, _ in next, tfm.get.room.playerList do
+		_G.eventNewPlayer(playerName)
+	end
+end
+
 do
 	local bindMouse = system.bindMouse
 	local bindKeyboard = system.bindKeyboard
 	local lowerSyncDelay = tfm.exec.lowerSyncDelay
+	
 	function Room:newPlayer(playerName)
 		if not self:hasPlayer(playerName) then
 			self.playerList[playerName] = Player:new(playerName)
@@ -86,6 +90,8 @@ do
 		
 		self.presencePlayerList[playerName] = true
 		self.presencePlayers = self.presencePlayers + 1
+		
+		return self:getPlayer(playerName)
 	end
 end
 

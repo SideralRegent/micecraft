@@ -5,6 +5,7 @@ enum.icat = {
 }
 
 enum.iclass = { -- icat 2
+	player = -1,
 	null = 0,
 	block = 1,
 	sword = 21,
@@ -100,6 +101,8 @@ enum.keys = {
 	[16] = "SHIFT",
 --	[17] = "CONTROL", -- Issues with Mac
 	[18] = "ALT",
+	
+	[27] = "ESC",
 	
 	[32] = "SPACE",
 	

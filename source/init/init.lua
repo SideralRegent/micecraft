@@ -47,7 +47,7 @@ local xmlLoad = '<C><P L="%d" H="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D>
 --local xmlLoad = '<C><P Ca="" L="%d" H="%d"  /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
 local Module = {
-	version = "0.3.1-alpha",
+	version = "MODULE_VERSION",
 	apiVersion = "",
 	tfmVersion = "",
 	
@@ -63,6 +63,12 @@ local Module = {
 	
 	isPaused = false,
 	args = {}
+}
+
+local Interface = {
+	object = {},
+	settingIndex = 0,
+	objAc = 0,
 }
 
 local Room = {

@@ -125,11 +125,15 @@ do
 	local removeImage = tfm.exec.removeImage
 	
 	local bar_status = { -- 32 x 4 -- TODO: Add actual status images
-		[0] = " ",
-		"A",
-		"B",
-		"C",
-		"D",
+		"192623b20dd.png", -- Fewer uses
+		"192623afe9f.png",
+		"192623ac1dd.png",
+		"192623aa2e3.png",
+		"192623a846b.png",
+		"192623a4794.png",
+		"192623a2113.png",
+		"1926239fff0.png",
+		"1926239d5dd.png", -- Most uses
 	}
 	
 	function ItemContainer:setUsageBarDisplay(key, show)
@@ -142,11 +146,11 @@ do
 		if show ~= false and self.item then
 			local consumable = self.item.consumable
 			
-			if consumable then				
+			if consumable and consumable.uses ~= 0 then				
 				local image = ceil((consumable.uses / consumable.maxUses) * #bar_status)
 				
 				i.id_bar = addImage(
-					image,
+					bar_status[image],
 					i.targetLayer,
 					i.barX, i.barY,
 					i.playerName,
@@ -240,7 +244,7 @@ do
 				i.playerName,
 				i.selectX, i.selectY,
 				i.selectWidth, i.selectHeight,
-				0xff0000, 0xff0000,
+				0xFFFFFF, 0xFFFFFF,
 				0.25,
 				i.fixedPos
 			)
@@ -341,7 +345,7 @@ do
 			end
 			
 			if state ~= nil then
-				self.displaInfo[key].active = state
+				self.displayInfo[key].active = state
 			end
 		else
 			if state == nil then
@@ -446,7 +450,7 @@ do
 		local item = self.item
 		if not item then return false end
 		
-		local destroyed = item:checkUse(false)
+		local destroyed = item:checkUse(false, ...)
 		if destroyed then
 			-- If self.amount is 1 then it will get erased
 			self:setAmount(-1, true, false)
@@ -469,6 +473,8 @@ do
 			if updateDisplay then
 				self:refreshDisplay2(nil, true, false, false)
 			end
+			
+			return true
 		end
 		
 		return false

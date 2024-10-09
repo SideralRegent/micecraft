@@ -44,16 +44,18 @@ do
 			player:damageBlock(targetBlock)
 		end)	
 		
-		Mousebinds:new(keys.SHIFT, true, function(player, targetBlock, ...)
-			player:placeBlock(targetBlock)
+		Mousebinds:new(keys.SHIFT, true, function(player, targetBlock, x, y)
+			if not player:placeBlock(targetBlock) then
+				player:useItem(targetBlock, x, y)
+			end
 		end)
 		
 		Mousebinds:new(keys.one, true, function(_, block, ...)
 			block:create(blockMeta.maps.stone, true, true, true)	
 		end)
 		
-		Mousebinds:new(keys.ALT, false, function(player, _, xPosition, yPosition)
-			player:move(xPosition, yPosition, false)
+		Mousebinds:new(keys.ALT, false, function(player, _, x, y)
+			player:move(x, y, false)
 		end)
 	
 		Mousebinds:new(keys.C, true, function(player, ...)
@@ -91,10 +93,11 @@ do
 		end
 	end
 	
+	local o = os.time()
 	Module:on("Mouse", function(playerName, xPosition, yPosition)
 		local player = Room:getPlayer(playerName)
 		
-		if player then
+		if player and player.isActive and player.isAlive then
 			Mousebinds:event(player, xPosition, yPosition)
 		end
 	end)

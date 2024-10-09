@@ -20,8 +20,8 @@ Module:newMode("test", function(this, _)
 			overwrite = false,
 			exclusive = true,
 			dir = function(x, y)
-				if y == 23 then
-					return blockMeta.maps.cobblestone
+				if y >= 20 then
+					return blockMeta.maps.cactus
 				else
 					return VOID
 				end
@@ -35,14 +35,14 @@ Module:newMode("test", function(this, _)
 				ui.setBackgroundColor("#6a7495")
 		--	ui.setBackgroundColor("#5A5A5A")
 		end)
-
+--[[
 		Module:on("PlayerDied", function(playerName)
 			local player = Room:getPlayer(playerName)
 			
 			if player then
 				player:init()
 			end
-		end)
+		end)]]
 	end
 	
 	function this:getSettings()

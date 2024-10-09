@@ -19,7 +19,7 @@ do
 			
 			properties = {},
 			
-			
+			damage = 2,
 			
 			onUse = void,
 			onPlacement = void,
@@ -43,8 +43,8 @@ do
 		end
 	end
 	
-	function Item:setFromType(type, clean) -- Set all fields to meta info
-		self.type = type or self.type
+	function Item:setFromType(typeId, clean) -- Set all fields to meta info
+		self.type = typeId or self.type
 		local meta = itemMeta:get(self.type)
 		
 		self.category = meta.category
@@ -54,7 +54,16 @@ do
 		
 		self.placeable = meta.placeable
 		
-		self.consumable = meta.consumable
+		if type(meta.consumable) == "boolean" then
+			self.consumable = meta.consumable
+		else
+			self.consumable = {
+				uses = 0,
+				maxUses = meta.consumable
+			}
+		end
+		
+		self.damage = meta.damage
 		
 		self.onUse = meta.onUse
 		self.onPlacement = meta.onPlacement
@@ -102,15 +111,16 @@ do
 	local restrict = math.restrict
 	function Item:use(user, ...)
 		local consumable = self.consumable
+		local aintBroken = true
 		if consumable then
 			consumable.uses = consumable.uses + 1
 			
-			return consumable.uses < consumable.maxUses
+			aintBroken = consumable.uses < consumable.maxUses
 		end
 		
 		self:onUse(user, ...)
 		
-		return true
+		return aintBroken
 	end
 	
 	local abs = math.abs

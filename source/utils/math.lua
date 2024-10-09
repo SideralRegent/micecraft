@@ -208,6 +208,43 @@ do
 		return heightMap
 	end
 	
+	local ipairs = ipairs
+	local round = math.round
+	math.heightMapVar = function(amplitude, width, direction, truncate)
+		local heightMap = {}
+		
+		local xEnd = 0
+		local xStart = 1
+		local a, b = 0, 0
+		
+		local y = 0
+		local s = 0
+		
+		for _, section in ipairs(direction) do
+			xStart = xEnd + 1
+			s = xEnd
+			xEnd = section[1]
+			a = b
+			b = section[2]
+			
+			if truncate then
+				for x = xStart, xEnd do
+					y = cosint(a, b, s) * amplitude
+					
+					heightMap[#heightMap + 1] = round(y)
+				end
+			else
+				for x = xStart, xEnd do
+					y = cosint(a, b, s) * amplitude
+					
+					heightMap[#heightMap + 1] = y
+				end
+			end
+		end
+		
+		return heightMap
+	end
+	
 	do
 		local op = {
 			add = function(a, b)

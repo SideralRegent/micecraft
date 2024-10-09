@@ -67,17 +67,25 @@ do
 		end
 	end
 	
-	function SelectFrame:useItem(user, block)
-		if user and block then
-			return self.pObj:useItem(user, block)
+	function SelectFrame:useItem(user, block, x, y)
+		if not (user and block) then return false end
+		
+		if self:validatePointer() then
+			return self.pObj:useItem(true, user, block, x, y)
 		end
+		
+		return false
 	end
 	
 	function SelectFrame:placeItem(blockTarget, perpetrator)
 		perpetrator = perpetrator or Room:getPlayer(self.owner)
 		
-		if blockTarget and perpetrator then
-			self.pObj:placeItem(true, blockTarget, perpetrator)
+		if not (blockTarget and perpetrator) then return false end
+		
+		if self:validatePointer() then
+			return self.pObj:placeItem(true, blockTarget, perpetrator)
 		end
+		
+		return false
 	end
 end

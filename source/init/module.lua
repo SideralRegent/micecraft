@@ -355,7 +355,7 @@ do
 	function Module:increaseRuntime(increment)
 		self.currentRuntime = self.currentRuntime + increment
 		
-		updateTextArea(12, ("%d ms"):format(self.currentRuntime), nil)
+		updateTextArea(12, ("<font color='#000000'>%d ms"):format(self.currentRuntime), nil)
 		
 		if self.currentRuntime >= self.runtimeLimit then
 			self:pause()
@@ -378,8 +378,7 @@ do
 		
 		self.isPaused = true
 		
-		self:trigger("Pause")
-		
+		self:trigger("Pause", time)
 		newTimer(function(_)
 			self:continue()
 		end, time, false)
