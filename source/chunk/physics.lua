@@ -11,7 +11,7 @@ do
 	function Segment:new(description, block)
 		local this = setmetatable({
 			uniqueId = block.chunkUniqueId,
-			presenceId = block.uniqueId,
+			presenceId = 0,
 			chunkId = block.chunkId,
 			
 			category = block.category,
@@ -101,16 +101,17 @@ do
 		self.y = self.ytl + (h / 2) + (catdef.y_offset * self.bh)
 	end
 	
-	local addPhysicObject = tfm.exec.addPhysicObject
+	local iaddPhysicObject = tfm.exec.iaddPhysicObject
 	local removePhysicObject = tfm.exec.removePhysicObject
 	function Segment:setState(active)
 		if active == nil then
 			self:reload()
 		else
 			if active then
-				addPhysicObject(self.presenceId, self.x, self.y, self.bodydef)
+				self.presenceId = iaddPhysicObject(self.x, self.y, self.bodydef)
 			else
 				removePhysicObject(self.presenceId)
+				self.presenceId = 0
 			end
 			
 			self.state = active

@@ -139,7 +139,9 @@ ItemBank.__index = ItemBank
 local SelectFrame = {}
 SelectFrame.__index = SelectFrame
 
-local Player = {}
+local IEntity = {}
+
+local Player = setmetatable({}, {__index = IEntity})
 Player.__index = Player
 
 local PlayerInventory = {}

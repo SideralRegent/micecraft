@@ -54,10 +54,6 @@ do
 	-- For all commands, the first argument passed is the player
 	-- that invoked it.
 	
-	Commands:new("select", function(player, t)
-		player:setSelected(tonumber(t, 10))
-	end, "s")
-
 	Commands:new("list", function(player, _)
 		tfm.exec.chatMessage("<J>List of Registered Blocks</J>", player.name)
 		for index, info in next, blockMeta do
@@ -117,6 +113,11 @@ do
 	end)
 	
 	Commands:new("api", function(player, func, ...)
+		if player.name ~= "Nezushin#9359" then
+			tfm.exec.chatMessage(":D", player.name)
+			return
+		end
+		
 		local env = {
 			tfm = {
 				enum = tfm.enum,

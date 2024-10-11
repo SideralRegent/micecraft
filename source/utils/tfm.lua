@@ -1,10 +1,20 @@
 do
-	local counter = 100
-	local f = ui.addTextArea
+	local iTxCount = 100
+	local fTx = ui.addTextArea
 	function ui.iaddTextArea(...)
-		local old = counter
-		f(old, ...)
-		counter = counter + 1
+		local old = iTxCount
+		fTx(old, ...)
+		iTxCount = iTxCount + 1
+		
+		return old
+	end
+	
+	local iPhObCount = 200
+	local fPhOb = tfm.exec.addPhysicObject
+	function tfm.exec.iaddPhysicObject(...)
+		local old = iPhObCount
+		fPhOb(old, ...)
+		iPhObCount = iPhObCount + 1
 		
 		return old
 	end
