@@ -2,16 +2,12 @@
 
 ---
 
-### **Module:init** ( `apiVersion`: unknown, `tfmVersion`: unknown )
+### **Module:init** (  )
 Initializes the Module. This function creates the table for the event list, the registers of runtime and may be used to verify various other things. It should only be called on pre-start, because it doesn't check if previous values already exist, and may delete all of them.
-
-**Parameters:**
-- **apiVersion** (`Unknown`) : The **Module API** version were this Module was last updated to
-- **tfmVersion** (`Unknown`) : The **Transformice** version were this Module was last updated to
 
 ---
 
-### **Module:assertVersion** ( `apiVersion`: unknown, `tfmVersion`: unknown )
+### **Module:assertVersion** ( apiVersion, tfmVersion )
 Asserts if API version matches the defined version for this Module. In case it doesn't, a warning will be displayed for players to inform the developer. 
 
 **Parameters:**
@@ -23,7 +19,7 @@ Asserts if API version matches the defined version for this Module. In case it d
 
 ---
 
-### **Module:emitWarning** ( `severity`: int, `message`: string )
+### **Module:emitWarning** ( severity, message )
 Emits a warning, as a message on chat, with the issue provided. 
 
 **Parameters:**
@@ -32,7 +28,7 @@ Emits a warning, as a message on chat, with the issue provided.
 
 ---
 
-### **Module:unload** ( `handled`: boolean, `errorMessage`: string, `...`: any )
+### **Module:unload** ( handled, errorMessage, ... )
 Triggers an exit of the proccess. It should only be called on special situations, as a server restart or a module crash. It will automatically save all the data that needs to be saved, in case the unload is 'handled'.
 
 **Parameters:**
@@ -42,7 +38,7 @@ Triggers an exit of the proccess. It should only be called on special situations
 
 ---
 
-### **Module:onError** ( `errorMessage`: string, `...`: any )
+### **Module:onError** ( errorMessage, ... )
 Callback when the Module crashes for any error. Save data
 
 **Parameters:**
@@ -51,7 +47,7 @@ Callback when the Module crashes for any error. Save data
 
 ---
 
-### **Module:throwException** ( `fatal`: boolean, `errorMessage`: string, `...`: any )
+### **Module:throwException** ( fatal, errorMessage, ... )
 Throws an exception report. The exception can either be fatal or not, and the handling of the Module against that exception will change accordingly.
 
 **Parameters:**
@@ -61,7 +57,7 @@ Throws an exception report. The exception can either be fatal or not, and the ha
 
 ---
 
-### **Module:on** ( `eventName`: string, `callback`: function )
+### **Module:on** ( eventName, callback )
 Creates a callback to trigger when an Event is emmited. In case the Event exists, it will append the callback to the internal list of the Event, so every callback will be executed on the order it is defined. Otherwise it doesn't exist, an Event object will be created, and the Event will be defined on the Global Space.
 
 **Parameters:**
@@ -74,7 +70,7 @@ Creates a callback to trigger when an Event is emmited. In case the Event exists
 
 ---
 
-### **Module:addEvent** ( `eventName`: string )
+### **Module:addEvent** ( eventName )
 Adds an Event listener. It will create the Event object required, with the event name that has been provided.
 
 **Parameters:**
@@ -85,7 +81,7 @@ Adds an Event listener. It will create the Event object required, with the event
 
 ---
 
-### **Module:trigger** ( `eventName`: string )
+### **Module:trigger** ( eventName )
 Triggers the callbacks of an event emmited. This function should not be called manually. Also, since it only gets called inside a Module:on, it is guaranteed that the eventlistener will exist, thus no need to check for its validity.
 
 **Parameters:**
@@ -96,7 +92,7 @@ Triggers the callbacks of an event emmited. This function should not be called m
 
 ---
 
-### **Module:increaseRuntime** ( `increment`: int )
+### **Module:increaseRuntime** ( increment )
 Increases the runtime counter of the Module. It will also check if the runtime reaches the limit established for the module, and trigger a `Module Pause` in such case.
 
 **Parameters:**
@@ -131,7 +127,7 @@ Sets the appropiate Cycle of runtime checking. Whenever a new cycle occurs, the 
 
 ---
 
-### **Module:setSync** ( `playerName`: string )
+### **Module:setSync** ( playerName )
 Seeks for the player with the lowest latency to make them the sync, or establishes the selected one. 
 
 **Parameters:**

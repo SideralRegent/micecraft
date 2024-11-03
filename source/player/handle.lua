@@ -43,8 +43,11 @@ do
 		end
 		
 		for _, chunk in next, chunkList do
-			chunk:setCollisions(update, self.name)
-			chunk:setDisplay(update, self.name)
+			chunk:setState(update, update, self.presenceId)
 		end
+	end
+	
+	function Player:getRank()
+		return Room.ranks[self.name]
 	end
 end

@@ -115,13 +115,31 @@ function Map:getSpawn()
 	return self.spawnPoint
 end
 do
+	function Map:restartObjectList()
+		self.objectList = {
+			index = 0,
+			object = {},
+		}
+	end
+	
+	local def = {}
+	function Map:setCandidateShamanObject(t)
+		self.objectList.object = t or def
+	end
+	
 	local addShamanObject = tfm.exec.addShamanObject
 	local removeShamanObject = tfm.exec.removeObject
-	function Map:spawnShamanObject(objectType, Position, yPosition, angle, xSpeed, ySpeed, ghost, options)
-		local id = addShamanObject(objectType, Position, yPosition, angle, xSpeed, ySpeed, ghost, options)
-		if id then
-			self.objectList[id] = true
-			
+	function Map:spawnShamanObject(objectType, xPosition, yPosition, angle, xSpeed, ySpeed, ghost, options)
+		self:setCandidateShamanObject({
+			x = xPosition,
+			y = yPosition,
+			ghost = not not ghost,
+			angle = angle,
+			type = objectType
+		})
+		
+		local id = addShamanObject(objectType, xPosition, yPosition, angle, xSpeed, ySpeed, ghost, options)
+		if id then			
 			if options and options.despawn then
 				Timer:new(options.despawn, false, function()
 					removeShamanObject(id)
@@ -130,9 +148,42 @@ do
 		end
 	end
 	
-	function Map:spawnStructure(structureName, x, y, xAnchor, yAnchor)
+	function Map:despawnShamanObject(objectId)
+		self.objectList[objectId] = false
+		removeShamanObject(objectId)
+	end
+	
+	local restrict = math.restrict
+	function Map:setMatrix(matrix, x, y, update)
+		local maxWidth, maxHeight = self:getBlocks()
+		local height, width = #matrix, #matrix[1]
+		
+		local xEnd = restrict(x + (width - 1), 1, maxWidth)
+		local yEnd = restrict(y + (height - 1), 1, maxHeight)
+		
+		local block, type
+		for yi = y, yEnd do
+			for xi = x, xEnd do 
+				type = matrix[(yi - y) + 1][(xi - x) + 1]
+				block = Map:getBlock(xi, yi, CD_MTX)
+				if type ~= VOID then
+					block:create(
+						type, -- type
+						true, -- display
+						update, -- update
+						update -- update physics
+					)
+				end
+			end
+		end
+		
+		return x, y, xEnd, yEnd
+	end
+	
+	function Map:spawnStructure(structureName, x, y, xAnchor, yAnchor, update)
 		local structure = Structures[structureName]
 		local VOID = blockMeta._C_VOID
+		local type = 0
 		
 		xAnchor = xAnchor or 0.5
 		yAnchor = yAnchor or 0.5
@@ -140,26 +191,63 @@ do
 		local xStart = math.round(x - (structure.width * xAnchor))
 		local yStart = math.round(y - (structure.height * yAnchor))
 		
-		local maxWidth, maxHeight = self:getBlocks()
-		local height, width = #structure.matrix, #structure.matrix[1]
+		--local xi, yi, xf, yf = 
+		self:setMatrix(structure.matrix, xStart, yStart, update)
 		
-		local xEnd = math.restrict(xStart + (width - 1), 1, maxWidth)
-		local yEnd = math.restrict(yStart + (height - 1), 1, maxHeight)
+		--[[if update then
+			self:forChunkArea(xi, yi, xf, yf, CD_BLK, "refreshPhysics", self.physicsMode, nil, true, {
+				xStart = xi,
+				xEnd = xf,
+				yStart = yi,
+				yEnd = yf
+			})
+		end]]
+	end
+	
+	local defaultChunkPos = {
+		x = 1,
+		y = 1
+	}
+	
+	local min, max = math.min, math.max
+	function Map:getChunkArea(xi, yi, xf, yf, cdType)
+		local xLi, yLi, xLf, yLf = self:getLimits(cdType)
 		
-		local template, block
-		for y = yStart, yEnd do
-			for x = xStart, xEnd do 
-				template = structure.matrix[(y - yStart) + 1][(x - xStart) + 1]
-				block = Map:getBlock(x, y, CD_MTX)
-				if not (template.type == VOID) then
-					block:create(
-						template.type, -- type
-						true, -- display
-						true, -- update
-						true -- update physics
-					)
+		xi = max(xLi, xi)
+		yi = max(yLi, yi)
+		xf = min(xLf, xf)
+		yf = min(yLf, yf)
+		
+		if cdType == CD_MTX then
+			local list = {}
+			
+			for y = yi, yf do
+				for x = xi, xf do
+					list[#list + 1] = self:getChunk(x, y, CD_MTX)
 				end
 			end
+						
+			return list
+		else
+			local UL = self:getChunk(xi, yi, cdType)
+			local LR = self:getChunk(xf, yf, cdType)
+			
+			UL = UL or defaultChunkPos
+			LR = LR or UL
+			
+			return self:getChunkArea(
+				UL.x, UL.y, 
+				LR.x, LR.y, 
+				CD_MTX
+			)
+		end
+	end
+	
+	function Map:forChunkArea(xi, yi, xf, yf, cdType, actionName, ...)
+		local chunkList = self:getChunkArea(xi, yi, xf, yf, cdType)
+		
+		for _, chunk in next, chunkList do
+			chunk[actionName](chunk, ...)
 		end
 	end
 end

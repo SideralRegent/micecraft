@@ -1,48 +1,56 @@
-function Module:loadMap()
-	local spawn = Map:getSpawn()
-	local width, height = Map:getMapPixelDimensions()
-	
-	tfm.exec.newGame(xmlLoad:format(width, height, spawn.dx, spawn.dy))
+do 
+	function Module:loadMap()		
+		local spawn = Map:getSpawn()
+		local width, height = Map:getMapPixelDimensions()
+		
+		tfm.exec.newGame(xmlLoad:format(width, height, spawn.dx, spawn.dy + 16))
+	end
+
+end
+
+function Module:softRelaunch(schedule)
+	if schedule then
+		self.scheduleId = Tick:newTask(6, false, self.softRelaunch, self, false)
+	else
+		self.scheduleId = nil
+		print("<b>Charging new map...</b>")
+		
+		self:loadMap()
+	end
 end
 
 function Module:start()
 	print("<T>Starting module...</T>")
 	Room:init()
 	
-	--local mode = self:setMode(Room.mode)
-	local mode = self:setMode("test")	
+	local mode = self:setMode(Room.mode or "testing")	
 	
-	debug.pmeasure("World: %s", World.init, World)
 	--World:init()
-	debug.pmeasure("Mode: %s", mode.init, mode, Map)
+	debug.pmeasure("<u>World:</u> %s", World.init, World)
+	
 	--mode:init(Map)
+	debug.pmeasure("<u>Mode:</u> %s", mode.init, mode, Map)
+	
 	--Map:init()
-	debug.pmeasure("Map: %s", Map.init, Map)
+	debug.pmeasure("<u>Map:</u> %s", Map.init, Map)
 	
 	
-	print("<b>Setting room...</b>")
+	print("Setting room...")
+	Room:setConfiguration()
 	
-	tfm.exec.disableAfkDeath(true)
-	tfm.exec.disableAutoNewGame(true)
-	tfm.exec.disableAutoScore(true)
-	tfm.exec.disableAutoShaman(true)
-	tfm.exec.disableAutoTimeLeft(true)
-	tfm.exec.disablePhysicalConsumables(true)
-	system.disableChatCommandDisplay(nil)
-	
-	debug.pmeasure("Mode (run): %s", mode.run, mode)
+	-- mode:run()
+	debug.pmeasure("<u>Mode (run):</u> %s", mode.run, mode)
 	
 	print("<b>Loading map...</b>")
-	
 	self:loadMap()
 	
-	printf("<J>Micecraft %s</J>", self.version)
-	
+	print("Setting current players...")
 	Room:initPlayers()
+	
+	printf("<J>Micecraft %s</J>", self.version)
 end
-
-
-Module:start()
 --[[xpcall(Module.start, function(err)
 	Module:throwException(true, err)
 end, Module)]]
+
+Module:start()

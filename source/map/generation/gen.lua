@@ -38,7 +38,7 @@ do
 		for x = 1, width do
 			for y = 1 , size do
 				if random(y) == 1 then
-					self:assignTemplate(x, height - (y - 1), BEDROCK)
+					self[height - (y - 1)][x] = BEDROCK
 				end
 			end
 		end

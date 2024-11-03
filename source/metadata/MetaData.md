@@ -2,7 +2,7 @@
 
 ---
 
-### **nil** ( `default`: any )
+### **nil** ( default )
 Creates a new Meta Data handler. A handler can automatically fill void properties, return defaults or function as Class inheritor, by supporting Templates.
 
 **Parameters:**
@@ -13,7 +13,7 @@ Creates a new Meta Data handler. A handler can automatically fill void propertie
 
 ---
 
-### **nil** ( `identifier`: any, `definition`: any, `aux`: any )
+### **nil** ( identifier, definition, aux )
 Creates a new Template for the specified Meta Data handler. A template can serve to apply specific properties automatically to new objects created under it. Templates can be derivated from other templates to support higher abstraction.
 
 **Parameters:**
@@ -26,7 +26,7 @@ Creates a new Template for the specified Meta Data handler. A template can serve
 
 ---
 
-### **nil** ( `identifier`: any )
+### **nil** ( identifier )
 Gets a template, if it exists. 
 
 **Parameters:**
@@ -37,7 +37,7 @@ Gets a template, if it exists.
 
 ---
 
-### **nil** ( `index`: any, `template`: any, `definition`: any )
+### **nil** ( index, template, definition )
 Sets a new object under the Meta Data storage. An object can inherit properties from a template or from another object.
 
 **Parameters:**
@@ -50,7 +50,7 @@ Sets a new object under the Meta Data storage. An object can inherit properties 
 
 ---
 
-### **nil** ( `index`: any )
+### **nil** ( index )
 Gets an object, if it exists. 
 
 **Parameters:**

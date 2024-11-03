@@ -12,17 +12,37 @@ do
 	local ipairs = ipairs
 	local unpack = table.unpack
 	
-	function Command:new(commandName, callback, ...)
-		return setmetatable({
+	local ranks = enum.ranks
+	
+	-- Some defaults to not create too many tables
+	local none = {}
+	local staff = {ranks.staff}
+	local moderators = {ranks.staff, ranks.moderator}
+	local roomModifier = {ranks.moderator, ranks.roomAdmin}
+	local everyone = table.copyvalues(ranks)
+	
+	function Command:new(commandName, callback, aliases, allowedRanks)
+		local this = setmetatable({
 			name = commandName,
 			callback = callback,
 			issues = setmetatable({}, {__index = table}),
-			aliases = {...}
+			aliases = aliases,
+			allowedRanks = {
+				[ranks.loader] = true
+			}
 		}, self)
+		
+		for _, rank in ipairs(allowedRanks) do
+			this.allowedRanks[rank] = true
+		end
+			
+		return this
 	end
 	
 	function Command:isAllowed(player) -- TODO: Check player data
-		return not not player
+		local rank = player:getRank()
+		
+		return self.allowedRanks[rank]
 	end
 	
 	function Command:execute(args)
@@ -37,14 +57,15 @@ do
 		local message = ("<N>[Command <ROSE>%s</ROSE>] %s</N> ( %s )"):format(self.name, result, raw_args)
 		self.issues:insert({error = result, raw = raw_args})
 	
-		Module:throwException(2, message)
-		--print(message)
+		Module:emitWarning(2, message)
 	end
 	
-	function Commands:new(commandName, callback, ...)
-		self.list[commandName] = Command:new(commandName, callback, ...)
+	function Commands:new(commandName, aliases, ranks, callback)
+		aliases = aliases or {}
+		ranks = ranks or {}
+		self.list[commandName] = Command:new(commandName, callback, aliases, ranks)
 		
-		for _, alias in ipairs({...}) do
+		for _, alias in ipairs(aliases) do
 			self.aliases[alias] = commandName
 		end
 	end
@@ -54,7 +75,8 @@ do
 	-- For all commands, the first argument passed is the player
 	-- that invoked it.
 	
-	Commands:new("list", function(player, _)
+	Commands:new("list", none, none, 
+	function(player, _)
 		tfm.exec.chatMessage("<J>List of Registered Blocks</J>", player.name)
 		for index, info in next, blockMeta do
 			if type(info) == "table" and info.name then
@@ -63,7 +85,8 @@ do
 		end
 	end)
 	
-	Commands:new("time", function(player, time)
+	Commands:new("time", {"t"}, roomModifier,
+	function(player, time)
 		if time then
 			World:setTime(time, false, true)
 		else
@@ -71,18 +94,24 @@ do
 		end
 	end)
 	
-	Commands:new("tp", function(player, x, y, offset)
+	Commands:new("tp", {"teleport"}, roomModifier,
+	function(player, x, y, offset)
 		player:move(x, y, offset)
-	end, "teleport")
+	end)
 
-	Commands:new("btp", function(player, x, y)
+	Commands:new("btp", {"block_teleport"}, roomModifier,
+	function(player, x, y)
 		local block = Map:getBlock(x, y, CD_MTX)
 		if block then
 			player:move(block.dxc, block.dyc, false)
 		end
-	end, "block_teleport")
+	end)
 	
-	Commands:new("goto", function(player, target1, target2)
+	Commands:new(
+		"goto", 
+		{"gt"},
+		staff,
+	function(player, target1, target2)
 		local p1 = Room:getPlayer(target1)
 		local p2 = Room:getPlayer(target2)
 		
@@ -101,23 +130,28 @@ do
 				player:move(p1.x, p1.y, false)
 			end
 		end
-	end, "teleport")
-
-	Commands:new("runtime", function(player)
-		ui.addTextArea(12, "NaN ms", player.name, 750, 384, 0, 0, 0x0, 0x0, 1.0, true)
 	end)
 
-	Commands:new("reload", function()
+	Commands:new("runtime", {"rt"}, everyone,
+	function(player)
+		ui.addTextArea(enum.textId.runtime, "NaN ms", player.name, 750, 384, 0, 0, 0x0, 0x0, 1.0, true)
+	end)
+
+	Commands:new("reload", none, staff,
+	function()
 		print("Reloading map.")
 		Module:loadMap()
 	end)
-	
-	Commands:new("api", function(player, func, ...)
-		if player.name ~= "Nezushin#9359" then
-			tfm.exec.chatMessage(":D", player.name)
-			return
+
+	Commands:new("save", none, roomModifier,
+	function(player)
+		if player.name == Room.referenceAdmin then
+			player:saveWorld(false)
 		end
-		
+	end)
+	
+	Commands:new("api", {"lua", "lu"}, none,
+	function(player, func, ...)		
 		local env = {
 			tfm = {
 				enum = tfm.enum,
@@ -179,7 +213,18 @@ do
 			end
 		end
 		
-	end, "lua")
+	end)
+
+	Commands:new("getchunk", none, everyone,
+	function(player)
+		local chunk = Map:getChunk(player.x, player.y, CD_MAP)
+		if chunk then
+			tfm.exec.chatMessage(
+				Map:encode(chunk.xf, chunk.yf, chunk.xb, chunk.yb), 
+				player.name
+			)
+		end
+	end)
 	
 	-- === === === === === === === === === === === === === === === --
 	
@@ -190,8 +235,11 @@ do
 	local booleans = {
 		["true"] = true,
 		["yes"] = true,
+		["y"] = true,
+		
 		["false"] = false,
-		["no"] = false
+		["no"] = false,
+		["n"] = false
 	}
 	local tonumber, tostring = tonumber, tostring
 	
@@ -226,7 +274,7 @@ do
 	function Commands:process(playerName, message)
 		local player = Room:getPlayer(playerName)
 		
-		if player then
+		if player and player.perms.useCommands then
 			local commandName, arguments = self:parse(message)
 			local command = self:get(commandName)
 			arguments[1] = player

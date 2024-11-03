@@ -113,7 +113,7 @@ do
 		catlist = catlist or default_cats
 		local list = {}
 		
-		for cat, _ in next, catlist do -- There should be a better way to do this. At the moment I wrote it I couldn't think of one.
+		for cat, _ in next, catlist do
 			repeat
 				matches = 0
 				xe = xEnd

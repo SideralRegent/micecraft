@@ -7,7 +7,7 @@ do
 			for _, player in next, Room.playerList do
 				if player.isActive then
 					player:tfmUpdateInformation()
-					player:setClock(500, true, true)
+					player:setClock(1, true, true)
 				end
 			end
 		end

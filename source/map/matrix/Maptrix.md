@@ -2,7 +2,7 @@
 
 ---
 
-### **Tile:getDisplay** ( `index`: any )
+### **Tile:getDisplay** ( index )
 Returns a display object from the Tile, given the index, if it exists. 
 
 **Parameters:**
@@ -23,7 +23,7 @@ Shows the Tile in the Map. All Displays are shown in the order established.
 
 ---
 
-### **Tile:addDisplay** ( `name`: string, `order`: int, `imageUrl`: string, `targetLayer`: string, `displayX`: int, `displayY`: int, `scaleX`: number, `scaleY`: number, `rotation`: number, `alpha`: number, `show`: boolean )
+### **Tile:addDisplay** ( name, order, imageUrl, targetLayer, displayX, displayY, scaleX, scaleY, rotation, alpha, show )
 Adds a new Display object to the Block. There's no check if a previous display already exists, beware of overwritting other of your displays when specifing its order.
 
 **Parameters:**
@@ -45,7 +45,7 @@ Adds a new Display object to the Block. There's no check if a previous display a
 
 ---
 
-### **Tile:removeDisplay** ( `index`: any, `hide`: boolean )
+### **Tile:removeDisplay** ( index, hide )
 Removes a Display object from the Tile 
 
 **Parameters:**
@@ -75,7 +75,7 @@ Refreshes the Display of a Tile All sprites are hidden and shown again.
 
 ---
 
-### **Tile:refreshDisplayAt** ( `index`: any )
+### **Tile:refreshDisplayAt** ( index )
 Refreshes a single Display object. Same behaviour as [Tile:refreshDisplay](Map.md#Tile:refreshDisplay).
 
 **Parameters:**

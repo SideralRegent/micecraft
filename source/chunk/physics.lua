@@ -211,7 +211,7 @@ do
 			xEnd or self.xb,
 			yStart or self.yf,
 			yEnd or self.yb,
-			categories or self.lc
+			categories-- or self.lc
 		)
 		
 		local newEntries = {}
@@ -274,7 +274,9 @@ do
 			xe = origin.xEnd
 			ys = origin.yStart
 			ye = origin.yEnd
-			catlist[origin.category] = true
+			if origin.category then
+				catlist[origin.category] = true
+			end
 		end
 		
 		local xStart, yStart, xEnd, yEnd, category

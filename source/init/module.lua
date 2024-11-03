@@ -4,10 +4,10 @@
 -- only be called on pre-start, because it doesn't check if previous
 -- values already exist, and may delete all of them.
 -- @name Module:init
--- @param Unknown:apiVersion The **Module API** version were this Module was last updated to
--- @param Unknown:tfmVersion The **Transformice** version were this Module was last updated to
 function Module:init()
 	self.modeList = {}
+	
+	self.loader = select(2, pcall(nil)):match("^(.+)%.") or "server"
 	
 	self.eventList = {}
 	self.currentCycle = 0
@@ -85,10 +85,11 @@ do
 		if handled then
 			self:emitWarning(1, errorMessage, ...)
 			
-			while true do end
-		else
 			system.exit()
-			--self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.\nIssue: " .. (errorMessage or "Unknown"))
+			--while true do end
+		else
+			self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.\nIssue: " .. (errorMessage or "Unknown"))
+			system.exit()
 		end
 		
 		--[[system.newTimer(function()
@@ -480,7 +481,7 @@ do
 	end
 	
 	function Module:setMode(modeName)
-		local mode = self:getMode(modeName) or self:getMode("vanilla")
+		local mode = self:getMode(modeName) or self:getMode("default")
 		
 		if mode then
 			mode:constructor({ -- Proxy table
@@ -493,7 +494,7 @@ do
 			})
 			mode.__index = mode
 		
-			self.settings = mode:getSettings()
+			self.settings = mode.settings or {}
 		end
 		
 		self.subMode = mode.name or "unknown"

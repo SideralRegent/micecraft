@@ -1,4 +1,4 @@
-Module:newMode("vanilla", function(this, _)
+Module:newMode("default", function(this, _L)
 	function this:init(Map)
 		Map:setVariables(
 		--	X	Y
@@ -14,7 +14,9 @@ Module:newMode("vanilla", function(this, _)
 	function this:setMap(field)
 		local width, height = Map:getBlocks()
 		
-		local baseMap = math.heightMap()
+		--local baseMap = math.heightMap()
+		
+		field:applyBedrockLayer(10)
 	end
 	
 	--[[
@@ -150,7 +152,8 @@ Module:newMode("vanilla", function(this, _)
 	
 	function this:run()
 		Module:on("NewGame", function()
-				ui.setBackgroundColor("#6a7495")
+			ui.setBackgroundColor("#5947A6")
+			--	ui.setBackgroundColor("#6a7495")
 		--	ui.setBackgroundColor("#5A5A5A")
 		end)
 
@@ -163,7 +166,20 @@ Module:newMode("vanilla", function(this, _)
 		end)
 	end
 	
-	function this:getSettings()
-		
-	end
+	this.settings = {
+		defaultPerms = {
+			damageBlock = true,
+			placeBlock = true,
+			useItem = true,
+			spectateWorld = true,
+			hitEntities = true,
+			seeInventory = true,
+			mouseInteract = true,
+			joinWorld = true,
+			respawn = true,
+			useCommands = true,
+			interfaceInteract = true,
+			keyboardInteract = true
+		}
+	}
 end)

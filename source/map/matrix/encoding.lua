@@ -1,7 +1,6 @@
 do -- TODO
 	-- local tobase = math.tobase
 	local tonumber = tonumber
-	local lchar = {[true] = "+", [false] = "-", ["+"] = true, ["-"] = false}
 	local concat = table.concat
 	
 	function Map:decode(ENCODED_STR)
@@ -14,21 +13,19 @@ do -- TODO
 			x = 1
 			field[y] = {}
 			
-			for tinfo, tchar in line:gmatch("([%d|:]-)([%+%-])") do
-				tangible = lchar[tchar]
-				
-				if tinfo:find("|", 2, true) then
-					type, repeats = tinfo:match("^([d%d]+)|([%w]+)$")
+			for potentialRow in line:gmatch("[^,]+") do
+				if potentialRow:find("|", 2, true) then
+					type, repeats = potentialRow:match("^([d%d]+)|(%d+)$")
 					type = tonumber(type, 16)
 					repeats = tonumber(repeats)
 					
 					for xi = x, x + (repeats - 1) do
 						x = xi
 						
-						field[y][x] = {type=type}
+						field[y][x] = type
 					end
-				else
-					field[y][x] = {type=tonumber(tinfo, 16)}
+				else -- It's a single tile
+					field[y][x] = tonumber(potentialRow, 16)
 				end
 				
 				x = x + 1
@@ -38,7 +35,6 @@ do -- TODO
 		return field
 	end
 	
-	-- Not working (won't fix)
 	function Map:encode(xStart, yStart, xEnd, yEnd)
 		xStart = xStart or 1
 		yStart = yStart or 1
@@ -50,41 +46,41 @@ do -- TODO
 		local matches
 		
 		local lines = {}
-		local line = {}
+		local currentLine = {}
 		local x = 1
-		local tile, par
+		local referenceTile, currentTile
 		
-		local bm = self.blocks
+		local blockMatrix = self.blocks
+		local blockLine
 		
 		for y = yStart, yEnd do
+			blockLine = blockMatrix[y]
 			lineCount = lineCount + 1
-			line = {}
+			currentLine = {}
 			
 			x = xStart
 			while x <= xEnd do
-				tile = bm[y][x]
+				referenceTile = blockLine[x].type
 				matches = 1
-				for xi = x + 1, xEnd do
-					par = bm[y][xi]
-					
-					if tile.type == par.type then
+				for xIndex = x + 1, xEnd do					
+					if referenceTile == blockLine[xIndex].type then
 						matches = matches + 1
-						x = xi
+						x = xIndex
 					else
 						break
 					end
 				end
 				
 				if matches > 1 then
-					line[#line + 1] = ("%d|%d%s"):format(tile.type, matches, lchar[tile.tangible])
+					currentLine[#currentLine + 1] = ("%x|%d"):format(referenceTile, matches)
 				else
-					line[#line + 1] = ("%s%s"):format(tile.type, lchar[tile.tangible])
+					currentLine[#currentLine + 1] = ("%x"):format(referenceTile)
 				end
 				
 				x = x + 1
 			end
 			
-			lines[lineCount] = concat(line)
+			lines[lineCount] = concat(currentLine, ",")
 		end
 		
 		ENCODED_STR = concat(lines, ";")

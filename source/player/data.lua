@@ -1,5 +1,10 @@
 function Player:generateData()
+	local info = {
+		cw = self.custom
+	}
 	
+	-- ...
+	return info
 end
 
 function Player:loadData()
@@ -7,30 +12,44 @@ function Player:loadData()
 end
 
 function Player:readData(rawdata)
---	print(("%s's data:"):format(self.name))
-	--table.print(rawdata)
-	--local dat = data.decode(rawdata)
-	
+	local dat = data.decode(rawdata)
 	-- apply
+	self.custom = dat.cw
 end
 
-function Player:writeData(save)
-	local dat = {
-		-- ...
-	}
+do
+	local encode = data.encode
+	local setToModule = data.setToModule
 	
-	local encoded = data.encode(dat)
-	self.dataFile = data.setToModule(self.dataFile, "MCR", encoded)
+	function Player:writeData()
+		local info = self:generateData()
+		
+		local encoded = encode(info)
+		
+		self.dataFile = setToModule(self.dataFile, "MCR", encoded)
+	end
+end
+
+do
+	local savePlayerData = system.savePlayerData
 	
-	if save then
+	function Player:saveData(update)
+		if update then
+			self:writeData()
+		end
+		
+		savePlayerData(self.name, self.dataFile)
+	end
+end
+
+function Player:saveWorld(database)
+	local chunk = Map:getChunk(1, 1, CD_MTX)
+	
+	self.custom = Map:encode(chunk.xf, chunk.yf, chunk.xb, chunk.yb)
+	
+	self:writeData()
+	
+	if database then
 		self:saveData(false)
 	end
-end
-
-function Player:saveData(generate)
-	if generate or self.dataFile == "" then
-		self:generateData(false)
-	end
-	
-	system.savePlayerData(self.name, self.dataFile)
 end

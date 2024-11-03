@@ -1,44 +1,70 @@
-function Player:new(playerName)
-	local info = tfm.get.room.playerList[playerName] or {}
-	
-	local this = setmetatable({
-		name = playerName,
-		id = info.id,
+do
+	local copykeys = table.copykeys
+	function Player:new(playerName)
+		local info = tfm.get.room.playerList[playerName] or {}
 		
-		language = info.language,
+		local this = setmetatable({
+			name = playerName,
+			presenceId = 0,
+			id = info.id,
+			
+			language = info.language,
+			registrationDate = info.registrationDate,
+			
+			x = 0, y = 0,
+			vx = 0, vy = 0,
+			
+			isMoving = false,
+			isJumping = false,
+			isFacingRight = true,
+			
+			isAlive = false,
+			isBanned = false,
+			
+			currentChunk = -1,
+			lastChunk = -1,
+			
+			keys = {},
+			interface = {
+				MainMenu = false,
+				Spectator = false,
+				RoomSettings = false
+			},
+			
+			perms = nil,--copykeys(enum.perms, false),
+			cooldown = copykeys(enum.cooldown, 0),
+			
+			inventory = PlayerInventory:new(playerName, info.id),		
+			selectedFrame = SelectFrame:new(playerName, info.id),
+			
+			internalTime = 0,
+			
+			dataFile = "",
+			awaitingData = false
+		}, self)
+		-- ...
 		
-		x = 0, y = 0,
-		vx = 0, vy = 0,
+		this:setPresenceId()
+		this:setPermissions(nil)
 		
-		isMoving = false,
-		isJumping = false,
-		isFacingRight = true,
+		this.inventory:set()
+		this:setSelectedContainer(1, this.inventory.bank, false)
 		
-		isAlive = false,
-		isBanned = false,
+		this:freeze(true, true, 0, 0)
 		
-		currentChunk = -1,
-		lastChunk = -1,
+		return this
+	end
+end
+
+do
+	local ID = 1
+	function Player:setPresenceId()
+		self.presenceId = ID
 		
-		keys = {},
-		interface = {},
+		Room.presencePlayerList[ID] = self.name
 		
-		inventory = PlayerInventory:new(playerName, info.id),		
-		selectedFrame = SelectFrame:new(playerName, info.id),
-		
-		internalTime = 0,
-		
-		dataFile = "",
-		awaitingData = false
-	}, self)
-	-- ...
-	
-	this.inventory:set()
-	this:setSelectedContainer(1, this.inventory.bank, false)
-	
-	this:freeze(true, true, 0, 0)
-	
-	return this
+		ID = ID + 1
+	end
 end
 
 function Player:init(enable)
@@ -55,44 +81,4 @@ function Player:init(enable)
 	if enable then
 		self:checkEnable()
 	end
-end
-
-function Player:checkEnable()
-	--self.isActive = false
-	if self:assertValidity() then
-		self:enable()
-	else
-		self:disable()
-	end
-	
-	return self.isActive
-end
-
-function Player:enable()
-	if not self.isAlive then
-		self:respawn()
-	end
-	
-	if not self.isActive then
-		self.isActive = true
-			
-		self.inventory:setDisplay("hotbar", true)
-		self:freeze(false, false)
-	end
-end
-
-function Player:disable()
-	self.isActive = false
-	self:kill()
-	
-	self.inventory:setDisplay("hotbar", false)
-	self.inventory:setDisplay("remainder", false)
-end
-
-function Player:assertValidity() -- TODO: Implement persistent data checking
-	return not self.isBanned
-end
-
-function Player:__eq(other)
-	return self.name == other.name
 end

@@ -244,8 +244,8 @@ do
 				i.playerName,
 				i.selectX, i.selectY,
 				i.selectWidth, i.selectHeight,
-				0xFFFFFF, 0xFFFFFF,
-				0.25,
+				0x0, 0x0,
+				1.00,
 				i.fixedPos
 			)
 		else
@@ -379,11 +379,7 @@ do
 	end
 	
 	function ItemContainer:refreshDisplay2(key, counter, usageBar, selector, status)
-		if key then
-			if selector then
-				self:setSelectable(key, nil)
-			end
-			
+		if key then		
 			if self.item then
 				if (self.amount ~= 0) then
 					if counter then
@@ -396,6 +392,11 @@ do
 				end
 			else
 				self:setHide(key, true, true, true, false, nil)
+			end
+			
+			
+			if selector then
+				self:setSelectable(key, nil)
 			end
 			
 			self.displayInfo[key].active = true
@@ -440,7 +441,7 @@ do
 		end
 		
 		if updateDisplay then
-			self:refreshDisplay2(nil, true, true, false)
+			self:refreshDisplay2(nil, true, true, true)
 		end
 		
 		return remainder
@@ -457,7 +458,7 @@ do
 		end
 		
 		if updateDisplay then
-			self:refreshDisplay2(nil, true, true, false)
+			self:refreshDisplay2(nil, true, true, true)
 		end
 		
 		return destroyed
@@ -471,7 +472,7 @@ do
 			self:setAmount(-1, true, false)
 			
 			if updateDisplay then
-				self:refreshDisplay2(nil, true, false, false)
+				self:refreshDisplay2(nil, true, false, true)
 			end
 			
 			return true

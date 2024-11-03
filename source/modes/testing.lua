@@ -1,6 +1,6 @@
-Module:newMode("test", function(this, _)
+Module:newMode("testing", function(this, _L)
 	function this:init(Map)
-		Map:setVariables(32, 32, 25, 12, 2, 2, 0, 0)
+		Map:setVariables(32, 32, 10, 8, 20, 25, 600, 600)
 		Map:setPhysicsMode("rectangle_detailed")
 	end
 	
@@ -27,25 +27,34 @@ Module:newMode("test", function(this, _)
 				end
 			end
 		})
-		--field:applyBedrockLayer()
+		
+		field:applyBedrockLayer(3)
 	end
 	
 	function this:run()
+		tfm.exec.chatMessage("Test room detected.", nil)
+		
 		Module:on("NewGame", function()
-				ui.setBackgroundColor("#6a7495")
+				ui.setBackgroundColor("#6A7495")
 		--	ui.setBackgroundColor("#5A5A5A")
 		end)
---[[
-		Module:on("PlayerDied", function(playerName)
-			local player = Room:getPlayer(playerName)
-			
-			if player then
-				player:init()
-			end
-		end)]]
 	end
 	
-	function this:getSettings()
-		
-	end
+	this.settings = {
+		defaultPerms = {
+			damageBlock = true,
+			placeBlock = true,
+			useItem = true,
+			hitEntities = true,
+			
+			mouseInteract = true,
+			seeInventory = true,
+			spectateWorld = true,
+			joinWorld = true,
+			respawn = true,
+			useCommands = true,
+			interfaceInteract = true,
+			keyboardInteract = true
+		},	
+	}
 end)

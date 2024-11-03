@@ -2,7 +2,7 @@
 
 ---
 
-### **Chunk:new** ( `uniqueId`: int, `x`: int, `y`: int, `width`: int, `height`: int, `xFact`: int, `yFact`: int, `dx`: int, `dy`: int, `biome`: int )
+### **Chunk:new** ( uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome )
 Creates a new Chunk object. A chunk can hold information about blocks and items within a certain range, as well as collision information and other stuff.
 
 **Parameters:**
@@ -22,7 +22,7 @@ Creates a new Chunk object. A chunk can hold information about blocks and items 
 
 ---
 
-### **Chunk:setSegment** ( `description`: table )
+### **Chunk:setSegment** ( description )
 Creates a new Segment object, with the description provided 
 
 **Parameters:**
@@ -30,7 +30,7 @@ Creates a new Segment object, with the description provided
 
 ---
 
-### **Chunk:deleteSegment** ( `segmentId`: int )
+### **Chunk:deleteSegment** ( segmentId )
 Deletes a Segment from the Chunk. All blocks for which this Segment was attached will be deattached and their physic state will be reset.
 
 **Parameters:**
@@ -45,7 +45,7 @@ Deletes a Segment from the Chunk. All blocks for which this Segment was attached
 
 ---
 
-### **Chunk:getCollisions** ( `mode`: string, `xStart`: int, `xEnd`: int, `yStart`: int, `yEnd`: int, `categories`: table )
+### **Chunk:getCollisions** ( mode, xStart, xEnd, yStart, yEnd, categories )
 Gets the collisions from a Chunk. For blocks that don't have a segment assigned, it will calculate their collisions and assign them a new Segment.
 
 **Parameters:**
@@ -61,7 +61,7 @@ Gets the collisions from a Chunk. For blocks that don't have a segment assigned,
 
 ---
 
-### **Chunk:setPhysicState** ( `active`: boolean, `segmentList`: table )
+### **Chunk:setPhysicState** ( active, segmentList )
 Sets the state for the physics of the Chunk or some of its segments. 
 
 **Parameters:**
@@ -73,7 +73,7 @@ Sets the state for the physics of the Chunk or some of its segments.
 
 ---
 
-### **Chunk:refreshPhysics** ( `mode`: string, `segmentList`: table, `update`: boolean, `origin`: table )
+### **Chunk:refreshPhysics** ( mode, segmentList, update, origin )
 Recalculates the collisions of the given segments, or the whole chunk. 
 
 **Parameters:**
@@ -89,7 +89,7 @@ Empties a Chunk. All blocks from this Chunk will become **void**, their displays
 
 ---
 
-### **Chunk:setDisplayState** ( `active`: boolean )
+### **Chunk:setDisplayState** ( active )
 Sets the display state of a Chunk. When active, all blocks corresponding to this Chunk will be displayed, otherwise hidden. If active is **nil** then the Chunk will hide and display to reload all displays.
 
 **Parameters:**
@@ -97,7 +97,7 @@ Sets the display state of a Chunk. When active, all blocks corresponding to this
 
 ---
 
-### **Chunk:setUnloadDelay** ( `ticks`: int, `type`: string )
+### **Chunk:setUnloadDelay** ( ticks, type )
 Sets the Time that the Chunk should wait before unloading. There are three options to pick: physics, graphics, items. Note: Items unload removes them permanently.
 
 **Parameters:**
@@ -109,7 +109,7 @@ Sets the Time that the Chunk should wait before unloading. There are three optio
 
 ---
 
-### **Chunk:requestUnloadDelayRenewal** ( `time`: number, `operation`: string )
+### **Chunk:requestUnloadDelayRenewal** ( time, operation )
 Evaluates wheter it is proper or not to make a Unload Delay renewal and proceeds. 
 
 **Parameters:**
@@ -118,24 +118,24 @@ Evaluates wheter it is proper or not to make a Unload Delay renewal and proceeds
 
 ---
 
-### **Chunk:setCollisions** ( `active`: boolean|nil, `targetPlayer`: string|nil )
+### **Chunk:setCollisions** ( active, targetPresenceId )
 Sets the Collisions for the Chunk. This is just an interface function that manages the interactions between players and the Chunk, to ensure no innecessary calls for players that had the Chunk already loaded.
 
 **Parameters:**
 - **active** (`Boolean|Nil`) : Sets the collision state. If nil then a reload will be performed for all players
-- **targetPlayer** (`String|Nil`) : The target that asks for the collision update. If nil then player check wont be accounted
+- **targetPresenceId** (`Int|Nil`) : The target that asks for the collision update. If nil then player check wont be accounted
 
 **Returns:**
 - `Boolean` Whether the specified action happened or not
 
 ---
 
-### **Chunk:setDisplay** ( `active`: boolean|nil, `targetPlayer`: string|nil )
+### **Chunk:setDisplay** ( active, targetPresenceId )
 Sets the Display state of a Chunk. This is just an interface function that manages the interactions between players and the Chunk, to ensure no innecessary calls for players that had the Chunk already displayed.
 
 **Parameters:**
 - **active** (`Boolean|Nil`) : Sets the Display state. If nil then a reload will be performed for all players
-- **targetPlayer** (`String|Nil`) : The target that asks for the Display. If nil then player check wont be accounted
+- **targetPresenceId** (`Int|Nil`) : The target that asks for the Display. If nil then player check wont be accounted
 
 **Returns:**
 - `Boolean` Whether the specified action happened or not

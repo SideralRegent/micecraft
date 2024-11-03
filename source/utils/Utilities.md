@@ -2,7 +2,7 @@
 
 ---
 
-### **math.round** ( `n`: number )
+### **math.round** ( n )
 Rounds a number to the nearest integer. For numbers with decimal digit under 0.5, it will floor that number, and for numbers over 0.5 it will ceil that number.
 
 **Parameters:**
@@ -13,7 +13,7 @@ Rounds a number to the nearest integer. For numbers with decimal digit under 0.5
 
 ---
 
-### **math.restrict** ( `number`: number, `lower`: number, `higher`: number )
+### **math.restrict** ( number, lower, higher )
 Restrict the given input between two limits. 
 
 **Parameters:**
@@ -26,7 +26,7 @@ Restrict the given input between two limits.
 
 ---
 
-### **math.pythag** ( `ax`: number, `ay`: number, `bx`: number, `by`: number )
+### **math.pythag** ( ax, ay, bx, by )
 Returns the distance between two points on a cartesian plane. 
 
 **Parameters:**
@@ -40,7 +40,7 @@ Returns the distance between two points on a cartesian plane.
 
 ---
 
-### **math.udist** ( `a`: number, `b`: number )
+### **math.udist** ( a, b )
 Returns the absolute difference between two numbers. 
 
 **Parameters:**
@@ -52,7 +52,7 @@ Returns the absolute difference between two numbers.
 
 ---
 
-### **math.precision** ( `number`: number, `precision`: int )
+### **math.precision** ( number, precision )
 Rounds a number to the specified level of precision. The precision is the amount of decimal points after the integer part.
 
 **Parameters:**
@@ -64,7 +64,7 @@ Rounds a number to the specified level of precision. The precision is the amount
 
 ---
 
-### **math.tobase** ( `number`: number, `base`: int )
+### **math.tobase** ( number, base )
 Converts a number to a string representation in another base. The base can be as lower as 2 or as higher as 64, otherwise it returns nil.
 
 **Parameters:**
@@ -76,7 +76,7 @@ Converts a number to a string representation in another base. The base can be as
 
 ---
 
-### **math.tonumber** ( `str`: string, `base`: int )
+### **math.tonumber** ( str, base )
 Converts a string to a number, if possible. The base can be as lower as 2 or as higher as 64, otherwise it returns nil. When bases are equal or lower than 36, it uses the native Lua `tonumber` method.
 
 **Parameters:**
@@ -88,7 +88,7 @@ Converts a string to a number, if possible. The base can be as lower as 2 or as 
 
 ---
 
-### **math.cosint** ( `a`: number, `b`: number, `s`: number )
+### **math.cosint** ( a, b, s )
 Interpolates two points with a cosine curve. 
 
 **Parameters:**
@@ -101,7 +101,7 @@ Interpolates two points with a cosine curve.
 
 ---
 
-### **math.heightMap** ( `amplitude`: number, `waveLenght`: number, `width`: int, `offset`: number, `lower`: number, `higher`: number )
+### **math.heightMap** ( amplitude, waveLenght, width, offset, lower, higher )
 Generates a Height Map based on the current `random seed`. 
 
 **Parameters:**
@@ -122,7 +122,7 @@ Combines two Height maps based on the operation provided. The built-in operation
 
 ---
 
-### **math.stretchMap** ( `ls`: table, `mul`: int )
+### **math.stretchMap** ( ls, mul )
 Stretches a height map, or array with numerical values. 
 
 **Parameters:**
@@ -134,7 +134,7 @@ Stretches a height map, or array with numerical values.
 
 ---
 
-### **table.isEmpty** ( `t`: table )
+### **table.isEmpty** ( t )
 Checks if the Table has no elements. 
 
 **Parameters:**
@@ -145,7 +145,7 @@ Checks if the Table has no elements.
 
 ---
 
-### **table.copy** ( `t`: table )
+### **table.copy** ( t )
 Copies a table and all its values recursively. It avoids keeping references over values.
 
 **Parameters:**
@@ -156,7 +156,15 @@ Copies a table and all its values recursively. It avoids keeping references over
 
 ---
 
-### **table.append** ( `t`: table, `...`: table )
+### **table.copyvalues** ( t )
+Copies only the values from a table, in an arbitrary order. 
+
+**Parameters:**
+- **t** (`Table`) : The table to copies values from
+
+---
+
+### **table.append** ( t, ... )
 Appends two numerical tables 
 
 **Parameters:**
@@ -168,7 +176,7 @@ Appends two numerical tables
 
 ---
 
-### **table.inherit** ( `t`: table, `ex`: table )
+### **table.inherit** ( t, ex )
 Inhertis all values to a table, from the specified one. It does not modify the original tables, but copies them, to avoid links. All values to inherit will overwrite values on the target table.
 
 **Parameters:**
@@ -180,7 +188,7 @@ Inhertis all values to a table, from the specified one. It does not modify the o
 
 ---
 
-### **table.find** ( `t`: table, `e`: any )
+### **table.find** ( t, e )
 Searches for a value across a table. Will return the first index of where it was found, otherwise returns nil.
 
 **Parameters:**
@@ -193,7 +201,7 @@ Searches for a value across a table. Will return the first index of where it was
 
 ---
 
-### **table.kfind** ( `t`: table, `key`: any, `e`: any )
+### **table.kfind** ( t, key, e )
 Searches for a value, but in a depth of 1 index. Refer to table.find for more information.
 
 **Parameters:**
@@ -207,7 +215,7 @@ Searches for a value, but in a depth of 1 index. Refer to table.find for more in
 
 ---
 
-### **table.extract** ( `t`: table, `e`: any )
+### **table.extract** ( t, e )
 Extracts a value from the given table. 
 
 **Parameters:**
@@ -220,7 +228,7 @@ Extracts a value from the given table.
 
 ---
 
-### **table.keys** ( `t`: table )
+### **table.keys** ( t )
 Returns an array with all the keys/indexes from the given table. 
 
 **Parameters:**
@@ -231,7 +239,7 @@ Returns an array with all the keys/indexes from the given table.
 
 ---
 
-### **table.count** ( `t`: table )
+### **table.count** ( t )
 Counts all entries in a Table. 
 
 **Parameters:**
@@ -242,7 +250,7 @@ Counts all entries in a Table.
 
 ---
 
-### **table.copykeys** ( `t`: table, `v`: any )
+### **table.copykeys** ( t, v )
 Copies all the keys from the table and assigns them the value given. 
 
 **Parameters:**
@@ -254,7 +262,7 @@ Copies all the keys from the table and assigns them the value given.
 
 ---
 
-### **table.random** ( `t`: table, `associative`: boolean )
+### **table.random** ( t, associative )
 Gives the value of a random entry from the table. If the table is associative it converts the keys to an array.
 
 **Parameters:**
@@ -267,7 +275,7 @@ Gives the value of a random entry from the table. If the table is associative it
 
 ---
 
-### **table.tostring** ( `value`: table|any, `tb`: int, `seen`: table )
+### **table.tostring** ( value, tb, seen )
 Converts a table to a string, in a reasonable format. TODO: Add special parsing for keys.
 
 **Parameters:**
@@ -280,7 +288,7 @@ Converts a table to a string, in a reasonable format. TODO: Add special parsing 
 
 ---
 
-### **table.print** ( `t`: table )
+### **table.print** ( t )
 Prints a table. 
 
 **Parameters:**
@@ -288,7 +296,7 @@ Prints a table.
 
 ---
 
-### **data.getFromModule** ( `str`: string, `m_id`: string )
+### **data.getFromModule** ( str, m_id )
 Gives the specific data of a module from an encoded string. 
 
 **Parameters:**
@@ -300,7 +308,7 @@ Gives the specific data of a module from an encoded string.
 
 ---
 
-### **data.setToModule** ( `str`: string, `m_id`: string, `rawdata`: string )
+### **data.setToModule** ( str, m_id, rawdata )
 Sets the data to the specified module on an encoded string 
 
 **Parameters:**
@@ -316,7 +324,7 @@ Sets the data to the specified module on an encoded string
 
 ---
 
-### **data.decode** ( `str`: string, `depth`: int )
+### **data.decode** ( str, depth )
 Decodes a piece of raw data. 
 
 **Parameters:**
@@ -328,7 +336,7 @@ Decodes a piece of raw data.
 
 ---
 
-### **data.parse** ( `str`: string, `depth`: int )
+### **data.parse** ( str, depth )
 Parses a value encoded or compressed. 
 
 **Parameters:**
@@ -340,7 +348,7 @@ Parses a value encoded or compressed.
 
 ---
 
-### **data.serialize** ( `this`: any, `depth`: int )
+### **data.serialize** ( this, depth )
 Encondes a value into a reasonable format. 
 
 **Parameters:**
@@ -352,7 +360,7 @@ Encondes a value into a reasonable format.
 
 ---
 
-### **data.encode** ( `this`: table, `depth`: int )
+### **data.encode** ( this, depth )
 Encodes a table into a reasonable format. 
 
 **Parameters:**
@@ -364,7 +372,7 @@ Encodes a table into a reasonable format.
 
 ---
 
-### **Timer:new** ( `awaitTime`: int, `loop`: boolean, `callback`: function, `...`: any )
+### **Timer:new** ( awaitTime, loop, callback, ... )
 Creates a new Timer. Timers can wait an established amount of seconds before triggering a callback.
 
 **Parameters:**
@@ -378,7 +386,7 @@ Creates a new Timer. Timers can wait an established amount of seconds before tri
 
 ---
 
-### **Timer:get** ( `timerId`: int )
+### **Timer:get** ( timerId )
 Retrieves a Timer object. 
 
 **Parameters:**
@@ -389,7 +397,7 @@ Retrieves a Timer object.
 
 ---
 
-### **Timer:remove** ( `timerId`: int )
+### **Timer:remove** ( timerId )
 Removes a Timer from the stack. 
 
 **Parameters:**
@@ -406,7 +414,7 @@ Handles the execution of all Timers present on the stack. The timers are called 
 
 ---
 
-### **Tick:step** ( `amount`: int )
+### **Tick:step** ( amount )
 Steps the specified amount of Ticks. If the amount is just 1, then the Timer will just increase. Otherwise, it will execute all the tasks for the next ticks.
 
 **Parameters:**
@@ -414,7 +422,7 @@ Steps the specified amount of Ticks. If the amount is just 1, then the Timer wil
 
 ---
 
-### **Task:new** ( `awaitTicks`: int, `shouldLoop`: boolean, `callback`: function, `...`: any )
+### **Task:new** ( awaitTicks, shouldLoop, callback, ... )
 Creates a new Task object. Tasks are used as an abstraction layer for executing events with a delay on a controlated environment.
 
 **Parameters:**
@@ -436,7 +444,7 @@ Renews a Task execution time. The new time will be the current tick, plus the as
 
 ---
 
-### **Task:kill** ( `reason`: string )
+### **Task:kill** ( reason )
 Destroys a Task object. 
 
 **Parameters:**
@@ -452,7 +460,7 @@ Executes the callback of the Task.
 
 ---
 
-### **Tick.slice:new** ( `tick`: int )
+### **Tick.slice:new** ( tick )
 Creates a new Slice. Slices consist of lookup tables with identifiers of the Task that need to be executed at an exact tick. A slice is, thus, the list of tasks for a specific tick.
 
 **Parameters:**
@@ -460,7 +468,7 @@ Creates a new Slice. Slices consist of lookup tables with identifiers of the Tas
 
 ---
 
-### **Tick.slice:addTask** ( `tick`: int, `taskId`: int )
+### **Tick.slice:addTask** ( tick, taskId )
 Adds a Task to a Slice's stack. 
 
 **Parameters:**
@@ -472,7 +480,7 @@ Adds a Task to a Slice's stack.
 
 ---
 
-### **Tick.slice:get** ( `tick`: int )
+### **Tick.slice:get** ( tick )
 Retrieves a Slice object. 
 
 **Parameters:**
@@ -483,7 +491,7 @@ Retrieves a Slice object.
 
 ---
 
-### **Tick.slice:remove** ( `tick`: int )
+### **Tick.slice:remove** ( tick )
 Deletes a Slice object. 
 
 **Parameters:**
@@ -491,7 +499,7 @@ Deletes a Slice object.
 
 ---
 
-### **Tick:newTask** ( `awaitTicks`: int, `shouldLoop`: boolean, `callback`: function, `...`: any )
+### **Tick:newTask** ( awaitTicks, shouldLoop, callback, ... )
 Adds a New Task to the stack. 
 
 **Parameters:**
@@ -505,7 +513,7 @@ Adds a New Task to the stack.
 
 ---
 
-### **Tick:getTask** ( `taskId`: int )
+### **Tick:getTask** ( taskId )
 Retrieves a Task object. 
 
 **Parameters:**
@@ -516,7 +524,7 @@ Retrieves a Task object.
 
 ---
 
-### **Tick:removeTask** ( `taskId`: int )
+### **Tick:removeTask** ( taskId )
 Removes a Task from the stack. 
 
 **Parameters:**
@@ -524,7 +532,7 @@ Removes a Task from the stack.
 
 ---
 
-### **Tick:setTaskTime** ( `taskId`: int, `tick`: int )
+### **Tick:setTaskTime** ( taskId, tick )
 Sets a new time for the specified Task. 
 
 **Parameters:**

@@ -338,6 +338,22 @@ blockMeta:set(0x256, {
 	end
 })
 
+blockMeta:set(0x41d0, {
+	name = "d_wood", 
+	sprite = "19283089309.png", 
+	durability = 20, 
+	hardness = 0, 
+	particle = 7
+})
+
+blockMeta:set(0x42d0, {
+	name = "d_stone", 
+	sprite = "19283105df0.png", 
+	durability = 30, 
+	hardness = 0, 
+	particle = 7
+})
+
 blockMeta:set(0x10, "Fluid", {
 		name = "water",
 		sprite = false

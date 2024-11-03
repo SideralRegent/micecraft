@@ -41,7 +41,7 @@ do
 			for x = xStart, xEnd do 
 				type = matrix[(y - yStart) + 1][(x - xStart) + 1]
 				if type ~= VOID then
-					self:assignTypeTo(x, y, type)
+					self[y][x] = type
 				end
 			end
 		end
@@ -180,7 +180,7 @@ do
 					break
 				end
 				
-				self:assignTypeTo(x, y, type)
+				self[y][x] = type
 			end
 		end
 	end
@@ -215,7 +215,7 @@ function Field:setNoiseMap(mapInfo)
 				sqr = noiseMap[yo][xo] or 0
 				
 				if sqr > threshold then
-					self:assignTypeTo(x, y, dir)
+					self[y][x] = dir
 				end
 			end
 		end

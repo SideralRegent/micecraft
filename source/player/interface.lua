@@ -1,25 +1,50 @@
-function Player:showMainMenu(set)
-	if set then
-		self.interface.menu = Interface:MainMenu(self.name)
-	else
-		if self.interface.menu then
-			Interface:removeView(self.interface.menu)
+do
+	
+	function Player:closeInterface(key)
+		local interface = self.interface
+		if interface[key] then
+			Interface:removeView(interface[key])
+		end
+				
+		interface[key] = false
+	end
+	
+	function Player:openInterface(key, ...)
+		self:closeInterface(key)
+		self.interface[key] = Interface[key](Interface, self.name, ...)
+	end
+	
+	local tkeys = table.keys
+	local next = next
+	-- Inneficient
+	function Player:switchInterface(name, ...)
+		local interface = self.interface
+		local keys = tkeys(interface)
+		
+		self:openInterface(name, ...)
+		
+		for _, key in next, keys do
+			if key ~= name then
+				self:closeInterface(key)
+			end
+		end
+	end
+	
+	function Player:closeAllInterfaces()
+		local interface = self.interface
+		local keys = tkeys(interface)
+		
+		for _, key in next, keys do
+			if interface[key] then
+				Interface:removeView(interface[key])
+			end
+			
+			interface[key] = false
 		end
 	end
 end
 
 function Player:promptMainMenu()
 	self:disable()
-	self:showMainMenuReturn(false)
-	self:showMainMenu(true)
-end
-
-function Player:showMainMenuReturn(set)
-	if set then
-		self.interface.returns = Interface:MainMenuReturn(self.name)
-	else
-		if self.interface.returns then
-			Interface:removeView(self.interface.returns)
-		end
-	end
+	self:switchInterface("MainMenu")
 end

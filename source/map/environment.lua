@@ -101,3 +101,17 @@ end
 function Map:getFieldNormRanges()
 	return self.chunkFieldViewNormX, self.chunkFieldViewNormY
 end
+
+function Map:getLimits(cdType)
+	if cdType == CD_MAP then
+		return self:getEdges()
+	elseif cdType == CD_BLK then
+		return 1, 1, self:getBlocks()
+	elseif cdType == CD_MTX then
+		return 1, 1, self:getChunks()
+	elseif cdType == CD_UID then
+		return 1, 0, #self.chunkLookup, 0
+	end
+	
+	return 0, 0, 0, 0
+end

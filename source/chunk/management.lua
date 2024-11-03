@@ -73,17 +73,17 @@ do
 	-- the Chunk already loaded.
 	-- @name Chunk:setCollisions
 	-- @param Boolean|Nil:active Sets the collision state. If nil then a reload will be performed for all players
-	-- @param String|Nil:targetPlayer The target that asks for the collision update. If nil then player check wont be accounted
+	-- @param Int|Nil:targetPresenceId The target that asks for the collision update. If nil then player check wont be accounted
 	-- @return `Boolean` Whether the specified action happened or not
-	function Chunk:setCollisions(active, targetPlayer)
+	function Chunk:setCollisions(active, targetPresenceId)
 		if active == nil then
 			self:setCollisions(false, nil)
 			self:setCollisions(true, nil)
 		else
 			local goAhead = false
-			if targetPlayer and active then
-				goAhead = (not self.collidesTo[targetPlayer] == active)
-				self.collidesTo[targetPlayer] = active
+			if targetPresenceId and active then
+				goAhead = (not self.collidesTo[targetPresenceId] == active)
+				self.collidesTo[targetPresenceId] = active
 			else -- nil players
 				goAhead = true
 				self.collidesTo = copykeys(Room.presencePlayerList, not not active)
@@ -107,9 +107,9 @@ do
 	-- the Chunk already displayed.
 	-- @name Chunk:setDisplay
 	-- @param Boolean|Nil:active Sets the Display state. If nil then a reload will be performed for all players
-	-- @param String|Nil:targetPlayer The target that asks for the Display. If nil then player check wont be accounted
+	-- @param Int|Nil:targetPresenceId The target that asks for the Display. If nil then player check wont be accounted
 	-- @return `Boolean` Whether the specified action happened or not
-	function Chunk:setDisplay(active, targetPlayer)
+	function Chunk:setDisplay(active, targetPresenceId)
 		if active == nil then
 			self:setDisplay(false, nil)
 			self:setDisplay(true, nil)
@@ -117,12 +117,12 @@ do
 			return true
 		else
 			local goAhead = false
-			if targetPlayer and active then
+			if targetPresenceId and active then
 				if isEmpty(self.displaysTo) then
 					return self:setDisplay(true, nil)
 				else
-					goAhead = (not self.displaysTo[targetPlayer] == active)
-					self.displaysTo[targetPlayer] = active
+					goAhead = (not self.displaysTo[targetPresenceId] == active)
+					self.displaysTo[targetPresenceId] = active
 				end
 			else
 				goAhead = true
@@ -135,17 +135,8 @@ do
 				if not active then
 					activeType = false
 				end
-				--[[if targetPlayer == nil then
-					if active then
-						activeType = nil
-					else
-						activeType = false
-					end
-				else
-					activeType = active
-				end]]
 				
-				self:setQueue(true, "setDisplayState", activeType, targetPlayer)
+				self:setQueue(true, "setDisplayState", activeType, targetPresenceId)
 			end
 			
 			if active then
@@ -157,9 +148,9 @@ do
 	end
 end
 
-function Chunk:setState(collision, display, targetPlayer)
-	self:setCollisions(collision, targetPlayer)
-	self:setDisplay(display, targetPlayer)
+function Chunk:setState(collision, display, targetPresenceId)
+	self:setCollisions(collision, targetPresenceId)
+	self:setDisplay(display, targetPresenceId)
 end
 
 do

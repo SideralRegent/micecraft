@@ -16,8 +16,8 @@ do
 	
 	local aux = {
 		__index = {
-			insert = function(t, v)
-				t[#t + 1] = v
+			insert = function(t, i, p)
+				t[#t + 1] = {id=i, playerName=p}
 			end
 		}
 	}
@@ -37,15 +37,17 @@ do
 		local object = self.object[objectId]
 		if not object then return end
 		
-		for _, imageId in next, object.img do
-			removeImage(imageId, false)
+		for _, imageInfo in next, object.img do
+			removeImage(imageInfo.id, false)
 		end
 		
-		for _, textId in next, object.txt do
-			removeTextArea(textId, nil)
+		for _, textInfo in next, object.txt do
+			removeTextArea(textInfo.id, textInfo.playerName)
 		end
 		
 		self.object[objectId] = nil
+		
+		return false
 	end
 	
 	function Interface:current()
@@ -53,11 +55,22 @@ do
 	end
 	
 	local iaddTextArea = ui.iaddTextArea
-	function Interface:addText(...)
-		local id = iaddTextArea(...)
+	function Interface:addText(text, targetPlayer, ...)
+		local id = iaddTextArea(text, targetPlayer, ...)
 		
-		self:current().txt:insert(id)
+		self:current().txt:insert(id, targetPlayer)
 	end	
+	
+	local addTextArea = ui.addTextArea
+	function Interface:addIText(id, text, targetPlayer, ...)
+		addTextArea(id, text, targetPlayer, ...)
+		
+		self:current().txt:insert(id, targetPlayer)
+	end	
+	
+	function Interface:updateText(...)
+		updateTextArea(...)
+	end
 	
 	local addImage = tfm.exec.addImage
 	function Interface:addImage(...)

@@ -27,6 +27,6 @@ end
 function Mode:run()
 	-- Start your mode
 	Module:on("NewPlayer", function(playerName)
-		tfm.exec.chatMessage("I'm a default message. Say hi " .. playerName .."!")
+		tfm.exec.chatMessage("I'm a default message. Say hi " .. playerName .."!", playerName)
 	end)
 end

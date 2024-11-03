@@ -63,7 +63,7 @@ do
 		end)
 	
 		Mousebinds:new(keys.M, true, function(_, block, ...)
-			Map:spawnStructure("SandPiramidSmall", block.x, block.y, 0.6, 1.0)
+			Map:spawnStructure("SandPiramidSmall", block.x, block.y, 0.6, 1.0, true)
 		end)
 	end
 	
@@ -97,7 +97,7 @@ do
 	Module:on("Mouse", function(playerName, xPosition, yPosition)
 		local player = Room:getPlayer(playerName)
 		
-		if player and player.isActive and player.isAlive then
+		if player and player.perms.mouseInteract then--and player.isActive and player.isAlive then
 			Mousebinds:event(player, xPosition, yPosition)
 		end
 	end)

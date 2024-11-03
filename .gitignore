@@ -43,5 +43,7 @@ micecraft.lua
 main.lua
 
 *.png
+*.jpg
+*.jpeg
 
 .vscode/

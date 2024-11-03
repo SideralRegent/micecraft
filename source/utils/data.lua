@@ -64,7 +64,7 @@ do
 		depth = depth or 1
 		local this = {}
 
-		local pattern = ("[^%c]+"):format(char(17 + depth))
+		local pattern = ("[^%c]+"):format(17 + depth)
 		
 		local d_parse = data.parse
 		
@@ -179,5 +179,11 @@ do
 		end
 		
 		return tconcat(str, separator)
+	end
+	
+	data.parseName = function(str)
+		local name, tag = str:match("([%w_]+)#(%d%d%d%d)")
+		
+		return name, tag
 	end
 end

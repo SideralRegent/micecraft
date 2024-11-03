@@ -76,11 +76,21 @@ do
 	
 	function ItemBank:bulkFill(item, amount, updateDisplay)
 		for _, container in next, self.containers do
-			container:setItemType(item +_, amount, updateDisplay)
+			container:setItemType(item , amount, updateDisplay)
+		end
+	end
+	
+	function ItemBank:bulkFillTest(updateDisplay)
+		local types = {}
+		for itemName, id in next, itemMeta.maps do
+			types[#types + 1] = id
 		end
 		
-		if updateDisplay then
-		--	self:refreshContainers(nil)
+		local current = 1
+		for _, container in next, self.containers do
+			container:setItemType(types[current], 512, updateDisplay)
+			
+			current = 1 + current % #types
 		end
 	end
 	

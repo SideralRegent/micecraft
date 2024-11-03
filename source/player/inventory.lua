@@ -46,10 +46,10 @@ do -- This is crap.
 	local collumn = 10
 	local scale = 0.625
 	local pxsize = scale * 32
-	local offset = 0.35 * pxsize
+	local offset = 0.5 * pxsize
 	local pxoffset = pxsize + offset
 		
-	local X, Y = 15, 25
+	local X, Y = 15, 32
 		
 	function PlayerInventory:set()
 		local line = self.hotbarLim
@@ -83,8 +83,7 @@ do -- This is crap.
 		self:setSection("hotbar", 1, self.hotbarLim, solveFunction)
 		self:setSection("remainder", self.hotbarLim + 1, 40, solveFunction)
 				
-		self.bank:bulkFill(itemMeta.maps.dirt, 1000000, false)
-		--self:setDisplay("hotbar", true)
+		self.bank:bulkFillTest(false)
 	end
 end
 
@@ -92,13 +91,15 @@ function PlayerInventory:setDisplay(key, display)
 	if display == nil then
 		self:setDisplay(key, not self.section[key].active)
 	else
-		self.section[key].active = display
-		
 		if display then
-			self.bank:showContainers(key)
+			if not self.section[key].active then
+				self.bank:showContainers(key)
+			end
 		else
 			self.bank:hideContainers(key)
 		end
+		
+		self.section[key].active = display
 	end
 end
 
@@ -125,7 +126,9 @@ function PlayerInventory:checkView(...)
 	for _, index in next, checks do
 		section = self:getSectionByIndex(index)
 		
-		if not section.active then return false end
+		if not (section and section.active) then
+			return false 
+		end
 	end
 	
 	return true
@@ -135,12 +138,13 @@ function Player:shiftHotbarSelector(value, updateDisplay)
 	value = value or 1
 	local selector = self.selectedFrame
 	
-	local success = selector:shiftPointer(value, 1, self.hotbarLim, "hotbar")
+	local success = selector:shiftPointer(value, 1, self.inventory.hotbarLim, "hotbar")
 	
 	selector:setView(success and updateDisplay)
 end
 
 function Player:setSelectedContainer(index, bank, updateDisplay)
+	index = index or self.selectedFrame.pointer
 	bank = bank or self.inventory.bank
 	local selector = self.selectedFrame
 		
@@ -159,4 +163,10 @@ function Player:setSelectedContainer(index, bank, updateDisplay)
 	selector:setView(success and updateDisplay)
 	
 	return not isEqual
+end
+
+function Player:assertSelectorView()
+	if not self.inventory:checkView(self.selectedFrame.pointer) then
+		self:setSelectedContainer(0, nil, true)
+	end
 end

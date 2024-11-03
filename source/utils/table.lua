@@ -42,6 +42,20 @@ do
 		end
 	end
 	
+	--- Copies only the values from a table, in an arbitrary order.
+	-- @name table.copyvalues
+	-- @param Table:t The table to copies values from
+	-- @retrun `Table` A list with all the values.
+	table.copyvalues = function(t)
+		local list = {}
+		
+		for _, v in next, t do
+			list[#list + 1] = v
+		end
+		
+		return list
+	end
+	
 	--- Appends two numerical tables
 	-- @name table.append
 	-- @param Table:t The first table
@@ -201,6 +215,23 @@ do
 		return t[index], index
 	end
 	
+	local alphabetic_sort = function(a, b)
+		local ca, cb 
+		
+		for i = 1, min(#a, #b) do
+			ca = a:byte(i)
+			cb = b:byte(i)
+			
+			if ca > cb then
+				return false
+			elseif ca < cb then
+				return true
+			end
+		end
+		
+		return false
+	end
+	
 	--- Converts a table to a string, in a reasonable format.
 	-- @name table.tostring
 	-- @param Table|Any:value The table to convert to string
@@ -208,9 +239,24 @@ do
 	-- @param Table:seen A list of tables that have been seen when iterating
 	-- @return `String` The value converted to string
 	-- TODO: Add special parsing for keys.
-	table.tostring = function(value, tb, seen, pretty)
+	
+	local colors = {
+		string = "CEP",
+		boolean = "ROSE",
+		number = "V",
+		coroutine = "VP",
+		["function"] = "VI"
+	}
+	local prettify = function(value, type)
+		local color = colors[type]
+		
+		return ("<%s>%s</%s>"):format(color, tostring(value), color)
+	end
+	
+	table.tostring = function(value, tb, seen, pretty, lim)
+		lim = lim or 8
 		tb = tb or 0
-		if tb > 8 then return end -- Max depth is 8, unlike Tig's broken print.
+		if tb > lim then return end -- Max depth is 8, unlike Tig's broken print.
 		
 		local tv = type(value)
 		if tv == "table" then
@@ -220,7 +266,7 @@ do
 			local kk, vv
 			local p1 = tb + 1
 			for k, v in next, value do
-				kk = table.tostring(k, p1, nil, pretty)
+				kk = table.tostring(k, p1, nil, pretty, lim)
 				if not seen[v] and not tostring(k):match("__index") then
 					if type(v) == "table" then
 						seen[v] = true
@@ -231,61 +277,33 @@ do
 					
 					args[#args + 1] = ("%s%s"):format(
 						("\t"):rep(p1),
-						("[%s] = %s"):format(kk, vv)
+						("%s = %s"):format(kk, vv)
 					)
 				end
 			end
 			
-			-- Sorts alphabetically
-			sort(args, function(a, b)
-				local ca, cb 
-				
-				for i = 1, min(#a, #b) do
-					ca = a:byte(i)
-					cb = b:byte(i)
-					
-					if ca > cb then
-						return false
-					elseif ca < cb then
-						return true
-					end
-				end
-				
-				return false
-			end)
+			sort(args, alphabetic_sort)
+			
 			args = concat(args, ",\n")
 			
-			if pretty then -- Less uglier than `X and A or B`
+			if pretty then
 				return ("<N>{\n%s\n%s}</N>"):format(args, ("\t"):rep(tb))
 			else
 				return ("{\n%s\n%s}"):format(args, ("\t"):rep(tb))
 			end
-		elseif tv == "string" then -- <> are for tags that get parsed in-game
-			local vvv = ('"%s"'):format(
-				value:gsub("<", "&lt;"):gsub(">", "&gt;")
-			)
-			return pretty and ("<CEP>%s</CEP>"):format(vvv) or vvv
 		else
-			if pretty then
-				if tv == "boolean" then
-					return ("<ROSE>%s</ROSE>"):format(tostring(value))
-				elseif tv== "number" then
-					return ("<V>%s</V>"):format(tostring(value))
-				elseif tv == "function" then
-					return ("<VI>%s</VI>"):format(tostring(value))
-				else
-					return tostring(value)
-				end
-			else
-				return tostring(value)
+			if tv == "string" then
+				value = ('"%s"'):format(value:gsub("<", "&lt;"):gsub(">", "&gt;"))
 			end
+			
+			return pretty and prettify(value, tv) or tostring(value)
 		end
 	end
 	
 	--- Prints a table.
 	-- @name table.print
 	-- @param Table:t The table to print
-	table.print = function(t, pretty)
-		print(table.tostring(t, 0, nil, pretty))
+	table.print = function(t, pretty, lim)
+		print(table.tostring(t, 0, nil, pretty, lim))
 	end	
 end

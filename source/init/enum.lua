@@ -135,6 +135,59 @@ enum.particle_display = {
 	touhou = 9
 }
 
+enum.cooldown = {
+	playerInventory = 400,
+	blockDamage = 125,
+	placeBlock = 200,
+	useItem = 200,
+}
+
+enum.ranks = {
+	loader = 0,
+	staff = 1,
+	moderator = 3,
+	roomAdmin = 5,
+	funcorp = 8,
+	player = 10
+}
+
+enum.perms = { -- player
+	damageBlock = false,
+	placeBlock = false,
+	useItem = false,
+	joinWorld = false,
+	spectateWorld = false,
+	hitEntities = false,
+	respawn = false,
+	useCommands = false,
+	seeInventory = false,
+	interfaceInteract = false,
+	keyboardInteract = false,
+	mouseInteract = false,
+}
+
+enum.invalidPlayerReason = {
+	banned = 1,
+	newAccount = 2,
+	souris = 3,
+	notAllowedRoom = 4
+}
+
+-- Reserved on 0 <= ID < 100
+enum.textId = {
+	runtime = 12,
+	
+	maxPlayers = 20,
+	maxSpectators = 21,
+	
+	canOpenInventory = 41,
+	canPlaceBlock = 42,
+	canDamageBlock = 43,
+	canUseItem = 44,
+	
+	password = 50,
+	
+}
 do
 	local associate = function(t)
 		local it = {}
@@ -154,4 +207,5 @@ do
 	enum.physics = associate(enum.physics)
 	enum.keys = associate(enum.keys)
 	enum.particle_display = associate(enum.particle_display)
+	enum.invalidPlayerReason = associate(enum.invalidPlayerReason)
 end

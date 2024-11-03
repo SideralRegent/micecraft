@@ -79,11 +79,11 @@ do
 		end)
 	
 		Keybinds:new("V", true, function(player)
-			player:queueNearChunks(nil, true)	
+			--player:queueNearChunks(nil, true)	
 		end)
 	
 		Keybinds:new("X", true, function(player)
-			player.inventory:setDisplay("remainder", nil)
+			player:showInventoryAction(true, nil)
 		end)
 	
 		-- Hotbar shift

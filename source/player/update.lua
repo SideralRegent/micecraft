@@ -61,7 +61,7 @@ do
 		
 		self.currentChunk = chunk.uniqueId
 			
-		if chunk.collidesTo[self.name] then
+		if chunk.collidesTo[self.presenceId] then
 			if self.isFrozen then
 				self:freeze(false, true)
 			end
@@ -84,7 +84,7 @@ do
 	
 	function Player:setClock(time, add, runEvents)
 		if add then
-			time = time or 500
+			time = time or 1
 			self.internalTime = self.internalTime + time
 		else
 			self.internalTime = time
@@ -95,9 +95,22 @@ do
 		end
 	end
 	
+	-- Tables do not reference correctly on Tick:newTask, so I can't pass
+	--	player directly and I won't duplicate Tick class just for this
+	
+	-- How bad could this become?
 	function Player:runEvents()
-		if self.internalTime % 4000 == 0 then -- Every 4 seconds
+		local internalTime = self.internalTime 
+		if internalTime % 8 == 0 then -- Every 4 seconds
 			self:updateChunkArea()
+			
+			if internalTime % 40 == 0 then -- Every 20 seconds
+				if internalTime % 120 == 0 then -- Every 1 min
+					self:saveData(true)
+				else
+					self:writeData()
+				end
+			end
 		else
 			self:checkForCurrentChunk()
 		end

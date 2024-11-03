@@ -57,23 +57,24 @@ do
 			end
 		end)
 	
-		TextAreaBinds:new("play", function(player, ...)			
-			if player:checkEnable() then
-				player:showMainMenu(false)
-			else
-				tfm.exec.chatMessage("Not implemented.", player.name)
+		TextAreaBinds:new("play", function(player, ...)
+			local joined, reason = player:checkJoin()
+			
+			if not joined then
+				tfm.exec.chatMessage("You can't join this game, reason: " .. reason, player.name)
 			end
 		end)
 		
 		TextAreaBinds:new("spectate", function(player, ...)
-			player:disable()
-			player:showMainMenu(false)
-			player:showMainMenuReturn(true)
+			player:checkSpectate()
 		end)
 	
 		TextAreaBinds:new("retmainmen", function(player, ...)
-			player:showMainMenuReturn(false)
-			player:showMainMenu(true)
+			player:switchInterface("MainMenu")
+		end)
+	
+		TextAreaBinds:new("room_settings", function(player, ...)
+			player:switchInterface("RoomSettings")
 		end)
 	end
 	
@@ -81,8 +82,9 @@ do
 	Module:on("TextAreaCallback", function(textAreaId, playerName, eventName)
 		local player = Room:getPlayer(playerName)
 		
-		if player then
-			local name, info = eventName:match("^(%a+)%-(.+)$")
+		if player and player.perms.interfaceInteract then
+			local name, info = eventName:match("^([_%a]+)%-(.+)$")
+			print(name, info)
 			name = name or eventName
 			TextAreaBinds:event(player, name, info)
 		end

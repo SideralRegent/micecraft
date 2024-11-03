@@ -2,7 +2,7 @@
 
 ---
 
-### **Block:new** ( `uniqueId`: int, `type`: int, `MapX`: int, `MapY`: int, `displayX`: int, `displayY`: int, `width`: int, `height`: int )
+### **Block:new** ( uniqueId, type, MapX, MapY, displayX, displayY, width, height )
 Creates a new Block object. 
 
 **Parameters:**
@@ -20,7 +20,7 @@ Creates a new Block object.
 
 ---
 
-### **Block:setVoid** ( `update`: boolean )
+### **Block:setVoid** ( update )
 Sets the Block to a **void** state. 
 
 **Parameters:**
@@ -28,7 +28,7 @@ Sets the Block to a **void** state.
 
 ---
 
-### **Block:setRelativeCoordinates** ( `xInChunk`: int, `yInChunk`: int, `idInChunk`: int, `chunkX`: int, `chunkY`: int, `chunkId`: int )
+### **Block:setRelativeCoordinates** ( xInChunk, yInChunk, idInChunk, chunkX, chunkY, chunkId )
 Sets the Block relative coordinates to its chunk. 
 
 **Parameters:**
@@ -41,7 +41,7 @@ Sets the Block relative coordinates to its chunk.
 
 ---
 
-### **Block:__eq** ( `other`: block )
+### **Block:__eq** ( other )
 Compares with another block object. 
 
 **Parameters:**
@@ -62,7 +62,7 @@ Triggers when the Block is destroyed. Declare as `onDestroy = function(self, pla
 
 ---
 
-### **Block:onInteract** ( `player`: player )
+### **Block:onInteract** ( player )
 Triggers when the Block gets interaction with a **player**. Declare as `onInteract = function(self, player)`.
 
 **Parameters:**
@@ -70,7 +70,7 @@ Triggers when the Block gets interaction with a **player**. Declare as `onIntera
 
 ---
 
-### **Block:onDamage** ( `amount`: int, `player`: player )
+### **Block:onDamage** ( amount, player )
 Triggers when the Block gets damaged. Declare as `onDamage = function(self, amount, player)`.
 
 **Parameters:**
@@ -79,7 +79,7 @@ Triggers when the Block gets damaged. Declare as `onDamage = function(self, amou
 
 ---
 
-### **Block:onContact** ( `player`: player )
+### **Block:onContact** ( player )
 Triggers when the Block gets touched by a **player**. Declare as `onContact = function(self, player)`.
 
 **Parameters:**
@@ -87,7 +87,7 @@ Triggers when the Block gets touched by a **player**. Declare as `onContact = fu
 
 ---
 
-### **Block:onUpdate** ( `block`: block )
+### **Block:onUpdate** ( block )
 Triggers when the Block gets updated by the actions of another block. Declare as `onUpdate = function(self, block)`.
 
 **Parameters:**
@@ -95,7 +95,7 @@ Triggers when the Block gets updated by the actions of another block. Declare as
 
 ---
 
-### **Block:create** ( `type`: int, `display`: boolean, `update`: boolean, `updatePhysics`: boolean )
+### **Block:create** ( type, display, update, updatePhysics )
 Creates a new Block. The state of the Block is changed from what it was previously to the new specified state. If the specified Block type doesn't exist, it will default to an invalid block type.
 
 **Parameters:**
@@ -106,7 +106,7 @@ Creates a new Block. The state of the Block is changed from what it was previous
 
 ---
 
-### **Block:createAsFluidWith** ( `type`: int, `level`: int, `display`: boolean, `update`: boolean, `updatePhysics`: boolean )
+### **Block:createAsFluidWith** ( type, level, display, update, updatePhysics )
 Creates a Block of fluid type. It can be initialized with specific properties regarding fluids.
 
 **Parameters:**
@@ -118,7 +118,7 @@ Creates a Block of fluid type. It can be initialized with specific properties re
 
 ---
 
-### **Block:destroy** ( `display`: boolean, `update`: boolean, `updatePhysics`: boolean )
+### **Block:destroy** ( display, update, updatePhysics )
 Destroys a Block. The block will become void/air.
 
 **Parameters:**
@@ -128,7 +128,7 @@ Destroys a Block. The block will become void/air.
 
 ---
 
-### **Block:setDamageLevel** ( `amount`: int, `add`: boolean, `display`: boolean, `update`: boolean, `updatePhysics`: boolean )
+### **Block:setDamageLevel** ( amount, add, display, update, updatePhysics )
 Sets the damage level of a Block 
 
 **Parameters:**
@@ -143,7 +143,7 @@ Sets the damage level of a Block
 
 ---
 
-### **Block:setRepairDelay** ( `set`: boolean, `delay`: int, `...`: any )
+### **Block:setRepairDelay** ( set, delay, ... )
 Sets the delay time for repairing a block. 
 
 **Parameters:**
@@ -156,7 +156,7 @@ Sets the delay time for repairing a block.
 
 ---
 
-### **Block:damage** ( `amount`: int, `add`: boolean, `display`: boolean, `update`: boolean, `updatePhysics`: boolean )
+### **Block:damage** ( amount, add, display, update, updatePhysics )
 Damages a Block. This is just an interface to `Block:setDamageLevel`.
 
 **Parameters:**
@@ -171,7 +171,7 @@ Damages a Block. This is just an interface to `Block:setDamageLevel`.
 
 ---
 
-### **Block:repair** ( `amount`: int, `add`: boolean, `display`: boolean, `update`: boolean, `updatePhysics`: boolean )
+### **Block:repair** ( amount, add, display, update, updatePhysics )
 Repairs a Block previously damaged. This is just an interface to `Block:setDamageLevel`.
 
 **Parameters:**
@@ -186,7 +186,7 @@ Repairs a Block previously damaged. This is just an interface to `Block:setDamag
 
 ---
 
-### **Block:interact** ( `player`: player )
+### **Block:interact** ( player )
 Interacts with a Block. Triggers the method `Block:onInteract` for the provided player.
 
 **Parameters:**
@@ -205,7 +205,7 @@ Retrieves the Chunk object from which the Block belongs to
 
 ---
 
-### **Block:requestPhysicsUpdate** ( `segmentList`: table )
+### **Block:requestPhysicsUpdate** ( segmentList )
 Triggers a recalculation of the physic body (segment) that concerns this block. 
 
 **Parameters:**
@@ -213,7 +213,7 @@ Triggers a recalculation of the physic body (segment) that concerns this block.
 
 ---
 
-### **Block:getBlocksAround** ( `shape`: string, `include`: boolean )
+### **Block:getBlocksAround** ( shape, include )
 Retrieves a list with the blocks adjacent to the Block. 
 
 **Parameters:**
@@ -225,7 +225,7 @@ Retrieves a list with the blocks adjacent to the Block.
 
 ---
 
-### **Block:requestNeighborUpdate** ( `inquireShape`: int )
+### **Block:requestNeighborUpdate** ( inquireShape )
 Requests an update to its neighbours. 
 
 **Parameters:**
@@ -236,7 +236,7 @@ Requests an update to its neighbours.
 
 ---
 
-### **Block:updateEvent** ( `update`: boolean, `updatePhysics`: boolean, `lookupCategory`: int )
+### **Block:updateEvent** ( update, updatePhysics, lookupCategory )
 Interface for handling when a block state gets updated. 
 
 **Parameters:**
@@ -283,7 +283,7 @@ Deletes the upmost block of the same type and creates a new one on the expected 
 
 ---
 
-### **Block:display** ( `nil`:  )
+### **Block:display** (  )
 Displays the sprite that corresponds to this block, if any. 
 
 **Parameters:**
@@ -301,7 +301,7 @@ Hides and shows the sprite from the block.
 
 ---
 
-### **Block:setSprite** ( `sprite`: string, `refresh`: boolean )
+### **Block:setSprite** ( sprite, refresh )
 Establishes the sprite for the designed block. 
 
 **Parameters:**
@@ -310,7 +310,7 @@ Establishes the sprite for the designed block.
 
 ---
 
-### **Block:pulse** ( `image`: string )
+### **Block:pulse** ( image )
 Makes a visible pulse. 
 
 **Parameters:**
@@ -318,7 +318,7 @@ Makes a visible pulse.
 
 ---
 
-### **nil** ( `x`: number, `y`: number, `vx`: number, `vy`: number )
+### **nil** ( x, y, vx, vy )
 Displays particles when a block is touched. They display from the contact point and try to follow a convincing representation of real life dust and debris coming out of nature objects life stones and such. 
 
 **Parameters:**
@@ -329,7 +329,7 @@ Displays particles when a block is touched. They display from the contact point 
 
 ---
 
-### **nil** ( `type`: number, `x`: number, `y`: number, `vx`: number, `vy`: number )
+### **nil** ( type, x, y, vx, vy )
 Displays particles from the block according to a specified mode. 
 
 **Parameters:**
@@ -341,7 +341,7 @@ Displays particles from the block according to a specified mode.
 
 ---
 
-### **Block:playSound** ( `soundKey`: string, `player`: player )
+### **Block:playSound** ( soundKey, player )
 Plays the specified sound for the Block. A block can have different types of sounds according to the event that happens to them.
 
 **Parameters:**

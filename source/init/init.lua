@@ -47,7 +47,7 @@ local xmlLoad = '<C><P L="%d" H="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D>
 --local xmlLoad = '<C><P Ca="" L="%d" H="%d"  /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
 local Module = {
-	version = "MODULE_VERSION",
+	version = "SCRIPT_VERSION",
 	apiVersion = "",
 	tfmVersion = "",
 	
@@ -60,6 +60,9 @@ local Module = {
 	runtimeLog = {},
 	currentTime = {},
 	runtimeLimit = {},
+	
+	loader = "",
+	lastMapLoad = 0,
 	
 	isPaused = false,
 	args = {}

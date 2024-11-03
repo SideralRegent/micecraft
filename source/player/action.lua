@@ -1,6 +1,5 @@
 do
 	local movePlayer = tfm.exec.movePlayer
-	
 	function Player:move(xPosition, yPosition, positionOffset, xSpeed, ySpeed, speedOffset)
 		xPosition = xPosition or 0
 		yPosition = yPosition or 0
@@ -53,40 +52,69 @@ do
 	local respawnPlayer = tfm.exec.respawnPlayer
 	
 	function Player:respawn()
-		respawnPlayer(self.name)
+		if self.perms.respawn then
+			respawnPlayer(self.name)
+			
+			return true
+		else
+			return false
+		end
 	end
 	
 	function Player:placeBlock(targetBlock)
-		if (targetBlock.type ~= 0) and (targetBlock.fluidRate == 0) then
-			return false
-		end
-		
-		if self.selectedFrame:validatePointer() then
-			return self.selectedFrame:placeItem(targetBlock, self)
+		if self.perms.placeBlock then
+			if (targetBlock.type ~= 0) and (targetBlock.fluidRate == 0) then
+				return false
+			end
+			
+			if self:checkCooldown("placeBlock") then
+				if self.selectedFrame:validatePointer() then
+					return self.selectedFrame:placeItem(targetBlock, self)
+				end
+			end
 		end
 		
 		return false
 	end
 	
 	function Player:damageBlock(targetBlock)
-		if targetBlock.type == 0 then return end
+		if self.perms.damageBlock then
+			if targetBlock.type == 0 then return false end
+			
+			if self:checkCooldown("blockDamage") then
+				return targetBlock:damage(1, true, true, true, true, self)
+			end
+		end
 		
-		-- self.selectedFrame item in selected frame affects damage to blocks
-		-- TODO: Add a 'damage' field to Items
-		targetBlock:damage(1, true, true, true, true, self)
+		return false
 	end
 	
 	function Player:useItem(targetBlock, x, y)
-		self.selectedFrame:useItem(self, targetBlock, x, y)
+		if self.perms.useItem then
+			if self:checkCooldown("useItem") then
+				self.selectedFrame:useItem(self, targetBlock, x, y)
+			end
+		end
 	end
 	
 	function Player:moveItem(targetIndex)
+		if not self.perms.seeInventory then return end
+		
 		local selector = self.selectedFrame
 		local inventory = self.inventory
 		if selector:validatePointer() and inventory:checkIndex(targetIndex) then
 			if inventory:checkView(selector.pointer, targetIndex) then
 				inventory.bank:moveItem(selector.pointer, targetIndex, true)
 			end
+		end
+	end
+	
+	function Player:showInventoryAction(hotbar, remainder)
+		if not self.perms.seeInventory then return end
+		
+		if self:checkCooldown("playerInventory") then
+			self.inventory:setView(hotbar, remainder)		
+			self:assertSelectorView()
 		end
 	end
 end
