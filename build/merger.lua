@@ -12,7 +12,7 @@ local Merger = {
 	
 	settings = {
 		shouldLog = false,
-		releaseBuild = true,
+		releaseBuild = false,
 		preview = true,
 		shouldCreateFile = true
 	},
@@ -26,6 +26,7 @@ local fileList = {
         __directory = "source/init",
 		__docs = false,
         "init",
+		"headers",
 		"constants"
     },
 	{
@@ -66,6 +67,7 @@ local fileList = {
 		__docs = true,
 		"init",
 		"environment",
+		"matrix/matrix", -- This is crap.
 		"interaction"
 	},
 	{
@@ -156,7 +158,8 @@ local fileList = {
 		"default",
 		"testing",
 		"lobby",
-		"personal"
+		"personal",
+		"editor"
 	},
 	{
 		__name = "Events",

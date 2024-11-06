@@ -12,14 +12,16 @@ end
 function Map:initBlocks(width, height)
 	local blockId = 0
 	
+	local block = Block
+	local decoTile = self.decorations.implement
+	
 	-- Localization
-	local blocks = self.blocks
+	local blocks = Matrix:new(Block)--self.blocks
 	local field = Field
 	local physics = self.physicsMap
 	local deco = self.decorations
 	
-	local block = Block
-	local decoTile = deco.TileClass
+	
 	
 	-- Values for correct positioning
 	local blockWidth, blockHeight = self:getBlockDimensions()
@@ -66,6 +68,9 @@ function Map:initBlocks(width, height)
 		blocks[y] = line
 		deco[y] = decoLine
 	end
+	
+	self.blocks = blocks
+	self.decorations = deco
 end
 
 function Map:initChunks()
@@ -88,7 +93,7 @@ function Map:initChunks()
 		dxList[x] = xoff + ((x - 1) * xp)
 	end
 	
-	local chunks = self.chunks
+	local chunks = Matrix:new(chunk)
 	
 	local line
 	
@@ -118,6 +123,8 @@ function Map:initChunks()
 		
 		chunks[y] = line
 	end
+	
+	self.chunks = chunks
 end
 
 function Map:init()

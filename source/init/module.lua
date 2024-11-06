@@ -502,3 +502,11 @@ do
 		return mode
 	end
 end
+
+do
+	function Module:onUserInput(type, ...)
+		local class = self.userInputClasses[type]
+		
+		class:new(...)
+	end
+end

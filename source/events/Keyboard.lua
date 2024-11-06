@@ -124,6 +124,8 @@ do
 		end
 	end
 	
+	Module.userInputClasses["Keyboard"] = Keybinds
+	
 	Module:on("Keyboard", function(playerName, keyId, down, ...)
 		local player = Room:getPlayer(playerName)
 		

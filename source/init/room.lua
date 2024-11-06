@@ -48,12 +48,15 @@ function Room:evaluateName()
 			C, playerName, tag = arg:match("^(%a)([%w_]+)#(%d%d%d%d)$")
 			if C and playerName and tag then
 				playerName = ("%s%s#%s"):format(C:upper(), playerName:lower(), tag)
+				self.args[#self.args + 1] = playerName
 				
 				self:setRank(playerName, "roomAdmin", false)
 				
 				if not self.referenceAdmin then
 					self.referenceAdmin = playerName
-					self.mode = "personal"
+					if #self.args == 1 then
+						self.mode = "personal"
+					end
 				end
 			else
 				self.args[#self.args + 1] = arg
@@ -80,8 +83,15 @@ function Room:evaluateName()
 	end	
 end
 
-function Room:isAdmin(playerName)
-	return self.ranks[playerName] == enum.ranks.roomAdmin
+do
+	function Room:isAdmin(playerName)
+		local adminRanks = {
+			[enum.ranks.roomAdmin] = true,
+			[enum.ranks.staff] = true,
+			[enum.ranks.loader] = true
+		}
+		return adminRanks[self.ranks[playerName]]
+	end
 end
 
 function Room:hasPlayer(playerName)

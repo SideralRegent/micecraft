@@ -9,7 +9,7 @@ do
 	local abs = math.abs
 	local next = next
 	
-	local PM = {}
+	local PM = Matrix:new()
 	
 	function PM:getSegment(xs, ys, xe, ye, cat)
 		return {

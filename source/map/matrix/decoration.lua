@@ -1,9 +1,7 @@
 do
-	local DEC = {}
+	local DEC --= {}
 	local Tile = {}
 	Tile.__index = Tile
-	
-	DEC.TileClass = Tile
 	
 	local setmetatable = setmetatable
 	local next = next
@@ -219,6 +217,8 @@ do
 	end
 	
 	-- Tile:setDefaultDisplay doesn't apply.
+	
+	DEC = Matrix:new(Tile)
 	
 	function DEC:initAt(x, y, dx, dy)
 		self[y][x] = Tile:new(dx, dy)

@@ -16,7 +16,7 @@ Module:newMode("personal", function(this, _L)
 		})
 	end
 	
-	function this:run()
+	function this:run()		
 		tfm.exec.chatMessage(
 			("Loading %s's world."):format(Room.referenceAdmin), 
 			nil

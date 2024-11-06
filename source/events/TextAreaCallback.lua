@@ -78,6 +78,7 @@ do
 		end)
 	end
 	
+	Module.userInputClasses["TextAreaCallback"] = TextAreaBinds
 	
 	Module:on("TextAreaCallback", function(textAreaId, playerName, eventName)
 		local player = Room:getPlayer(playerName)

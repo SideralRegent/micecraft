@@ -93,6 +93,8 @@ do
 		end
 	end
 	
+	Module.userInputClasses["Mouse"] = Mousebinds
+	
 	local o = os.time()
 	Module:on("Mouse", function(playerName, xPosition, yPosition)
 		local player = Room:getPlayer(playerName)

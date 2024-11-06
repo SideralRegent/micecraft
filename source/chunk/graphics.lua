@@ -11,14 +11,14 @@ function Chunk:setDisplayState(active, targetPlayer)
 	
 	if active == nil then
 		mBlock = Block.refreshDisplay
-		mDeco = deco.TileClass.refreshDisplay
+		mDeco = deco.implement.refreshDisplay
 	else
 		if active then
 			mBlock = Block.display
-			mDeco = deco.TileClass.display
+			mDeco = deco.implement.display
 		else
 			mBlock = Block.hide
-			mDeco = deco.TileClass.hide
+			mDeco = deco.implement.hide
 			self.displaysTo = {}
 		end
 	end

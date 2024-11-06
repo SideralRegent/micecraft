@@ -232,6 +232,8 @@ do
 		return self.list[commandName] or self.list[self.aliases[commandName]]
 	end
 	
+	Module.userInputClasses["ChatCommand"] = Commands
+	
 	local booleans = {
 		["true"] = true,
 		["yes"] = true,

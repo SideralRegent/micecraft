@@ -50,15 +50,18 @@ do -- TODO
 		local x = 1
 		local referenceTile, currentTile
 		
-		local blockMatrix = self.blocks
 		local blockLine
 		
-		for y = yStart, yEnd do
-			blockLine = blockMatrix[y]
+		local encodable = self.blocks:getMatrixRectangularSection(xStart, yStart, xEnd, yEnd)
+		
+		xEnd = #encodable[1]
+		
+		for y = 1, #encodable do
+			blockLine = encodable[y]
 			lineCount = lineCount + 1
 			currentLine = {}
 			
-			x = xStart
+			x = 1
 			while x <= xEnd do
 				referenceTile = blockLine[x].type
 				matches = 1

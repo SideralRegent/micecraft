@@ -55,15 +55,15 @@ do
 		local rank = self:getRank()
 			
 		if rankPerms[rank] then
-			perms = rankPerms[rank]
-		end
-		
-		if perms then
-			for permName, value in next, perms do
-				self.perms[permName] = value
-			end
+			perms = table.copy(rankPerms[rank])
 		else
-			self.perms = copykeys(enum.perms, false)
+			if perms then
+				for permName, value in next, perms do
+					self.perms[permName] = value
+				end
+			else
+				self.perms = copykeys(enum.perms, false)
+			end
 		end
 	end
 	

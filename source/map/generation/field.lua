@@ -1,3 +1,5 @@
+Field = Matrix:new()
+
 function Field:generateNew(width, height)
 	local VOID = blockMeta._C_VOID
 	for y = 1, height do
