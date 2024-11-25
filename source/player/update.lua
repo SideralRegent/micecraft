@@ -88,9 +88,7 @@ do
 			self.internalTime = self.internalTime + time
 		else
 			self.internalTime = time
-		end
-
-		if runEvents then
+		end		if runEvents then
 			self:runEvents()
 		end
 	end
@@ -111,8 +109,8 @@ do
 					self:writeData()
 				end
 			end
-		else
-			self:checkForCurrentChunk()
 		end
+		
+		self:checkForCurrentChunk()
 	end
 end

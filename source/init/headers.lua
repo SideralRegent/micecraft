@@ -37,7 +37,7 @@ local Room = {
 
 local Mode = {}
 
-local enum = {}
+local mc = {}
 
 -- local Ui = {}
 
@@ -88,6 +88,7 @@ local MetaData = {}
 MetaData.__index = MetaData
 local blockMeta = {}
 local itemMeta = {}
+local decoMeta = {}
 
 local Item = {}
 Item.__index = Item
@@ -126,3 +127,11 @@ local Tick = {
 	taskList = {}
 }
 Tick.__index = Tick
+
+local temp = {
+	popup = {}
+} -- garbage goes here
+
+local Translations = {
+	default = 'en'
+}

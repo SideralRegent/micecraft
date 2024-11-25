@@ -8,9 +8,9 @@ Module:on("PlayerDataLoaded", function(playerName, rawdata)
 		player.awaitingData = false
 		
 		if not player.isActive then
-			player:init()
+			player:init(false)
 			
-			player:promptMainMenu()
+			Module:checkEnableUser(player)
 		end
 	end
 end)

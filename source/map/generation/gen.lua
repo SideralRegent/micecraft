@@ -1,4 +1,3 @@
-
 do
 	local ceil = math.ceil
 	local floor = math.floor

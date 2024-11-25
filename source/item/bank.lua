@@ -1,13 +1,10 @@
-
 do
 	local setmetatable = setmetatable
 	function ItemBank:new(containersAmount)
 		local this = setmetatable({
 			containers = {},
 			display = {}
-		}, self)
-
-		for index = 1, containersAmount do
+		}, self)		for index = 1, containersAmount do
 			this.containers[index] = ItemContainer:new(index)
 		end
 		

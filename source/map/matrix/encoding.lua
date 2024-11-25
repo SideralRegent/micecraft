@@ -4,11 +4,18 @@ do -- TODO
 	local concat = table.concat
 	
 	function Map:decode(ENCODED_STR)
+		local blocks, deco
+		if ENCODED_STR:find('_', 1, true) then
+			blocks, deco = ENCODED_STR:match("^(.-)_(.-)$")
+		else
+			blocks = ENCODED_STR
+		end
+		
 		local field = {}
 		local x, y = 1, 0
 		local type, repeats, tangible
 		
-		for line in ENCODED_STR:gmatch("[^;]+") do
+		for line in blocks:gmatch("[^;]+") do
 			y = y + 1
 			x = 1
 			field[y] = {}
@@ -32,7 +39,12 @@ do -- TODO
 			end
 		end
 		
-		return field
+		local decos
+		if deco then
+			decos = Map.decorations:deserialize(deco)
+		end
+		
+		return field, decos
 	end
 	
 	function Map:encode(xStart, yStart, xEnd, yEnd)
@@ -40,6 +52,9 @@ do -- TODO
 		yStart = yStart or 1
 		xEnd = xEnd or self.totalBlockWidth
 		yEnd = yEnd or self.totalBlockHeight
+		
+		local width = (xEnd - xStart) + 1
+		local height = (yEnd - yStart) + 1
 		
 		local ENCODED_STR = ""
 		local lineCount = 0
@@ -50,9 +65,11 @@ do -- TODO
 		local x = 1
 		local referenceTile, currentTile
 		
+		local deco = {}
+		local decoTile
 		local blockLine
 		
-		local encodable = self.blocks:getMatrixRectangularSection(xStart, yStart, xEnd, yEnd)
+		local encodable = self.blocks:getMatrixRectangularSection(xStart, yStart, width, height)
 		
 		xEnd = #encodable[1]
 		
@@ -65,7 +82,11 @@ do -- TODO
 			while x <= xEnd do
 				referenceTile = blockLine[x].type
 				matches = 1
-				for xIndex = x + 1, xEnd do					
+				for xIndex = x + 1, xEnd do
+					decoTile = self:getDecoTile(x, y):serialize()
+					if decoTile ~= "" then
+						deco[#deco + 1] = decoTile
+					end
 					if referenceTile == blockLine[xIndex].type then
 						matches = matches + 1
 						x = xIndex
@@ -86,9 +107,8 @@ do -- TODO
 			lines[lineCount] = concat(currentLine, ",")
 		end
 		
-		ENCODED_STR = concat(lines, ";")
+		ENCODED_STR = ("%s_%s"):format(concat(lines, ";"), concat(deco, ";"))
 		
 		return ENCODED_STR
 	end
 end
-

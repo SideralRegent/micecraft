@@ -21,8 +21,6 @@ function Map:initBlocks(width, height)
 	local physics = self.physicsMap
 	local deco = self.decorations
 	
-	
-	
 	-- Values for correct positioning
 	local blockWidth, blockHeight = self:getBlockDimensions()
 	local originX, originY = self:getEdges()
@@ -94,7 +92,7 @@ function Map:initChunks()
 	end
 	
 	local chunks = Matrix:new(chunk)
-	
+	local method = self.physicsMap[self.physicsMode]
 	local line
 	
 	for y = 1, heightLim do
@@ -115,8 +113,8 @@ function Map:initChunks()
 				1
 			)
 			
-			this:getCollisions(self.physicsMode)
-			self.chunkLookup[chunkId] = {x=x, y=y}
+			this:getCollisionsFast(method)
+			self.chunkLookup[chunkId] = {x = x, y = y}
 			
 			line[x] = this
 		end
@@ -133,13 +131,18 @@ function Map:init()
 	
 	local width, height = self:getBlocks()
 	
-	Field:generateNew(width, height)
+	debug.pmeasure("- F_init: %s", Field.generateNew, Field, width, height)
+	--Field:generateNew(width, height)
 	
-	mode:setMap(Field)
+	debug.pmeasure("- F_set: %s", mode.setMap, mode, Field)
+	--mode:setMap(Field)
 	
-	self:initPhysics(width, height)
-
-	self:initBlocks(width, height)
+	debug.pmeasure("- Init physics: %s", self.initPhysics, self, width, height)
+	--self:initPhysics(width, height)
 	
-	self:initChunks()
+	debug.pmeasure("- Init blocks: %s", self.initBlocks, self, width, height)
+	--self:initBlocks(width, height)
+	
+	debug.pmeasure("- Chunks: %s", self.initChunks, self)
+	--self:initChunks()
 end

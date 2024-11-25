@@ -17,8 +17,8 @@ do
 	local copykeys = table.copykeys
 	
 	local rankPerms = {
-		loader = table.copykeys(enum.perms, true),
-		staff = {
+		[mc.ranks.loader] = table.copykeys(mc.perms, true),
+		[mc.ranks.staff] = {
 			damageBlock = true,
 			placeBlock = true,
 			useItem = nil,
@@ -32,14 +32,14 @@ do
 			interfaceInteract = true,
 			keyboardInteract = true
 		},
-		moderator = table.copykeys(enum.perms, true),
-		roomAdmin = {
+		[mc.ranks.moderator] = table.copykeys(mc.perms, true),
+		[mc.ranks.roomAdmin] = {
 			damageBlock = true,
 			placeBlock = true,
 			useItem = true,
 			hitEntities = true,
 			mouseInteract = true,
-			seeInventory = true,
+			seeInventory = nil,
 			spectateWorld = true,
 			joinWorld = true,
 			respawn = true,
@@ -47,23 +47,33 @@ do
 			interfaceInteract = true,
 			keyboardInteract = true
 		},
-		funcorp = table.copykeys(enum.perms, true),
+		[mc.ranks.funcorp] = table.copykeys(mc.perms, true),
 	}
 	
+	function Player:setRankPermissions()
+		local rank = self:getRank()
+		if rankPerms[rank] then
+			self:setPermissions(rankPerms[rank])
+			
+			return true
+		end
+		
+		return false
+	end
 	
 	function Player:setPermissions(perms)
-		local rank = self:getRank()
-			
-		if rankPerms[rank] then
-			perms = table.copy(rankPerms[rank])
-		else
-			if perms then
-				for permName, value in next, perms do
-					self.perms[permName] = value
-				end
-			else
-				self.perms = copykeys(enum.perms, false)
+		if perms then
+			for permName, value in next, perms do
+				self.perms[permName] = value
 			end
+		else
+			self.perms = copykeys(mc.perms, false)
+		end
+	end
+	
+	function Player:checkSetPermissions(perms)
+		if not self:setRankPermissions() then
+			self:setPermissions(perms)
 		end
 	end
 	
@@ -75,7 +85,7 @@ do
 	}
 	
 	function Player:setModePermissions()
-		self:setPermissions(Module.settings.defaultPerms)
+		self:checkSetPermissions(Module.settings.defaultPerms)
 	end
 	
 	function Player:disable()
@@ -96,11 +106,12 @@ do
 		if not self.isActive then
 			self.isActive = true
 				
-			self.inventory:setDisplay("hotbar", true)
-			self:freeze(false, false)
+			self:showInventoryAction(true, false)
 		end
 		
 		self:setModePermissions()
+		
+		self:checkForCurrentChunk()
 	end
 end
 
@@ -110,11 +121,11 @@ function Player:banDisable()
 	
 	self.inventory:setView(false, false)
 	
-	self:setPermissions(nil)
+	self:setPermissions(false)
 end
 
 do
-	local invalid = enum.invalidPlayerReason
+	local invalid = mc.invalidPlayerReason
 	local time = os.time
 	function Player:assertValidity()
 		
@@ -152,7 +163,7 @@ function Player:checkJoin()
 			return false, reason
 		end
 	else
-		return false, enum.invalidPlayerReason.notAllowedRoom
+		return false, mc.invalidPlayerReason.notAllowedRoom
 	end
 end
 
@@ -164,7 +175,7 @@ end
 
 do
 	local time = os.time
-	local cooldowns = enum.cooldown
+	local cooldowns = mc.cooldown
 	function Player:checkCooldown(key)
 		local currentTime = time()
 		

@@ -10,7 +10,7 @@ do
 	local random = math.random
 	
 	local tostring = tostring
-	local BASEDIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&!" -- Used for base conversion
+	local BASEDIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@!" -- Used for base conversion
 	
 	local insert = table.insert
 	local concat = table.concat
@@ -98,9 +98,7 @@ do
 			local digit = (number % base) + 1
 			number = floor(number / base)
 			insert(composition, 1, digits:sub(digit, digit))
-		until number == 0
-
-		return sign .. concat(composition, "")
+		until number == 0		return sign .. concat(composition, "")
 	end
 	
 	local STRDIGITS = {}

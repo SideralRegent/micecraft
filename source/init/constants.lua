@@ -1,5 +1,6 @@
-local BOX2D_MAX_SIZE = 32767 -- Constant according to game limitations. Do not modify!
+local BOX2D_MAX_SIZE = 2^32 -- Constant according to game limitations. Do not modify!
 local TEXTURE_SIZE = 32 -- Constant according to assets uploaded. Do not modify !
+
 local REFERENCE_SCALE = 1.0
 local REFERENCE_SCALE_X = 1.0
 local REFERENCE_SCALE_Y = 1.0
@@ -23,6 +24,7 @@ local CD_UID = 3 -- Unique ID
 local CD_BLK = 4 -- Block
 local CD_SPC = 5 -- Special
 
+-- Fluid stuff
 local FL_FILL = 4
 local FL_EMPTY = 0
 

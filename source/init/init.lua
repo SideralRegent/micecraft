@@ -1,7 +1,9 @@
 local math, os, string, table =_G.math, _G.os, _G.string, _G.table
 local debug, system, tfm, ui = _G.debug, _G.system, _G.tfm, _G.ui
 
+local assert = _G.assert
 local next, pcall, tonumber, tostring, type, setmetatable = _G.next, _G.pcall, _G.tonumber, _G.tostring, _G.type, _G.setmetatable
+
 local currentTime = os.time
 
 if tfm.get.room.name:lower():match("village") then

@@ -21,9 +21,7 @@ do
 		end
 		
 		return false
-	end
-
-	local type = type
+	end	local type = type
 	function Chunk:setQueue(set, operation, ...)
 		local chunkInfo = {
 			uniqueId = self.uniqueId,
@@ -94,7 +92,10 @@ do
 			end
 			
 			if active then
-				self:requestUnloadDelayRenewal(90, "setPhysicState")
+				self:requestUnloadDelayRenewal(
+					Module.settings.unloadDelay or 90,
+					"setPhysicState"
+				)
 			end
 			
 			return goAhead
@@ -140,7 +141,10 @@ do
 			end
 			
 			if active then
-				self:requestUnloadDelayRenewal(90, "setDisplayState")
+				self:requestUnloadDelayRenewal(
+					Module.settings.unloadDelay or 90,
+					"setDisplayState"
+				)
 			end
 			
 			return goAhead

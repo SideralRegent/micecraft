@@ -73,7 +73,7 @@ do
 		if not self.particle then return end
 		
 	--	local amount
-		local PD = enum.particle_display
+		local PD = mc.particle_display
 		
 		if type == PD.touch then
 			self:displayTouchParticles(x, y, vx, vy)
@@ -90,16 +90,29 @@ do
 	-- @param Player:player The player that should hear this sound, if nil, applies to everyone.
 	-- @return `Boolean` Whether the sound was successfully played or not
 	local playSound = tfm.exec.playSound
-	function Block:playSound(soundKey, player)
-		
+	local restrict = math.restrict
+	local sqrt = math.sqrt
+	local log = math.log
+	local e = math.exp
+	function Block:playSound(soundKey)
+		table.print(self.sound)
 		if self.sound then
-			local sound = self.sound[soundKey] or self.sound.default
-			playSound(
-				sound, 100,
-				player and (player.x - self.dxc) * REFERENCE_SCALE_X or self.dxc,
-				player and (player.y - self.dyc) * REFERENCE_SCALE_Y or self.dyc,
-				player and player.name or nil
-			)
+			local sound = self.sound[soundKey] or "cite18/bouton1"
+			local volume, distance
+			for playerName, player in next, Room.playerList do
+				distance = sqrt(
+					((player.x - self.dxc) * REFERENCE_SCALE_X)^2 
+					+ ((player.y - self.dyc) * REFERENCE_SCALE_Y)^2
+				)
+				volume = restrict(110*e(-0.004*distance), 10, 110) - 10
+				
+				playSound(
+					sound, volume,
+					nil, nil,--(player.x - self.dxc) * REFERENCE_SCALE_X,
+					--(player.y - self.dyc) * REFERENCE_SCALE_Y,
+					playerName
+				)
+			end
 			
 			return true
 		end

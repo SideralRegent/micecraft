@@ -31,8 +31,8 @@ do
 				RoomSettings = false
 			},
 			
-			perms = nil,--copykeys(enum.perms, false),
-			cooldown = copykeys(enum.cooldown, 0),
+			perms = copykeys(mc.perms, false),
+			cooldown = copykeys(mc.cooldown, 0),
 			
 			inventory = PlayerInventory:new(playerName, info.id),		
 			selectedFrame = SelectFrame:new(playerName, info.id),
@@ -42,10 +42,10 @@ do
 			dataFile = "",
 			awaitingData = false
 		}, self)
-		-- ...
 		
+		 -- Auto set
 		this:setPresenceId()
-		this:setPermissions(nil)
+		this:checkSetPermissions(mc.perms.player)
 		
 		this.inventory:set()
 		this:setSelectedContainer(1, this.inventory.bank, false)
@@ -79,6 +79,7 @@ function Player:init(enable)
 	self.isActive = false
 	
 	if enable then
-		self:checkEnable()
+		Module:checkEnableUser(self)
+		--self:checkEnable()
 	end
 end

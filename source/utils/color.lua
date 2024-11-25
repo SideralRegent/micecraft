@@ -89,6 +89,14 @@ do
 	color.rgbToHex = function(r, g, b)
 		return (r * 0x10000) + (g * 0x100) + b
 	end
+	local floor = math.floor
+	color.hexToRgb = function(hex)
+		local r = floor(hex / 0x10000)
+		local g = floor((hex%0x10000) / 0x100)
+		local b = hex % 0x100
+		
+		return {r=r, g=g, b=b}
+	end
 	
 	color.interpolate = function(c1, c2, width, toHex)
 		local intp = color.rgbInterpolate
@@ -110,4 +118,3 @@ do
 		return t
 	end
 end
-

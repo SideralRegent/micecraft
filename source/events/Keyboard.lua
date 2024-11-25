@@ -24,14 +24,14 @@ do
 		local ok, result = pcall(self.callback, player, ...)
 		
 		if not ok then
-			Module:throwException(2, result)
+			Module:emitWarning(mc.severity.mild, result)
 		end
 	end
 	
 	local next, type = next, type
 	
 	function Keybinds:new(keyName, down, callback)
-		local keyId = enum.keys[keyName]
+		local keyId = mc.keys[keyName]
 		
 		local activation
 		if down == nil then
@@ -43,7 +43,7 @@ do
 		local cb
 		for _, boolean in next, activation do
 			if type(callback) == "string" then
-				cb = self[boolean][enum.keys[callback]].callback
+				cb = self[boolean][mc.keys[callback]].callback
 			else
 				cb = callback
 			end
@@ -83,7 +83,11 @@ do
 		end)
 	
 		Keybinds:new("X", true, function(player)
-			player:showInventoryAction(true, nil)
+			if player.keys[mc.keys.SHIFT] then
+				player:showInventoryAction(false, false)
+			else
+				player:showInventoryAction(true, nil)
+			end
 		end)
 	
 		-- Hotbar shift

@@ -5,7 +5,6 @@ do
 		
 		tfm.exec.newGame(xmlLoad:format(width, height, spawn.dx, spawn.dy + 16))
 	end
-
 end
 
 function Module:softRelaunch(schedule)
@@ -34,21 +33,23 @@ function Module:start()
 	--Map:init()
 	debug.pmeasure("<u>Map:</u> %s", Map.init, Map)
 	
-	
 	print("Setting room...")
 	Room:setConfiguration()
 	
 	-- mode:run()
 	debug.pmeasure("<u>Mode (run):</u> %s", mode.run, mode)
 	
-	print("<b>Loading map...</b>")
-	self:loadMap()
+	if not self.settings.manualLaunch then
+		print("<b>Loading map...</b>")
+		self:loadMap()
+	end
 	
 	print("Setting current players...")
 	Room:initPlayers()
 	
 	printf("<J>Micecraft %s</J>", self.version)
 end
+
 --[[xpcall(Module.start, function(err)
 	Module:throwException(true, err)
 end, Module)]]

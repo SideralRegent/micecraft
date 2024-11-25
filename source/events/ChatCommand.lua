@@ -1,7 +1,8 @@
 do
 	local Commands = {
 		list = {},
-		aliases = {}
+		aliases = {},
+		safe = {}
 	}
 	local Command = {}
 	Command.__index = Command
@@ -12,7 +13,7 @@ do
 	local ipairs = ipairs
 	local unpack = table.unpack
 	
-	local ranks = enum.ranks
+	local ranks = mc.ranks
 	
 	-- Some defaults to not create too many tables
 	local none = {}
@@ -40,9 +41,7 @@ do
 	end
 	
 	function Command:isAllowed(player) -- TODO: Check player data
-		local rank = player:getRank()
-		
-		return self.allowedRanks[rank]
+		return player.perms.useCommands and self.allowedRanks[player:getRank()]
 	end
 	
 	function Command:execute(args)
@@ -57,10 +56,17 @@ do
 		local message = ("<N>[Command <ROSE>%s</ROSE>] %s</N> ( %s )"):format(self.name, result, raw_args)
 		self.issues:insert({error = result, raw = raw_args})
 	
-		Module:emitWarning(2, message)
+		Module:emitWarning(mc.severity.mild, message)
 	end
 	
-	function Commands:new(commandName, aliases, ranks, callback)
+	function Commands:new(commandName, aliases, ranks, callback, safe)
+		assert( type(commandName) == "string"
+			and (type(aliases) == "table" or not aliases)
+			and (type(ranks) == "table" or not ranks)
+			and type(callback) == "function", 
+			"Malformed eventChatCommand callback for key " .. tostring(commandName).. "."
+		)
+		
 		aliases = aliases or {}
 		ranks = ranks or {}
 		self.list[commandName] = Command:new(commandName, callback, aliases, ranks)
@@ -68,6 +74,8 @@ do
 		for _, alias in ipairs(aliases) do
 			self.aliases[alias] = commandName
 		end
+		
+		self.safe[commandName] = not not safe
 	end
 	
 	
@@ -97,9 +105,7 @@ do
 	Commands:new("tp", {"teleport"}, roomModifier,
 	function(player, x, y, offset)
 		player:move(x, y, offset)
-	end)
-
-	Commands:new("btp", {"block_teleport"}, roomModifier,
+	end)	Commands:new("btp", {"block_teleport"}, roomModifier,
 	function(player, x, y)
 		local block = Map:getBlock(x, y, CD_MTX)
 		if block then
@@ -130,20 +136,14 @@ do
 				player:move(p1.x, p1.y, false)
 			end
 		end
-	end)
-
-	Commands:new("runtime", {"rt"}, everyone,
+	end)	Commands:new("runtime", {"rt"}, everyone,
 	function(player)
-		ui.addTextArea(enum.textId.runtime, "NaN ms", player.name, 750, 384, 0, 0, 0x0, 0x0, 1.0, true)
-	end)
-
-	Commands:new("reload", none, staff,
+		ui.addTextArea(mc.textId.runtime, "NaN ms", player.name, 755, 384, 45, 0, 0x0, 0x0, 1.0, true)
+	end)	Commands:new("reload", none, staff,
 	function()
 		print("Reloading map.")
 		Module:loadMap()
-	end)
-
-	Commands:new("save", none, roomModifier,
+	end)	Commands:new("save", none, roomModifier,
 	function(player)
 		if player.name == Room.referenceAdmin then
 			player:saveWorld(false)
@@ -152,24 +152,7 @@ do
 	
 	Commands:new("api", {"lua", "lu"}, none,
 	function(player, func, ...)		
-		local env = {
-			tfm = {
-				enum = tfm.enum,
-				exec = tfm.exec,
-				get = tfm.get,
-			},
-			ui = ui,
-			system = system,
-			debug = debug,
-			
-			system = system,
-			math = math,
-			os = os,
-			table = table,
-			string = string
-		}
-		
-		local obj = table.copy(env)
+		local env = table.shallowcopy(_G)
 		
 		for index in func:gmatch("[^%.]+") do
 			if type(obj) == "table" then
@@ -186,11 +169,9 @@ do
 		else
 			returnValue = obj
 		end
-		
-		print(obj)
-		
+				
 		if returnValue ~= nil then -- This ensures that the whole text will be printed
-			local returnText = table.tostring(returnValue, 0, nil, true)
+			local returnText = table.tostring(returnValue, 0, nil, not returnValue == env, 3)
 			local textSlideSize = 950
 			local textSlides = math.ceil(#returnText / textSlideSize)
 			local lead = ""
@@ -209,12 +190,16 @@ do
 			end
 		else
 			if type(obj) ~= "function" then
-				tfm.exec.chatMessage(("This parameter (%s) doesn't exist."):format(func), player.name)
+				tfm.exec.chatMessage(("This parameter (%s) doesn't exist."):format(tostring(func)), player.name)
 			end
 		end
 		
+	end)	Commands:new("logs", none, staff,
+	function(player)
+		local logs = Module.errorLog:concatf("message", "\n"):sub(1, 990)
+		
+		tfm.exec.chatMessage(logs, player.name)
 	end)
-
 	Commands:new("getchunk", none, everyone,
 	function(player)
 		local chunk = Map:getChunk(player.x, player.y, CD_MAP)
@@ -225,6 +210,14 @@ do
 			)
 		end
 	end)
+	
+	Commands:new("perms", none, everyone,
+	function(player)
+		tfm.exec.chatMessage(table.tostring(player.perms, 0, nil, true, nil), player.name)
+	end, true)	Commands:new("checkperms", none, everyone,
+	function(player)
+		player:setRankPermissions()
+	end, true)
 	
 	-- === === === === === === === === === === === === === === === --
 	
@@ -276,14 +269,16 @@ do
 	function Commands:process(playerName, message)
 		local player = Room:getPlayer(playerName)
 		
-		if player and player.perms.useCommands then
+		if player then
 			local commandName, arguments = self:parse(message)
 			local command = self:get(commandName)
 			arguments[1] = player
 			
 			if command then
-				if command:isAllowed(player) then
+				if self.safe[commandName] or command:isAllowed(player) then
 					command:execute(arguments)
+				else
+					tfm.exec.chatMessage("You're not allowed to use this command.", playerName)
 				end
 			end
 		end

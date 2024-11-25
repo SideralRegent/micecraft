@@ -34,7 +34,7 @@ do
 			
 			kill = function(timer, reason)
 				if reason then
-					print(("<FC>[Timer #%d]</FC> <J>%s</J>"):format(timer.uniqueId, tostring(reason)))
+					printf("<FC>[Timer #%d]</FC> <J>%s</J>", timer.uniqueId, tostring(reason))
 				end
 				self.list[timer.uniqueId] = nil
 				
@@ -55,9 +55,7 @@ do
 				
 				return ok, result
 			end
-		}
-
-		self.list[this.uniqueId] = this
+		}		self.list[this.uniqueId] = this
 		
 		return this.uniqueId
 	end

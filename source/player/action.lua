@@ -69,7 +69,13 @@ do
 			
 			if self:checkCooldown("placeBlock") then
 				if self.selectedFrame:validatePointer() then
-					return self.selectedFrame:placeItem(targetBlock, self)
+					local success = self.selectedFrame:placeItem(targetBlock, self)
+					
+					if success then
+						targetBlock:playSound("place")
+					end
+					
+					return success
 				end
 			end
 		end
@@ -82,7 +88,11 @@ do
 			if targetBlock.type == 0 then return false end
 			
 			if self:checkCooldown("blockDamage") then
-				return targetBlock:damage(1, true, true, true, true, self)
+				local _, destroyed = targetBlock:damage(1, true, true, true, true, self)
+				
+				if destroyed then
+					targetBlock:playSound("destroy")
+				end
 			end
 		end
 		

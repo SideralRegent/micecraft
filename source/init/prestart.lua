@@ -1,1 +1,1 @@
-Module:init("0.28", 8.70)
+Module:init("0.28", tostring(tfm.get.misc.transformiceVersion))

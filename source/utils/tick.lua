@@ -72,7 +72,7 @@ do
 	local print, tostring = print, tostring
 	function Task:kill(reason)
 		if reason then
-			print(("<b><ROSE>[Task #%d]</ROSE></b> <VI>%s</VI>"):format(self.uniqueId, tostring(reason)))
+			printf("<b><ROSE>[Task #%d]</ROSE></b> <VI>%s</VI>", self.uniqueId, tostring(reason))
 		end
 		
 		Tick:removeTask(self.uniqueId)

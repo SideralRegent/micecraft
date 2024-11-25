@@ -154,7 +154,7 @@ do
 	end
 	
 	local restrict = math.restrict
-	function Map:setMatrix(matrix, x, y, update)
+	function Map:setMatrix(matrix, x, y, update, overwrite)
 		local maxWidth, maxHeight = self:getBlocks()
 		local height, width = #matrix, #matrix[1]
 		
@@ -166,13 +166,12 @@ do
 			for xi = x, xEnd do 
 				type = matrix[(yi - y) + 1][(xi - x) + 1]
 				block = Map:getBlock(xi, yi, CD_MTX)
-				if type ~= VOID then
-					block:create(
-						type, -- type
-						true, -- display
-						update, -- update
-						update -- update physics
-					)
+				if overwrite or type ~= VOID then
+					if blockMeta:get(type).fluidRate ~= 0 then
+						block:createAsFluidWith(type, 4, false, true, update, update)
+					else
+						block:create(type, true, update, update)
+					end
 				end
 			end
 		end
@@ -244,10 +243,24 @@ do
 	end
 	
 	function Map:forChunkArea(xi, yi, xf, yf, cdType, actionName, ...)
+		local a = {...}
+		printf("Map:forChunkArea(%d, %d, %d, %d, %d, %s, %s, %s)", xi, yi, xf, yf, cdType, actionName, tostring(a[1]), tostring(a[2]))
 		local chunkList = self:getChunkArea(xi, yi, xf, yf, cdType)
 		
 		for _, chunk in next, chunkList do
 			chunk[actionName](chunk, ...)
 		end
+	end
+	
+	function Map:loadFromPlayer(player)
+		self:loadFromString(player.custom)
+	end
+	
+	function Map:loadFromString(str)
+		local blocks, decos = self:decode(str)
+		local xi, yi, xf, yf = self:setMatrix(blocks, 1, 1, false, true)
+		self.decorations:setFromList(decos)
+		
+		self:forChunkArea(xi, yi, xf, yf, CD_BLK, "reloadPhysics")
 	end
 end

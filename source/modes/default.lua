@@ -78,9 +78,7 @@ Module:newMode("default", function(this, _L)
 				[1] = {type = blockMeta.maps.snowed_grass},
 				[2] = {type = -1}
 			}
-		}, heightMap)
-
-		field:setLayer({ -- Submarine layer
+		}, heightMap)		field:setLayer({ -- Submarine layer
 			overwrite = true,
 			exclusive = true,
 			dir = {
@@ -101,9 +99,7 @@ Module:newMode("default", function(this, _L)
 				--max = WATER_LEVEL,
 				[1] = {type = blockMeta.maps.stone}
 			}
-		}, stoneLayerMap)
-
-		field:setLayer({ -- Sandstone layer
+		}, stoneLayerMap)		field:setLayer({ -- Sandstone layer
 			overwrite = true,
 			exclusive = true,	
 			dir = {
@@ -155,9 +151,7 @@ Module:newMode("default", function(this, _L)
 			ui.setBackgroundColor("#5947A6")
 			--	ui.setBackgroundColor("#6a7495")
 		--	ui.setBackgroundColor("#5A5A5A")
-		end)
-
-		Module:on("PlayerDied", function(playerName)
+		end)		Module:on("PlayerDied", function(playerName)
 			local player = Room:getPlayer(playerName)
 			
 			if player then
@@ -167,6 +161,8 @@ Module:newMode("default", function(this, _L)
 	end
 	
 	this.settings = {
+		unloadDelay = 90,
+		
 		defaultPerms = {
 			damageBlock = true,
 			placeBlock = true,

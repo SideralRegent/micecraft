@@ -23,7 +23,7 @@ Shows the Tile in the Map. All Displays are shown in the order established.
 
 ---
 
-### **Tile:addDisplay** ( name, order, imageUrl, targetLayer, displayX, displayY, scaleX, scaleY, rotation, alpha, show )
+### **Tile:addDisplay** ( name, order, imageUrl, targetLayer, displayX, displayY, scaleX, scaleY, rotation, alpha, anchorX, anchorY, show )
 Adds a new Display object to the Block. There's no check if a previous display already exists, beware of overwritting other of your displays when specifing its order.
 
 **Parameters:**
@@ -37,6 +37,8 @@ Adds a new Display object to the Block. There's no check if a previous display a
 - **scaleY** (`Number`) : The vertical scale of the sprite
 - **rotation** (`Number`) : The rotation, in radians, of the sprite
 - **alpha** (`Number`) : The opacity of the sprite
+- **anchorX** (`Number`) : The horizontal anchor of the sprite
+- **anchorY** (`Number`) : The vertical anchor of the sprite
 - **show** (`Boolean`) : Whether the new display object should be instantly rendered
 
 **Returns:**
@@ -54,8 +56,11 @@ Removes a Display object from the Tile
 
 ---
 
-### **Tile:removeAllDisplays** (  )
+### **Tile:removeAllDisplays** ( hide )
 Removes **all** displays from a Tile. 
+
+**Parameters:**
+- **hide** (`Boolean`) : Hide all associated sprites
 
 ---
 

@@ -1,5 +1,4 @@
 do
-	
 	function Player:closeInterface(key)
 		local interface = self.interface
 		if interface[key] then
@@ -11,7 +10,8 @@ do
 	
 	function Player:openInterface(key, ...)
 		self:closeInterface(key)
-		self.interface[key] = Interface[key](Interface, self.name, ...)
+		local InterfacePrompt = Interface.UserMenu[key]
+		self.interface[key] = InterfacePrompt(self.name, ...)
 	end
 	
 	local tkeys = table.keys

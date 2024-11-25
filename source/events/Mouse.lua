@@ -1,5 +1,5 @@
 do	
-	local keys = enum.keys
+	local keys = mc.keys
 	
 	local Mousebinds = {
 		keys = {}
@@ -27,20 +27,26 @@ do
 			local ok, result = pcall(self.callback, player, block, xPosition, yPosition)
 			
 			if not ok then
-				Module:throwException(2, result)
+				Module:emitWarning(mc.severity.mild, result)
 			end
 		end
 		
 		return true
 	end
 	
-	function Mousebinds:new(keyId, blockOperator, callback)		
+	function Mousebinds:new(keyId, blockOperator, callback)
+		assert( type(keyId) == "number"
+			and type(blockOperator) == "boolean"
+			and type(callback) == "function", 
+			"Malformed eventMouse callback for key " .. tostring(keyId).. "."
+		)
 		self.keys[keyId] = Mousebind:new(keyId, blockOperator, callback)
 	end
+	local none = keys.none
 	
 	do
 		-- (-1) : No key active
-		Mousebinds:new(-1, true, function(player, targetBlock)
+		Mousebinds:new(none, true, function(player, targetBlock)
 			player:damageBlock(targetBlock)
 		end)	
 		
@@ -64,6 +70,11 @@ do
 	
 		Mousebinds:new(keys.M, true, function(_, block, ...)
 			Map:spawnStructure("SandPiramidSmall", block.x, block.y, 0.6, 1.0, true)
+		end)
+	
+		Mousebinds:new(keys.BACKSLASH, true, function(player, block, x, y)
+			Interface.Debug.BlockContextual(player.name, block)
+			--Interface.Debug.ChunkContextual(player.name, block:getChunk(), x, y)
 		end)
 	end
 	
@@ -89,13 +100,12 @@ do
 		end
 		
 		if count == 0 then
-			self:get(-1):trigger(player, block, xPosition, yPosition)
+			self:get(none):trigger(player, block, xPosition, yPosition)
 		end
 	end
 	
 	Module.userInputClasses["Mouse"] = Mousebinds
 	
-	local o = os.time()
 	Module:on("Mouse", function(playerName, xPosition, yPosition)
 		local player = Room:getPlayer(playerName)
 		

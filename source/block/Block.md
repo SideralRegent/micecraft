@@ -140,6 +140,7 @@ Sets the damage level of a Block
 
 **Returns:**
 - `Boolean` Whether the Block has the specified amount of damage
+- `Boolean` Whether the Block was destroyed
 
 ---
 

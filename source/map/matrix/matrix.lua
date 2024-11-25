@@ -41,20 +41,21 @@ do
 	end
 	
 	local restrict = math.restrict
+	local min = math.min
 	function Matrix:getMatrixRectangularSection(xStart, yStart, width, height)
 		local result = {}
 		
-		local xEnd = restrict(1, #self[1], xStart + width)
-		local yEnd = restrict(1, #self, yStart + height)
+		local xEnd = min(#self[1], xStart + width - 1)
+		local yEnd = min(#self, yStart + height - 1)
 		
 		local yShift
 		
 		for y = yStart, yEnd do
-			yShift = (yEnd - yStart) + 1
+			yShift = (y - yStart) + 1
 			result[yShift] = {}
 			
 			for x = xStart, xEnd do
-				result[yShift][(xEnd - xStart) + 1] = self[y][x]
+				result[yShift][(x - xStart) + 1] = self[y][x]
 			end
 		end
 		

@@ -11,8 +11,9 @@
 -- @return `Block` The Block object
 do
 	local setmetatable = setmetatable
+	
 	function Block:new(uniqueId, type, MapX, MapY, displayX, displayY, width, height)
-		local meta = blockMeta[type] or blockMeta[0]
+		local meta = blockMeta[type]-- or blockMeta[0]
 		
 		return setmetatable({ -- Define this way to save some table acceses.
 			uniqueId = uniqueId,
@@ -60,8 +61,9 @@ do
 			width = width,
 			height = height,
 			
-			sprite = meta.sprite,
-			spriteId = nil,
+			sound = meta.sound,
+			sprite = (meta.shows and meta.sprite or nil),
+		--	spriteId = nil,
 			--[[shadow = meta.shadow,
 			lighting = meta.lighting,]]
 			
@@ -70,7 +72,7 @@ do
 			
 			hide = self.hide,
 			display = self.display,
-			refreshDisplay = self.refreshDisplay,
+			--refreshDisplay = self.refreshDisplay,
 			-- setSprite = self.setSprite,
 			
 			onCreate = meta.onCreate,
@@ -79,7 +81,7 @@ do
 			onDamage = meta.onDamage,
 			onContact = meta.onContact,
 			onUpdate = meta.onUpdate
-		}, {__index = self}), 
+		}, self), 
 			meta.category	-- return value 2
 	end
 end
@@ -125,6 +127,7 @@ do
 		self.onUpdate = void
 		
 		self.sprite = false
+		--self.sound = false
 		
 		self:getDecoTile():removeDisplay(1, true)
 		
@@ -134,9 +137,7 @@ do
 			self:updateEvent(true, false)
 		end
 	end
-end
-
---- Sets the Block relative coordinates to its chunk.
+end--- Sets the Block relative coordinates to its chunk.
 -- @name Block:setRelativeCoordinates
 -- @param Int:xInChunk The horizontal position of the Block in its Chunk
 -- @param Int:yInChunk The vertical position of the Block in its Chunk
@@ -166,58 +167,42 @@ function Block:meta(field, type)
 	else
 		return metadata
 	end
-end
-
---- Compares with another block object.
+end--- Compares with another block object.
 -- @name Block:__eq
 -- @param Block:other Another block
 -- @return `Boolean` Whether they are equal or not
 function Block:__eq(other)
 	return self.uniqueId == other.uniqueId
-end
-
--- REFERENCE FOR METHODS (also failsafe in case it is NIL for some reason)
-
---- Triggers when the Block is "created" to the world.
+end-- REFERENCE FOR METHODS (also failsafe in case it is NIL for some reason)--- Triggers when the Block is "created" to the world.
 -- Declare as `onCreate = function(self)`.
 -- @name Block:onCreate
 function Block:onCreate()
 	print("created")
-end
-
---- Triggers when the Block is destroyed.
+end--- Triggers when the Block is destroyed.
 -- Declare as `onDestroy = function(self, player)`.
 -- @name Block:onDestroy
 function Block:onDestroy()
 	print("destroyed")
-end
-
---- Triggers when the Block gets interaction with a **player**.
+end--- Triggers when the Block gets interaction with a **player**.
 -- Declare as `onInteract = function(self, player)`.
 -- @name Block:onInteract
 -- @param Player:player The player object who interacted with this block
 function Block:onInteract(player)
 	print(player.name)
-end
-
---- Triggers when the Block gets damaged.
+end--- Triggers when the Block gets damaged.
 -- Declare as `onDamage = function(self, amount, player)`.
 -- @name Block:onDamage
 -- @param Int:amount The damage received from this block.
 -- @param Player:player The player object who damaged this block
 function Block:onDamage(amount, player)
 	print(amount, player)
-end
-
---- Triggers when the Block gets touched by a **player**.
+end--- Triggers when the Block gets touched by a **player**.
 -- Declare as `onContact = function(self, player)`.
 -- @name Block:onContact
 -- @param Player:player The player object who touched this block
 function Block:onContact(player)
 	print(player.name)
-end
-
---- Triggers when the Block gets updated by the actions of another block.
+end--- Triggers when the Block gets updated by the actions of another block.
 -- Declare as `onUpdate = function(self, block)`.
 -- @name Block:onUpdate
 -- @param Block:block The block that requests this one to be updated

@@ -62,9 +62,7 @@ do
 	-- @return `Table` The table with the data.
 	data.decode = function(str, depth)
 		depth = depth or 1
-		local this = {}
-
-		local pattern = ("[^%c]+"):format(17 + depth)
+		local this = {}		local pattern = ("[^%c]+"):format(17 + depth)
 		
 		local d_parse = data.parse
 		
@@ -83,9 +81,7 @@ do
 		end
 		
 		return this
-	end
-
-	--- Parses a value encoded or compressed.
+	end	--- Parses a value encoded or compressed.
 	-- @name data.parse
 	-- @param String:str The encoded data.
 	-- @param Int:depth The deep to look at, in case it's a Table
@@ -112,9 +108,7 @@ do
 				return math.tonumber(str, BASE_REF) or str
 			end
 		end
-	end
-
-	--- Encondes a value into a reasonable format.
+	end	--- Encondes a value into a reasonable format.
 	-- @name data.serialize
 	-- @param Any:this The value to convert
 	-- @param Int:depth The depth to encode at, in case it's a table

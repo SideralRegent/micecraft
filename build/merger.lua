@@ -11,6 +11,7 @@ local Merger = {
 	},
 	
 	settings = {
+		debugCode = "return {field = field, blockMeta = blockMeta}",
 		shouldLog = false,
 		releaseBuild = false,
 		preview = true,
@@ -47,10 +48,10 @@ local fileList = {
 		__name = "Head",
 		__directory = "source/init",
 		__docs = true,
+		"enum",
 		"module",
 		"room",
 		"env",
-		"enum",
 		"prestart"
 	},
 	{
@@ -58,6 +59,7 @@ local fileList = {
 		__directory = "source/interface",
 		__docs = true,
 		"def",
+		"debug",
 		"menu"
 	},
 	-- >> MAP
@@ -67,7 +69,7 @@ local fileList = {
 		__docs = true,
 		"init",
 		"environment",
-		"matrix/matrix", -- This is crap.
+		"matrix/matrix",
 		"interaction"
 	},
 	{
@@ -148,7 +150,15 @@ local fileList = {
 		__docs = true,
 		"logic",
 		"block",
-		"item"
+		"item",
+		"deco"
+	},
+	{
+		__name = "Translations",
+		__directory = "source/translations",
+		__docs = true,
+		"brain",
+		"en", "es"
 	},
 	{
 		__name = "Modes",
@@ -175,11 +185,13 @@ local fileList = {
 		"Keyboard",
 		"PlayerDied",
 		"PlayerRespawn",
+		"PopupAnswer",
 		"ChatCommand",
 		"ColorPicked",
 		"TextAreaCallback",
 		"Pause",
-		"Resume"
+		"Resume",
+		"Play"
 	},
 	{
 		__name = "Launch",
@@ -471,7 +483,6 @@ function Merger:buildAllModules(directories)
 	return table_concat(directoriesList, "\n")
 end
 
-
 function Merger:makeFile()
 	self:setVersion()
 	
@@ -497,7 +508,11 @@ end
 function Merger:testScript()
 	local load = loadstring or load
 	
-	local testCode = 'package.path = "build/?.lua;" .. package.path; require("tfmenv");' .. self.script
+	local testCode = table.concat({
+		'package.path = "build/?.lua;" .. package.path; require("tfmenv");',
+		self.script,
+		self.settings.debugCode
+	})
 	
 	local codeChunk, reason = load(testCode, self.scriptName)
 	

@@ -4,7 +4,7 @@
 -- only be called on pre-start, because it doesn't check if previous
 -- values already exist, and may delete all of them.
 -- @name Module:init
-function Module:init()
+function Module:init(apiVer, tfmVer)
 	self.modeList = {}
 	
 	self.loader = select(2, pcall(nil)):match("^(.+)%.") or "server"
@@ -17,12 +17,62 @@ function Module:init()
 	self.currentRuntime = 0
 	self.runtimeLimit = 52
 	
+	self.errorLog = setmetatable({}, {__index=table})
+	
 	self.isPaused = false
 	
+	self.iconLoadId = 0
+	
 	self.args = {}
+	
+	self:assertVersion(apiVer, tfmVer)	
 end
 
---- Asserts if API version matches the defined version for this Module.
+do
+	local backgroundColor = 0xBCBCBC
+	
+	-- Won't work, the game delays it.
+	function Module:showLoadInterface(playerName)
+		ui.addTextArea(1, "", playerName, 5, 5, 790, 390, backgroundColor, backgroundColor, 1.0, true)
+		local id = tfm.exec.addImage("19351d08ee3.png", "~100", 400, 205, playerName, 3.0, 3.0, 0, 0.25, 0.5, 0.5, false)
+		--ui.addTextArea(2, "", playerName, 145, 150, 500, 0, 0x0, 0x0, 1.0, true)
+		--ui.addTextArea(3, "", playerName, 145, 190, 500, 0, 0x0, 0x0, 1.0, true)
+		
+		if not playerName then
+			self.iconLoadId = id
+		end
+		
+		return id
+	end
+	
+	--Module:showLoadInterface(nil)
+	
+	function Module:unLoadInterface(playerName, m_id)
+		if m_id then
+			tfm.exec.removeImage(m_id, false)
+		else
+			tfm.exec.removeImage(self.iconLoadId)
+		end
+		
+		ui.removeTextArea(1, playerName)
+		--[[ui.removeTextArea(2, playerName)
+		ui.removeTextArea(3, playerName)]]
+	end
+	
+	function Module:lupdt()
+		ui.updateTextArea(1, "", nil)
+	end
+	
+	local template = "<p align='center'><font color='#0'>%s</font></p>"
+	function Module:setLoadInterfaceTitle(text, playerName)
+		ui.updateTextArea(2, template:format(text), playerName)
+		self:setLoadInterfaceDescription("", playerName)
+	end
+	
+	function Module:setLoadInterfaceDescription(text, playerName)
+		ui.updateTextArea(3, template:format(text), playerName)
+	end
+end--- Asserts if API version matches the defined version for this Module.
 -- In case it doesn't, a warning will be displayed for players to
 -- inform the developer. 
 -- @name Module:assertVersion
@@ -32,18 +82,18 @@ end
 do
 	local misc = tfm.get.misc
 	function Module:assertVersion(apiVersion, tfmVersion)		
-		self.apiVersion = apiVersion or misc.apiVersion
+		self.apiVersion = tostring(apiVersion or misc.apiVersion)
 		self.tfmVersion = tostring(tfmVersion or misc.transformiceVersion)
 		
 		local apiMatch = (self.apiVersion == misc.apiVersion)
 		local tfmMatch = (self.tfmVersion == tostring(misc.transformiceVersion))
 		
 		if not apiMatch then
-			self:emitWarning(3, "Module API version mismatch")
+			self:emitWarning(mc.severity.important, "Module API version mismatch")
 		end
 		
 		if not tfmMatch then
-			self:emitWarning(4, "Transformice version mismatch")
+			self:emitWarning(mc.severity.trivial, "Transformice version mismatch")
 		end
 		
 		return (apiMatch and tfmMatch)
@@ -52,10 +102,12 @@ end
 
 do
 	local colors = {
-		"R",
-		"O",
-		"J",
-		"V"
+		[mc.severity.panic] 	= 'VI',
+		[mc.severity.fatal] 	= "R",
+		[mc.severity.important] = "O",
+		[mc.severity.mild] 		= "J",
+		[mc.severity.minimal] 	= "V",
+		[mc.severity.trivial] 	= "N2",
 	}
 	--- Emits a warning, as a message on chat, with the issue provided.
 	-- @name Module:emitWarning
@@ -63,12 +115,12 @@ do
 	-- @param String:message The warning message to display.
 	function Module:emitWarning(severity, message)
 		message = message or "unknown"
-		severity = severity or 4
+		severity = severity or mc.severity.trivial
 		local color = colors[severity] or "V"
 		
 		local announce = ("<%s>[Warning]</%s> <N>%s</N>"):format(color, color, message)
 		tfm.exec.chatMessage(announce)
-		print(announce)
+		self:log(severity, message)
 	end
 end
 
@@ -83,52 +135,88 @@ do
 	-- @param Any:... Extra arguments
 	function Module:unload(handled, errorMessage, ...)
 		if handled then
-			self:emitWarning(1, errorMessage, ...)
-			
-			system.exit()
+			self:emitWarning(mc.severity.fatal, errorMessage, ...)
 			--while true do end
 		else
-			self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.\nIssue: " .. (errorMessage or "Unknown"))
-			system.exit()
+			self:emitWarning(mc.severity.panic, 
+				"The Module has been unloaded due to an uncatched exception.\nIssue: " .. tostring(errorMessage or "Unknown"))
 		end
 		
+		
+		system.exit()
 		--[[system.newTimer(function()
 			while true do end
 		end, 500, false)]]
 	end
-end
-
---- Callback when the Module crashes for any error.
+end--- Callback when the Module crashes for any error.
 -- @name Module:onError
 -- @param String:errorMessage The reason of the error.
 -- @param Any:... Extra arguments
 function Module:onError(errorMessage, ...)
 	-- Save data
 	self:unload(true, errorMessage, ...)
-end
-
---- Throws an exception report.
+end--- Throws an exception report.
 -- The exception can either be fatal or not, and the handling of
 -- the Module against that exception will change accordingly.
 -- @name Module:throwException
--- @param Boolean:fatal Wheter the Exception happened on a sensitive part of the Module or not
+-- @param Boolean:fatal Wheter the Exception happened on a sensitive part of the Module or not (throws error screen)
 -- @param String:errorMessage The reason for this Exception
 -- @param Any:... Extra arguments
 function Module:throwException(fatal, errorMessage, ...)
 	print(debug.traceback())
 	if fatal then
+		self:log(0, errorMessage, ...)
 		self:onError(errorMessage, ...)
 	else
-		self:emitWarning(1, errorMessage)
+		self:emitWarning(mc.severity.fatal, errorMessage)
 	end
+end--- Logs an error.
+-- Errors will be stored in a table, as given, with the fields 'level',
+-- 'message' & 'args' (if any).
+-- @name Module:log
+-- @param Int:level Severity of this error. See Module:emitWarning
+-- @param String:errorMessage The reason for this Exception
+-- @param Any:... Extra arguments
+function Module:log(level, errorMessage, ...)
+	local args = {...}
+	if #args == 0 then -- do not store unnecesary tables
+		args = nil
+	end
+	
+	self.errorLog:insert({level = level, message = errorMessage, args = args})
+	
+	local f
+	if args then
+		f = {}
+		
+		for i = 1, #args do
+			f[i] = tostring(args)
+		end
+		
+		f = (" (%s)"):format(table.concat(f, ', '))
+	else
+		f = ""
+	end
+	
+	printf("[%d] :: (%d) %s%s", #self.errorLog, level, errorMessage, f)
+end--- Logs an error with a formatted string.
+-- See Module:log.
+-- @name Module:logf
+-- @param Int:level Severity of this error. See Module:emitWarning
+-- @param String:errorMessage The reason for this Exception
+-- @param Any:... Extra arguments to format errorMessage
+function Module:logf(level, errorMessage, ...)
+	errorMessage = errorMessage:format(...)
+	
+	self.errorLog:insert({level = level, message = errorMessage})
+	
+	printf("[%d] :: (%d) %s", #self.errorLog, level, errorMessage)
 end
-
 
 local Event = {} -- Should this class be documented? No possible uses outside of **Module**...
 Event.__index = Event
-
 do
-		local time = os.time
+	local time = os.time
 	local next = next
 	local pcall = pcall
 	local rawget = rawget
@@ -179,19 +267,31 @@ do
 		["TextAreaCallback"] = true,
 		["TalkToNPC"] = true
 	}
+	
+	local unprotected = {
+		["Keyboard"] = true,
+		["Mouse"] = true,
+		["TextAreaCallback"] = true,
+		["PopupAnswer"] = true
+	}
+	
 	function Event:new(eventName)
 		local this = setmetatable({
 			keyName = eventName,
 			isNative = nativeEvents[eventName],
+			isProtected = not unprotected[eventName],
 			calls = {}
 		}, self)
 		
-		this.trigger = this.isNative and Event.triggerCount or Event.triggerUncount
+		
+		if this.isNative then -- Count runtime
+			this.trigger = this.isProtected and Event.triggerCountProtected or Event.triggerCount
+		else -- Do not count runtime (these are auxiliary events that get triggered by real events)
+			this.trigger = this.isProtected and Event.triggerUncountProtected or Event.triggerUncount
+		end
 		
 		return this
-	end
-
-	function Event:append(callback)
+	end	function Event:append(callback)
 		self.calls[#self.calls + 1] = callback
 		
 		return #self.calls
@@ -203,15 +303,12 @@ do
 			end
 		end
 	end
-	--[[
-	-- pcall is for little kids
-	function Event:triggerUncount(...)
+	
+	function Event:triggerUncountProtected(...)
 		local ok, result
 		
 		for _, instance in next, self.calls do
 			if not Module.isPaused then
-				--ok = true
-				--instance(...)
 				ok, result = pcall(instance, ...)
 				
 				if not ok then
@@ -220,9 +317,8 @@ do
 			end
 		end
 		
-		return true, "success"
+		return true
 	end
-	]]
 	
 	function Event:triggerCount(...)
 		local startTime
@@ -236,16 +332,13 @@ do
 			end
 		end
 	end
-	--[[
-	-- pcall is for little kids
-	function Event:triggerCount(...)		
+	
+	function Event:triggerCountProtected(...)		
 		local ok, result, startTime
 		
 		for _, instance in next, self.calls do
 			if not Module.isPaused then
 				startTime = time()
-				--ok = true
-				--instance(...)
 				ok, result = pcall(instance, ...)
 				
 				if ok then
@@ -256,27 +349,22 @@ do
 			end
 		end
 		
-		return true, "success"
+		return true
 	end
-	]]
-
+	
 	-- Gets the Event object by the event name provided.
 	-- @name Module:getEvent
 	-- @param String:eventName The name of the Event to get its object from.
 	-- @return `Event|nil` The Event object, if it exists.
 	function Module:getEvent(eventName)
 		return self.eventList[eventName]
-	end
-
-	-- Tells if an Event has been defined on the module.
+	end	-- Tells if an Event has been defined on the module.
 	-- @name Module:hasEvent
 	-- @param String:eventName The name of the Event to assert.
 	-- @return `Boolean` Whether the Event exists or not.
 	function Module:hasEvent(eventName)
 		return not not self:getEvent(eventName)
-	end
-
-	--- Creates a callback to trigger when an Event is emmited.
+	end	--- Creates a callback to trigger when an Event is emmited.
 	-- In case the Event exists, it will append the callback to the
 	-- internal list of the Event, so every callback will be executed
 	-- on the order it is defined. Otherwise it doesn't exist, an
@@ -289,16 +377,14 @@ do
 	-- @return `Number` The position of the callback in the calls list.
 	function Module:on(eventName, callback)
 		local createdNewObject, position
-		local eventFullName = ("event%s"):format(eventName)
-
-		if not self:hasEvent(eventName) then
+		local eventFullName = ("event%s"):format(eventName)		if not self:hasEvent(eventName) then
 			createdNewObject = self:addEvent(eventName)
 			
-			if nativeEvents[eventName] then
+			if nativeEvents[eventName] and eventName ~= "Loop" then
 				rawset(_G, eventFullName, function(...)
-					--if not self.isPaused then
+					if not self.isPaused then -- Ignore all event calls while paused.
 						self:trigger(eventName, ...)
-					--end
+					end
 				end)
 			else
 				rawset(_G, eventFullName, function(...)
@@ -310,9 +396,7 @@ do
 		position = self:getEvent(eventName):append(callback)
 		
 		return createdNewObject, position
-	end
-
-	--- Adds an Event listener.
+	end	--- Adds an Event listener.
 	-- It will create the Event object required, with the event name
 	-- that has been provided.
 	-- @name Module:addEvent
@@ -356,7 +440,7 @@ do
 	function Module:increaseRuntime(increment)
 		self.currentRuntime = self.currentRuntime + increment
 		
-		updateTextArea(12, ("<font color='#000000'>%d ms"):format(self.currentRuntime), nil)
+		updateTextArea(12, ("<font color='#000000'><p align='right'>%d ms"):format(self.currentRuntime), nil)
 		
 		if self.currentRuntime >= self.runtimeLimit then
 			self:pause()
@@ -365,9 +449,7 @@ do
 		end
 		
 		return false
-	end
-
-	--- Triggers a Module Pause.
+	end	--- Triggers a Module Pause.
 	-- When it triggers, no events will be listened, and all objects will freeze.
 	-- This function is automatically called by a runtime check when an event
 	-- triggers, however, it `should` be safe to call it dinamically.
@@ -379,15 +461,13 @@ do
 		
 		self.isPaused = true
 		
+		self:logf(4, "Module has been paused for %d ms.", time)
+		
 		self:trigger("Pause", time)
 		newTimer(function(_)
 			self:continue()
-		end, time, false)
-
-		return time
-	end
-
-	--- Continues the Module execution.
+		end, time, false)		return time
+	end	--- Continues the Module execution.
 	-- All events ressume listening, as well as players take back their movility.
 	-- It will check if the Module is already paused, so it is safe to call it
 	-- without previous checks.
@@ -402,12 +482,8 @@ do
 			self:trigger("Resume")
 			
 			return true
-		end
-
-		return false
-	end
-
-	--- Sets the appropiate Cycle of runtime checking.
+		end		return false
+	end	--- Sets the appropiate Cycle of runtime checking.
 	-- Whenever a new cycle occurs, the runtime counter will reset,
 	-- and its fingerprint will log.
 	-- @name Module:setCycle
@@ -428,17 +504,9 @@ do
 	--[[
 	function Module:setPercentageCounter()
 		
-	end
-
-	function Module:updatePercentage(increment)
-
-	end
-
-	function Module:getDebugInfo()
+	end	function Module:updatePercentage(increment)	end	function Module:getDebugInfo()
 		
-	end]]
-
-	--- Seeks for the player with the lowest latency to make them the sync, or establishes the selected one.
+	end]]	--- Seeks for the player with the lowest latency to make them the sync, or establishes the selected one.
 	-- @name Module:setSync
 	-- @param String:playerName The Player to set as sync, if not provided then it will be picked automatically
 	-- @return `String` The new sync.
@@ -453,7 +521,7 @@ do
 			local candidate, bestLatency = "", math.huge
 			
 			for playerName, player in next, tfm.get.room.playerList do
-				if player.averageLatency <= bestLatency then
+				if player.averageLatency < bestLatency then
 					bestLatency = player.averageLatency
 					candidate = playerName
 				end
@@ -465,18 +533,12 @@ do
 		tfm.exec.setPlayerSync(playerName)
 		
 		return playerName
-	end
-
-	function Module:newMode(modeName, constructor)
+	end	function Module:newMode(modeName, constructor)
 		self.modeList[modeName] = Mode:new(modeName, constructor)
-	end
-
-	function Module:getMode(modeName)
+	end	function Module:getMode(modeName)
 		modeName = modeName or self.subMode or ""
 		return self.modeList[modeName] or self.modeList[modeName:lower()]
-	end
-
-	function Module:hasMode(modeName)
+	end	function Module:hasMode(modeName)
 		return not not self:getMode(modeName or "")
 	end
 	
@@ -484,6 +546,8 @@ do
 		local mode = self:getMode(modeName) or self:getMode("default")
 		
 		if mode then
+			self.settings = mode.settings or {}
+			
 			mode:constructor({ -- Proxy table
 				__index = function(_, k)
 					return rawget(mode.environment, k)
@@ -493,8 +557,6 @@ do
 				end
 			})
 			mode.__index = mode
-		
-			self.settings = mode.settings or {}
 		end
 		
 		self.subMode = mode.name or "unknown"
@@ -508,5 +570,17 @@ do
 		local class = self.userInputClasses[type]
 		
 		class:new(...)
+	end
+	
+	function Module:checkEnableUser(player)
+		if self.settings.promptsMenu then
+			player:promptMainMenu()
+		else
+			player:checkEnable()
+		end
+	end
+	
+	function Module.setMapName()		
+		ui.setMapName(Translations(tfm.get.room.language, "mode.name"))
 	end
 end

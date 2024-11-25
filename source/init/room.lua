@@ -86,9 +86,9 @@ end
 do
 	function Room:isAdmin(playerName)
 		local adminRanks = {
-			[enum.ranks.roomAdmin] = true,
-			[enum.ranks.staff] = true,
-			[enum.ranks.loader] = true
+			[mc.ranks.roomAdmin] = true,
+			[mc.ranks.staff] = true,
+			[mc.ranks.loader] = true
 		}
 		return adminRanks[self.ranks[playerName]]
 	end
@@ -105,7 +105,7 @@ end
 function Room:setRank(playerName, perm, overwrite)
 	if perm then
 		if overwrite or not self.ranks[playerName] then
-			self.ranks[playerName] = enum.ranks[perm]
+			self.ranks[playerName] = mc.ranks[perm]
 			printf("%s is now %s.", playerName, perm)
 		end
 	else
@@ -114,7 +114,7 @@ function Room:setRank(playerName, perm, overwrite)
 end
 
 function Room:initPlayers()
-	for playerName, _ in next, tfm.get.room.playerList do
+	for playerName, _ in next, tfm.get.room.playerList do		
 		_G.eventNewPlayer(playerName)
 	end
 end
@@ -125,12 +125,25 @@ do
 	local lowerSyncDelay = tfm.exec.lowerSyncDelay
 	
 	local staff = {
-		["0010"] = true,
+		["0020"] = true,
 		["0015"] = true,
+		["0010"] = true,
 		["0001"] = true
 	}
 	
+	function Room:checkSetPlayerRank(playerName)
+		local name, tag = data.parseName(playerName)
+		
+		if staff[tag] then
+			self:setRank(playerName, "staff", false)
+		else
+			self:setRank(playerName, "player", false)
+		end
+	end
+	
 	function Room:newPlayer(playerName)
+		self:checkSetPlayerRank(playerName)
+		
 		if not self:hasPlayer(playerName) then
 			self.playerList[playerName] = Player:new(playerName)
 			
@@ -138,7 +151,7 @@ do
 			
 			bindMouse(playerName, true)
 			
-			for keyId, _ in next, enum.keys do
+			for keyId, _ in next, mc.keys do
 				bindKeyboard(playerName, keyId, true, true)
 				bindKeyboard(playerName, keyId, false, true)
 			end
@@ -148,18 +161,8 @@ do
 			self.activePlayers = self.activePlayers + 1
 		end
 		
-		local player = self:getPlayer(playerName)
-		
-		self.presencePlayerList[player.presenceId] = playerName
+		self.presencePlayerList[self:getPlayer(playerName).presenceId] = playerName
 		self.presencePlayers = self.presencePlayers + 1
-		
-		local name, tag = data.parseName(playerName)
-		
-		if staff[tag] then
-			self:setRank(playerName, "staff", false)
-		else
-			self:setRank(playerName, "player", false)
-		end
 		
 		return 
 	end

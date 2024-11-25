@@ -40,8 +40,10 @@ do
 	-- @param String:sprite The sprite URL from the Atelier801 servers
 	-- @param Boolean:refresh Whether it should refresh the sprite in the world or not
 	function Block:setSprite(sprite, refresh)
-		self.sprite = sprite or blockMeta:get(self.type).sprite
-			
+		local meta = blockMeta:get(self.type)
+		
+		self.sprite = sprite or (meta.shows and meta.sprite or nil)
+		
 		if refresh then
 			self:refreshDisplay()
 		end

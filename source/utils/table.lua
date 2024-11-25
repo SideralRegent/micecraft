@@ -21,17 +21,47 @@ do
 		return not next(t)
 	end
 	
+	table.concatf = function(list, field, sep, i, j)
+		i = i or 1
+		j = j or #list
+		local t = {}
+		
+		for n = i, j do
+			t[#t + 1] = list[n][field]
+		end
+		
+		return concat(t, sep)
+	end
+	
 	--- Copies a table and all its values recursively.
 	-- It avoids keeping references over values.
 	-- @name table.copy
 	-- @param Table:t The table to copy
 	-- @return `Table` The table copied.
-	table.copy = function(t)
-		if type(t) == "table" then
+	table.copy = function(t, seen)
+		seen = seen or {}
+		if type(t) == "table" and not seen[t] then
+			seen[t] = true
 			local ut = {}
 			
 			for k, v in next, t do
-				ut[k] = table.copy(v)
+				ut[k] = table.copy(v, seen)
+			end
+			
+			setmetatable(ut, getmetatable(t))
+			
+			return ut
+		else
+			return t
+		end
+	end
+	
+	table.shallowcopy = function(t)
+		if type(t) == "table" then
+			local ut = t
+			
+			for k, v in next, t do
+				ut[k] = v
 			end
 			
 			setmetatable(ut, getmetatable(t))
@@ -256,7 +286,7 @@ do
 	table.tostring = function(value, tb, seen, pretty, lim)
 		lim = lim or 8
 		tb = tb or 0
-		if tb > lim then return end -- Max depth is 8, unlike Tig's broken print.
+		if tb > lim then return "..." end -- Do not descend anymore.
 		
 		local tv = type(value)
 		if tv == "table" then
@@ -300,9 +330,11 @@ do
 		end
 	end
 	
-	--- Prints a table.
+	--- Prints a table. This is just a wrap of table.tostring.
 	-- @name table.print
 	-- @param Table:t The table to print
+	-- @param Boolean:pretty Add colors and stuff to this print
+	-- @param Int:lim How many subtables should it descend to
 	table.print = function(t, pretty, lim)
 		print(table.tostring(t, 0, nil, pretty, lim))
 	end	

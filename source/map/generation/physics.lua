@@ -1,17 +1,10 @@
 do
-	local default_cats = {
-		[1] = true, 
-		[2] = true, 
-		-- [3] = true, 
-		[4] = true, 
-		[6] = true
-	}
 	local abs = math.abs
 	local next = next
 	
 	local PM = Matrix:new()
 	
-	function PM:getSegment(xs, ys, xe, ye, cat)
+	function PM:getSegment(xs, ys, xe, ye)
 		return {
 			xStart = xs,
 			xEnd = xe,
@@ -19,7 +12,7 @@ do
 			yEnd = ye,
 			height = (ye - ys) + 1,
 			width = (xe - xs) + 1,
-			category = cat or abs(self[ys][xs]),
+			category = abs(self[ys][xs]),
 			block = Map:getBlock(xs, ys, CD_MTX)
 		}
 	end
@@ -27,13 +20,13 @@ do
 	local q = function(t, v)
 		t[#t + 1] = v
 	end
-
+	
 	function PM:individual(xStart, xEnd, yStart, yEnd)
 		local list = {}
 		for y = yStart, yEnd do
 			for x = xStart, xEnd do
 				if self[y][x] > 0 then
-					q(list, self:getSegment(x, y, x, y, self[y][x]))
+					q(list, self:getSegment(x, y, x, y))
 					self[y][x] = -self[y][x]
 				end
 			end
@@ -102,71 +95,81 @@ do
 		until (matches == 0)
 		
 		return list
-	end
+	end	
 	
-	function PM:rectangle_detailed(xStart, xEnd, yStart, yEnd, catlist)
+	-- For **detailed** functions: So, to process blocks it requires 
+	-- the reference category to be equal to the block checked.
+	-- If there's no reference category, then the block is set
+	-- as the reference, but if there is then it doesn't get
+	-- overwritten and thus checks against it. Then, it checks if 
+	-- the block category is positive (not changed). This ensures
+	-- that ONLY blocks not processed will get extra computations.
+	-- It represents a 25% performance improvement from previous.
+	
+	function PM:rectangle_detailed(xStart, xEnd, yStart, yEnd)
 		local x, y = 0, 0
 		local xs, xe, ys, ye
 		local matches = 0
 		local axisv = 0
 		
-		catlist = catlist or default_cats
 		local list = {}
+		local cat
 		
-		for cat, _ in next, catlist do
-			repeat
-				matches = 0
-				xe = xEnd
-				ye = yEnd
-				xs = xStart
-				ys = nil
-				
-				axisv = ye
-				x = xs
-				while x <= xe do
-					y = ys or yStart
-					while y <= ye do
-						if cat > 0 and self[y][x] == cat then -- Not processed
-							if ys then
-								if y == yEnd and x == xStart then
-									ye = y
-								end
-							else
-								ys = y
-								xs = x
+		repeat
+			matches = 0
+			xe = xEnd
+			ye = yEnd
+			xs = xStart
+			ys = nil
+			
+			axisv = ye
+			x = xs
+			while x <= xe do
+				y = ys or yStart
+				while y <= ye do
+					cat = cat or self[y][x]
+					if self[y][x] > 0 and cat == self[y][x] then -- Not processed
+						if ys then
+							if y == yEnd and x == xStart then
+								ye = y
 							end
-							
-							matches = matches + 1
-							self[y][x] = -self[y][x]
-						else -- Processed
-							
-							if ys then
-								if x == xs then
-									ye = y - 1
-								else
-									xe = x - 1
-									
-									for i = ys, y - 1 do
-										self[i][x] = -self[i][x]
-										matches = matches - 1
-									end
-									
-									break
-								end
-							end
+						else
+							ys = y
+							xs = x
 						end
 						
-						y = y + 1
+						matches = matches + 1
+						self[y][x] = -cat
+					else -- Processed
+						if ys then
+							if x == xs then
+								ye = y - 1
+							else
+								cat = nil
+								xe = x - 1
+								
+								for i = ys, y - 1 do
+									self[i][x] = -self[i][x]
+									matches = matches - 1
+								end
+								
+								break
+							end
+						else
+							cat = nil
+						end
 					end
-					x = x + 1
+					
+					y = y + 1
 				end
-				
-				if matches > 0 then
-					q(list, self:getSegment(xs, ys, xe, ye, cat))
-				end
-				
-			until (matches <= 0)
-		end
+				x = x + 1
+			end
+			
+			if matches > 0 then
+				q(list, self:getSegment(xs, ys, xe, ye))
+			end
+			
+		until (matches <= 0)
 		
 		return list
 	end
@@ -176,15 +179,15 @@ do
 		
 		local match = false
 		local ys, ye
-		local ct 
+		local cat 
 		
 		for x = xStart, xEnd do
 			match = false
 			ys = yStart
 			ye = yEnd
 			for y = yStart, yEnd do
-				ct = self[y][x]
-				if ct > 0 then
+				cat = self[y][x]
+				if cat > 0 then
 					if match then
 						ye = y
 					else
@@ -192,10 +195,10 @@ do
 						ye = y
 						match = true
 					end
-					self[y][x] = -ct
+					self[y][x] = -cat
 				end
 				
-				if ct <= 0 or y == yEnd then
+				if cat <= 0 or y == yEnd then
 					if match then
 						q(list, self:getSegment(x, ys, x, ye, 1))
 						match = false
@@ -207,9 +210,8 @@ do
 		return list
 	end
 	
-	function PM:line_detailed(xStart, xEnd, yStart, yEnd, catlist)
+	function PM:line_detailed(xStart, xEnd, yStart, yEnd)
 		local list = {}
-		catlist = catlist or default_cats
 		
 		local match = false
 		local ys, ye
@@ -222,8 +224,9 @@ do
 			ye = yEnd
 			y = yStart
 			while y <= yEnd do
-				ct = self[y][x]
-				if catlist[ct] and (ct == match or not match) then
+				ct = ct or self[y][x]
+				
+				if ct == match or not match then
 					if match then
 						ye = y
 					else
@@ -231,6 +234,7 @@ do
 						ye = y
 						match = ct
 					end
+					
 					self[y][x] = -ct
 				end
 				
@@ -288,7 +292,7 @@ do
 		return list
 	end
 	
-		function PM:row_detailed(xStart, xEnd, yStart, yEnd, catlist)
+		function PM:row_detailed(xStart, xEnd, yStart, yEnd)
 		local list = {}
 		
 		local match = false
@@ -304,7 +308,7 @@ do
 			x = xStart
 			while x <= xEnd do
 				ct = self[y][x]
-				if catlist[ct] and (ct == match or not match) then
+				if (ct == match or not match) then
 					if match then
 						xe = x
 					else

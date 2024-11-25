@@ -1,9 +1,9 @@
 do
-local void = function() end
+	local void = function() end
 	itemMeta = MetaData:newMetaData({
 		name = "Null",
-		category = enum.icat.null,
-		class = enum.iclass.null,
+		category = mc.icat.null,
+		class = mc.iclass.null,
 		
 		sprite = "17e1315385d.png", -- nil
 		sound = {
@@ -33,8 +33,8 @@ end
 itemMeta:import(blockMeta, { -- config
 		shift = 0x256d100,
 		template = {
-			category = enum.icat.block,
-			class = enum.iclass.block,
+			category = mc.icat.block,
+			class = mc.iclass.block,
 			placeable = true,
 			getBlock = function(self)
 				return blockMeta:get(self.fixedId - 0x256d100)
@@ -51,7 +51,7 @@ itemMeta:import(blockMeta, { -- config
 
 itemMeta:set(VOID, {
 	name = "Your_bank's_account",
-	category = enum.icat.null,
+	category = mc.icat.null,
 	sprite = nil,
 	consumable = false,
 	placeable = false
@@ -59,7 +59,7 @@ itemMeta:set(VOID, {
 
 itemMeta:set(0x7A315A, {
 	name = "Test_Sigil",
-	category = enum.icat.null,
+	category = mc.icat.null,
 	sprite = "1925f762ea4.png",
 	consumable = 8,
 	onUse = function(self, user, targetBlock, x, y)

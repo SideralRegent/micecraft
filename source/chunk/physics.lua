@@ -42,24 +42,24 @@ do
 	end
 	
 	local catinfo = {
-		[enum.category.default] = {type=14, friction=0.30, restitution=0.20, collides=true, y_offset = 0}, -- Default
-		[enum.category.grains] = {type=14, friction=0.5, restitution=0.00, collides=true, y_offset = 0}, -- Grains
-		-- [enum.category.wood] = {type=14, friction=0.60, restitution=0.25, collides=true, y_offset = 0}, -- Wood stuff
-		[enum.category.rocks_n_metals] = {type=14, friction=0.40, restitution=0.40, collides=true, y_offset = 0}, -- Rocks and Metals
-		[enum.category.crystals] = {type=14, friction=0.10, restitution=0.20, collides=true, y_offset = 0}, -- Crystal
-		-- [enum.category.other] = {type=14, friction=0.50, restitution=0.00, collides=true, y_offset = 0}, -- Others (leaves, wool)
-		[enum.category.water] = {type=09, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Water
-		[enum.category.lava] = {type=19, friction=2.00, restitution=500.00, collides=true, y_offset = 0}, -- Lava
-		[enum.category.cobweb] = {type=15, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Cobweb
-		[enum.category.acid]= {type=19, friction=20.0, restitution=0.00, collides=true, y_offset = 0}, -- Acid
+		[mc.category.default] = {type=14, friction=0.30, restitution=0.20, collides=true, y_offset = 0}, -- Default
+		[mc.category.grains] = {type=14, friction=0.5, restitution=0.00, collides=true, y_offset = 0}, -- Grains
+		-- [mc.category.wood] = {type=14, friction=0.60, restitution=0.25, collides=true, y_offset = 0}, -- Wood stuff
+		[mc.category.rocks_n_metals] = {type=14, friction=0.40, restitution=0.40, collides=true, y_offset = 0}, -- Rocks and Metals
+		[mc.category.crystals] = {type=14, friction=0.10, restitution=0.20, collides=true, y_offset = 0}, -- Crystal
+		-- [mc.category.other] = {type=14, friction=0.50, restitution=0.00, collides=true, y_offset = 0}, -- Others (leaves, wool)
+		[mc.category.water] = {type=09, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Water
+		[mc.category.lava] = {type=15, friction=2.00, restitution=500.00, collides=false, y_offset = 0}, -- Lava
+		[mc.category.cobweb] = {type=15, friction=0.00, restitution=0.00, collides=false, y_offset = 0}, -- Cobweb
+		[mc.category.acid]= {type=19, friction=20.0, restitution=0.00, collides=true, y_offset = 0}, -- Acid
 	}
-	catinfo.default = catinfo[enum.category.default]
+	catinfo.default = catinfo[mc.category.default]
 	for _, liquid in next, {"lava", "water"} do
 		local t
 		for i = 1, 4 do
-			t = table.copy(catinfo[enum.category[liquid]])
+			t = table.copy(catinfo[mc.category[liquid]])
 			t.y_offset = (4 - i) / 4
-			catinfo[enum.category[("%s_%d"):format(liquid, i)]] = t
+			catinfo[mc.category[("%s_%d"):format(liquid, i)]] = t
 		end
 	end
 	
@@ -91,7 +91,7 @@ do
 			groundCollision = catdef.collides,
 			contactListener = catdef.collides,
 			
-			foreground = true,
+			foreground = false,
 			angle = 0,
 			
 			dynamic = false
@@ -107,11 +107,13 @@ do
 		if active == nil then
 			self:reload()
 		else
-			if active then
-				self.presenceId = iaddPhysicObject(self.x, self.y, self.bodydef)
-			else
+			if self.presenceId ~= 0 then
 				removePhysicObject(self.presenceId)
 				self.presenceId = 0
+			end
+			
+			if active then
+				self.presenceId = iaddPhysicObject(self.x, self.y, self.bodydef)
 			end
 			
 			self.state = active
@@ -146,9 +148,7 @@ do
 	
 	function Segment:free()
 		self:setState(false)
-		self:setDebugDisplay(false)
-
-		local physicsMap = Map.physicsMap
+		self:setDebugDisplay(false)		local physicsMap = Map.physicsMap
 		local blocksMap = Map.blocks
 		for y = self.ys, self.ye do
 			for x = self.xs, self.xe do
@@ -223,6 +223,20 @@ do
 		return newEntries
 	end
 	
+	function Chunk:getCollisionsFast(method)
+		local seglist = method(Map.physicsMap,
+			self.xf,
+			self.xb,
+			self.yf,
+			self.yb
+		)
+		
+		for _, segment in next, seglist do
+			self:setSegment(segment)
+		end
+		
+	end
+	
 	
 	--- Sets the state for the physics of the Chunk or some of its segments.
 	-- @name Chunk:setPhysicState
@@ -268,24 +282,18 @@ do
 	function Chunk:refreshPhysics(mode, segmentList, update, origin)
 		segmentList = segmentList or copykeys(self.segments, true)
 		
-		local xs, ys, xe, ye, catlist = self.xb, self.yb, self.xf, self.yf, {}
+		local xs, ys, xe, ye = self.xb, self.yb, self.xf, self.yf
 		if origin then
 			xs = origin.xStart
 			xe = origin.xEnd
 			ys = origin.yStart
 			ye = origin.yEnd
-			if origin.category then
-				catlist[origin.category] = true
-			end
 		end
 		
-		local xStart, yStart, xEnd, yEnd, category
+		local xStart, yStart, xEnd, yEnd
 		for segmentId, _ in next, segmentList do
-			xStart, yStart, xEnd, yEnd, category = self:deleteSegment(segmentId)
-			if xStart and yStart and xEnd and yEnd and category then
-				if category ~= 0 then
-					catlist[category] = true
-				end
+			xStart, yStart, xEnd, yEnd = self:deleteSegment(segmentId)
+			if xStart and yStart and xEnd and yEnd then
 				
 				xs = min(xs, xStart)
 				ys = min(ys, yStart)
@@ -294,7 +302,7 @@ do
 			end
 		end
 		
-		local list = self:getCollisions(mode, xs, xe, ys, ye, catlist)
+		local list = self:getCollisions(mode, xs, xe, ys, ye)
 		
 		if update then
 			self:setPhysicState(true, list)
@@ -318,5 +326,10 @@ do
 		end
 		
 		self.segments = {}
+	end
+	
+	function Chunk:reloadPhysics()
+		local segments = self:getCollisions(Map.physicsMode)
+		self:setPhysicState(true, segments)
 	end
 end

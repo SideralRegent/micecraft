@@ -6,6 +6,15 @@ end
 
 local emptyFunc = function(...) end
 
+local idFunc
+do
+	local count = -1
+	idFunc = function()
+		count = count + 1
+		return count
+	end
+end
+
 tfm = {
     enum = {
         bonus = {
@@ -152,10 +161,10 @@ tfm = {
     exec = {
         addBonus = emptyFunc,
         addConjuration = emptyFunc,
-        addImage = emptyFunc,
-        addJoint = emptyFunc,
-        addPhysicObject = emptyFunc,
-        addShamanObject = emptyFunc,
+        addImage = idFunc,
+        addJoint = idFunc,
+        addPhysicObject = idFunc,
+        addShamanObject = idFunc,
         attachBalloon = emptyFunc,
         bindKeyboard = emptyFunc,
         changePlayerSize = emptyFunc,
@@ -190,7 +199,7 @@ tfm = {
                 eventNewGame()
                 if eventLoop then
                     for i=1, 20 do
-                        eventLoop(500 * i, 120000 - (500 * i))
+                        eventLoop(math.random(499, 551), 120000 - (500 * i))
                     end
                 end
             end

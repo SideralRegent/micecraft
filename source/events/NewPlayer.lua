@@ -3,3 +3,5 @@ Module:on("NewPlayer", function(playerName)
 	
 	Room.totalPlayers = Room.totalPlayers + 1
 end)
+
+Module:on("NewPlayer", Module.setMapName)

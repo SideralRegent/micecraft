@@ -18,13 +18,17 @@ do
 		local ok, result = pcall(self.callback, player, ...)
 			
 		if not ok then
-			Module:throwException(2, result)
+			Module:emitWarning(mc.severity.mild, result)
 		end
 		
 		return true
 	end
 	
 	function TextAreaBinds:new(key, callback)		
+		assert( type(key) == "string"
+			and type(callback) == "function", 
+			"Malformed eventTextAreaCallback callback for key " .. tostring(key).. "."
+		)
 		self.list[key] = TextAreaBind:new(key, callback)
 	end
 	
@@ -44,10 +48,12 @@ do
 		end
 	end
 	
+	-- === -- === -- === -- === -- === --
+	
 	do
 		TextAreaBinds:new("Inv", function(player, targetPlayerName, targetSlot)
 			if targetPlayerName == player.name then
-				if player.keys[enum.keys.SHIFT] then
+				if player.keys[mc.keys.SHIFT] then
 					player:moveItem(targetSlot)
 				end
 			
@@ -62,6 +68,8 @@ do
 			
 			if not joined then
 				tfm.exec.chatMessage("You can't join this game, reason: " .. reason, player.name)
+			else
+				Module:trigger("Play", player, ...)
 			end
 		end)
 		
@@ -76,6 +84,30 @@ do
 		TextAreaBinds:new("room_settings", function(player, ...)
 			player:switchInterface("RoomSettings")
 		end)
+	
+		TextAreaBinds:new("iclose", function(player, index)
+			Interface:removeView(index)
+		end)
+	
+		TextAreaBinds:new("chunk", function(player, action, id)
+			if action == "encode" then
+				local chunk = Map:getChunk(id, nil, CD_UID)
+				
+				tfm.exec.chatMessage(
+					("<CS>%s</CS>"):format(Map:encode(chunk.xf, chunk.yf, chunk.xb, chunk.yb)), 
+					player.name
+				)
+			elseif action == "load" then
+				ui.iaddPopup(
+					"cloadrecv", -- chunk load receiver
+					id, 2,
+					"Input chunk decodable.",
+					player.name, 
+					300, 175,
+					200, true
+				)
+			end
+		end)
 	end
 	
 	Module.userInputClasses["TextAreaCallback"] = TextAreaBinds
@@ -85,7 +117,6 @@ do
 		
 		if player and player.perms.interfaceInteract then
 			local name, info = eventName:match("^([_%a]+)%-(.+)$")
-			print(name, info)
 			name = name or eventName
 			TextAreaBinds:event(player, name, info)
 		end

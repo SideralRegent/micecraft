@@ -23,25 +23,24 @@ function PlayerInventory:setSection(name, lowerLim, upperLim, solver)
 		lowerLimit = section.lower,
 		upperLimit = section.upper,
 		solve = section.solver
-	})
-
-	self.section[name] = section
+	})	self.section[name] = section
 end
 
-local unpack = table.unpack
-function PlayerInventory:getSectionByIndex(index)
-	local t = {}
-	
-	for name, section in next, self.section do
-		if index >= section.lower and index <= section.upper then
-			t[#t + 1] = section
+do
+	local unpack = table.unpack
+	function PlayerInventory:getSectionByIndex(index)
+		local t = {}
+		
+		for name, section in next, self.section do
+			if index >= section.lower and index <= section.upper then
+				t[#t + 1] = section
+			end
 		end
+		
+		return unpack(t)
 	end
-	
-	return unpack(t)
-end
 
-do -- This is crap.
+	-- This is crap.
 	local floor = math.floor
 	local collumn = 10
 	local scale = 0.625

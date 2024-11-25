@@ -30,11 +30,8 @@ do
 		
 		for _, player in next, Room.playerList do
 			player:setPresenceId()
-			if Module.settings.promptsMenu then
-				player:promptMainMenu()
-			else
-				player:checkEnable()
-			end
+			
+			Module:checkEnableUser(player)
 		end
 		
 		local spawn = Map:getSpawn()
@@ -51,4 +48,6 @@ do
 		
 		Module.lastMapLoad = os.time()
 	end)
+
+	Module:on("NewGame", Module.setMapName)
 end

@@ -17,11 +17,6 @@ Module:newMode("personal", function(this, _L)
 	end
 	
 	function this:run()		
-		tfm.exec.chatMessage(
-			("Loading %s's world."):format(Room.referenceAdmin), 
-			nil
-		)
-		
 		Module:on("NewGame", function()
 				ui.setBackgroundColor("#6A7495")
 		--	ui.setBackgroundColor("#5A5A5A")
@@ -33,12 +28,8 @@ Module:newMode("personal", function(this, _L)
 				local player = Room:getPlayer(Room.referenceAdmin)
 			
 				if player.custom then
-					local xs, ys, xe, ye = Map:setMatrix(Map:decode(player.custom), 1, 1, false)
-					local chunk = Map:getChunk(1, 1, CD_MTX)
-					local segments = chunk:getCollisions(Map.physicsMode)
-
-					chunk:setPhysicState(true, segments)
-					--Module:softRelaunch(6)
+					Map:loadFromPlayer(player)
+					Module:loadMap()
 				end
 			end
 		end)
@@ -53,6 +44,9 @@ Module:newMode("personal", function(this, _L)
 	end
 	
 	this.settings = {
+		unloadDelay = math.huge,
+		manualLaunch = true,
+		
 		defaultPerms = {
 			damageBlock = false,
 			placeBlock = false,

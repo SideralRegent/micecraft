@@ -1,10 +1,10 @@
-enum.icat = {
+mc.icat = {
 	null = 0,
 	block = 1,
 	tool = 2
 }
 
-enum.iclass = { -- icat 2
+mc.iclass = { -- icat 2
 	player = -1,
 	null = 0,
 	block = 1,
@@ -14,7 +14,7 @@ enum.iclass = { -- icat 2
 	axe = 24
 }
 
-enum.community = { -- Based on Forum codes. Affects on nothing.
+mc.community = { -- Based on Forum codes. Affects on nothing.
 	-- Community 0 is just current player community
 	["xx"] = 1,
 	["int"] = 1, -- International  (all of them)
@@ -50,8 +50,7 @@ enum.community = { -- Based on Forum codes. Affects on nothing.
 	["pt"] = 31 -- Portuguese (had BR flag, but `technically` they're different communities)
 }
 
-enum.category = {
-	
+mc.category = {
 	default = 1,
 	grains = 2,
 	-- wood = 3,
@@ -72,7 +71,7 @@ enum.category = {
 	acid = 10
 }
 
-enum.physics = {
+mc.physics = {
 	rectangle = 1, -- Searches for the biggest rectangle
 	line = 2, -- Searches vertically, for the largest set of blocks within the same line
 	row = 3, -- Same as line, but horizontally
@@ -83,24 +82,26 @@ enum.physics = {
 }
 
 -- **Can't use:**
+-- Super
 -- (AZERTY/QWERTY issues): A, D, S, Q, W, Z
 -- (Mac issues): CONTROL
+-- Linux issues: ALT
 -- (Interface issues): TAB, I, M, R, T, Y, E, C
 -- TAB, CONTROL		A, D, I, M, Q, R, S, T, W, Y, Z
 
 -- Else	(good)		B, F, G, H, J, K, L, N, O, P, U, V, X, SHIFT, FN [1 - 12] (?)
 
-enum.keys = {
+mc.keys = {
+	[-1] = "none",
 	[0] = "LEFT",
 	[1] = "UP",
 	[2] = "RIGHT",
 	[3] = "DOWN",
 	
---	[9] = "TAB", -- Game binding
-
+--	[9] = "TAB", -- Game binding	
 	[16] = "SHIFT",
 --	[17] = "CONTROL", -- Issues with Mac
-	[18] = "ALT",
+	[18] = "ALT", -- Issues with Linux
 	
 	[27] = "ESC",
 	
@@ -125,24 +126,26 @@ enum.keys = {
 	[86] = "V",
 	[88] = "X",
 	
-	[114] = "F3"
+	[114] = "F3",
+	
+	[220] = "BACKSLASH"
 }
 
-enum.particle_display = {
+mc.particle_display = {
 	touch = 1,
 	damage = 2,
 	explode = 3,
 	touhou = 9
 }
 
-enum.cooldown = {
+mc.cooldown = {
 	playerInventory = 400,
 	blockDamage = 125,
 	placeBlock = 200,
 	useItem = 200,
 }
 
-enum.ranks = {
+mc.ranks = {
 	loader = 0,
 	staff = 1,
 	moderator = 3,
@@ -151,7 +154,7 @@ enum.ranks = {
 	player = 10
 }
 
-enum.perms = { -- player
+mc.perms = { -- player
 	damageBlock = false,
 	placeBlock = false,
 	useItem = false,
@@ -166,15 +169,24 @@ enum.perms = { -- player
 	mouseInteract = false,
 }
 
-enum.invalidPlayerReason = {
+mc.invalidPlayerReason = {
 	banned = 1,
 	newAccount = 2,
 	souris = 3,
 	notAllowedRoom = 4
 }
 
+mc.severity = {
+	panic = 0,
+	fatal = 1,
+	important = 2,
+	mild = 3,
+	minimal = 4,
+	trivial = 5
+}
+
 -- Reserved on 0 <= ID < 100
-enum.textId = {
+mc.textId = {
 	runtime = 12,
 	
 	maxPlayers = 20,
@@ -188,24 +200,27 @@ enum.textId = {
 	password = 50,
 	
 }
+
 do
-	local associate = function(t)
-		local it = {}
+	mc.associate = function(self, key)		
+		local t = {}
 		
-		for k, v in next, t do
-			it[k] = v
-			it[v] = k
+		for k, v in next, self[key] do
+			t[v] = k
 		end
 		
-		t = it
-		
-		return t
+		for k, v in next, t do
+			self[key][k] = v
+		end
 	end
 	
-	enum.community = associate(enum.community)
-	enum.category = associate(enum.category)
-	enum.physics = associate(enum.physics)
-	enum.keys = associate(enum.keys)
-	enum.particle_display = associate(enum.particle_display)
-	enum.invalidPlayerReason = associate(enum.invalidPlayerReason)
+	mc:associate("community")
+	mc:associate("category")
+	mc:associate("physics")
+	mc:associate("keys")
+	mc:associate("particle_display")
+	mc:associate("invalidPlayerReason")
+	mc:associate("ranks")
+	mc:associate("severity")
+	mc:associate("textId")
 end

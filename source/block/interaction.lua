@@ -42,7 +42,8 @@ do
 				self.translucent = meta.translucent
 				self.particle = meta.particle
 				
-				self.sprite = meta.sprite
+				self.sound = meta.sound
+				self.sprite = (meta.shows and meta.sprite or nil)
 				self.shadow = meta.shadow
 				self.lighting  = meta.lighting
 				
@@ -64,8 +65,6 @@ do
 		end
 	end
 end
-
-
 --- Creates a Block of fluid type.
 -- It can be initialized with specific properties regarding fluids.
 -- @name Block:createAsFluidWith
@@ -77,9 +76,7 @@ end
 function Block:createAsFluidWith(type, level, source, display, update, updatePhysics)
 	self:create(type, true, false, false, false)
 	self:setFluidState(level, source, display, update, updatePhysics)
-end
-
---- Destroys a Block.
+end--- Destroys a Block.
 -- The block will become void/air.
 -- @name Block:destroy
 -- @param Boolean:display Whether the new state should be automatically displayed
@@ -96,9 +93,7 @@ do
 			self.category = 0
 			
 			self:onDestroy(player)
-			self:setVoid()
-
-			if display then
+			self:setVoid()			if display then
 				self:refreshDisplay()
 			end
 			
@@ -132,6 +127,7 @@ do
 	-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event (in case it's destroyed)
 	-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
 	-- @return `Boolean` Whether the Block has the specified amount of damage
+	-- @return `Boolean` Whether the Block was destroyed
 	function Block:setDamageLevel(amount, add, player, display, update, updatePhysics)
 		if self.type ~= blockMeta._C_VOID then
 			amount = amount or 1
@@ -149,14 +145,14 @@ do
 					self:setRepairDelay(true, 2, 10000, true, display, update, updatePhysics)
 				end
 				
-				return false
+				return false, true
 			else
 				local tile = self:getDecoTile()
 				
 				if self.damagePhase > 0 then
 					local image = damage_sprites[self.damagePhase]
 					
-					tile:addDisplay("damage", 1, image, "!99999999", 0, 0, true, nil, nil, 0, 1.0)
+					tile:addDisplay("damage", 1, image, "!99999999", 0, 0, true, nil, nil, 0, 1.0, 0.0, 0.0, nil)
 					
 					if display then
 						
@@ -167,10 +163,10 @@ do
 				end
 			end
 			
-			return true
+			return true, false
 		end
 		
-		return false
+		return false, false
 	end
 	
 	--- Sets the delay time for repairing a block.
@@ -191,8 +187,6 @@ do
 		end
 	end
 end
-
-
 --- Damages a Block.
 -- This is just an interface to `Block:setDamageLevel`.
 -- @name Block:damage
@@ -204,7 +198,7 @@ end
 -- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:damage(amount, add, display, update, updatePhysics, player)
 	if self.type ~= VOID then		
-		local success = self:setDamageLevel(amount, add, player, display, update, updatePhysics)
+		local success, destroyed = self:setDamageLevel(amount, add, player, display, update, updatePhysics)
 	
 		if success then
 			self:onDamage(amount, player)
@@ -212,13 +206,11 @@ function Block:damage(amount, add, display, update, updatePhysics, player)
 			-- self:setRepairDelay(true, 2, 10000, add, display, update, updatePhysics)
 		end
 	
-		return success
+		return success, destroyed
 	end
 	
 	return false
-end
-
---- Repairs a Block previously damaged.
+end--- Repairs a Block previously damaged.
 -- This is just an interface to `Block:setDamageLevel`.
 -- @name Block:repair
 -- @param Int:amount The amount of damage to remove from the Block
@@ -291,11 +283,13 @@ function Block:setFluidState(level, isSource, display, update, updatePhysics)
 		self:setCategory(meta.category + self.fluidLevel)
 	end
 	
-	if display and self.sprite then
-		self.sprite = meta.fluidImages and meta.fluidImages[self.fluidLevel] or meta.sprite
+	if display then
+		if meta.fluidImages then
+			self.sprite = meta.fluidImages[self.fluidLevel]
+		else
+			self:setSprite(nil, false)
+		end
 		
 		self:refreshDisplay()
-	end
-
-	self:updateEvent(update, updatePhysics, meta.category)
+	end	self:updateEvent(update, updatePhysics, meta.category)
 end

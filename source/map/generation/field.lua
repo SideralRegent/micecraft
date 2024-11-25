@@ -2,11 +2,14 @@ Field = Matrix:new()
 
 function Field:generateNew(width, height)
 	local VOID = blockMeta._C_VOID
+	local line
 	for y = 1, height do
-		self[y] = {}
+		line = {}
 		for x = 1, width do
-			self[y][x] = VOID
+			line[x] = VOID
 		end
+		
+		self[y] = line
 	end
 end
 
@@ -138,9 +141,7 @@ do
 				end
 			end
 		end
-	end
-
-	function Field:setHeightMap(mapInfo)
+	end	function Field:setHeightMap(mapInfo)
 		local VOID = blockMeta._C_VOID
 		
 		local dir = mapInfo.dir
@@ -191,9 +192,7 @@ end
 
 function Field:setNoiseMap(mapInfo)	
 	local noiseMap = mapInfo.noiseMap
-	local dir = mapInfo.dir
-
-	local width, height = Map:getBlocks()
+	local dir = mapInfo.dir	local width, height = Map:getBlocks()
 	
 	local xs = math.range(dir.xStart or 1, 1, width)
 	local xe = math.range(dir.xEnd or width, 1, width)
@@ -223,4 +222,3 @@ function Field:setNoiseMap(mapInfo)
 		end
 	end
 end
-

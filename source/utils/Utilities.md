@@ -288,11 +288,13 @@ Converts a table to a string, in a reasonable format. TODO: Add special parsing 
 
 ---
 
-### **table.print** ( t )
-Prints a table. 
+### **table.print** ( t, pretty, lim )
+Prints a table. This is just a wrap of table.tostring. 
 
 **Parameters:**
 - **t** (`Table`) : The table to print
+- **pretty** (`Boolean`) : Add colors and stuff to this print
+- **lim** (`Int`) : How many subtables should it descend to
 
 ---
 

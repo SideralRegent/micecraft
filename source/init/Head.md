@@ -51,9 +51,29 @@ Callback when the Module crashes for any error. Save data
 Throws an exception report. The exception can either be fatal or not, and the handling of the Module against that exception will change accordingly.
 
 **Parameters:**
-- **fatal** (`Boolean`) : Wheter the Exception happened on a sensitive part of the Module or not
+- **fatal** (`Boolean`) : Wheter the Exception happened on a sensitive part of the Module or not (throws error screen)
 - **errorMessage** (`String`) : The reason for this Exception
 - **...** (`Any`) : Extra arguments
+
+---
+
+### **Module:log** ( level, errorMessage, ... )
+Logs an error. Errors will be stored in a table, as given, with the fields 'level', 'message' & 'args' (if any).
+
+**Parameters:**
+- **level** (`Int`) : Severity of this error. See Module:emitWarning
+- **errorMessage** (`String`) : The reason for this Exception
+- **...** (`Any`) : Extra arguments
+
+---
+
+### **Module:logf** ( level, errorMessage, ... )
+Logs an error with a formatted string. See Module:log.
+
+**Parameters:**
+- **level** (`Int`) : Severity of this error. See Module:emitWarning
+- **errorMessage** (`String`) : The reason for this Exception
+- **...** (`Any`) : Extra arguments to format errorMessage
 
 ---
 

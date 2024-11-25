@@ -59,17 +59,20 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, _)
 	local counter = 0
 	
 	local yf
+	local tx, ty = this.x, this.y
+	local txf, tyf = this.xf, this.yf
+	local txb = this.xb
 	
 	for y = this.yf, this.yb do
-		yf = (this.yf - y) + 1
-		for x = this.xf, this.xb do
+		yf = (tyf - y) + 1
+		for x = txf, txb do
 			counter = counter + 1
 			block = matrix[y][x]
 			
 			block:setRelativeCoordinates(
-				(this.xf - x) + 1, yf,
+				(txf - x) + 1, yf,
 				counter,
-				this.x, this.y,
+				tx, ty,
 				uniqueId
 			)
 			
