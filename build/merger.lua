@@ -11,7 +11,8 @@ local Merger = {
 	},
 	
 	settings = {
-		debugCode = "return {field = field, blockMeta = blockMeta}",
+		debugCodeStart = "tfm.get.room.name = 'en-#micecraft1'",
+		debugCodeEnd = "return {field = Field, blockMeta = blockMeta}",
 		shouldLog = false,
 		releaseBuild = false,
 		preview = true,
@@ -506,13 +507,18 @@ function Merger:makeFile()
 end
 
 function Merger:testScript()
+	local success = false
+	local retval = {
+		source = self.script
+	}
 	local load = loadstring or load
 	
 	local testCode = table.concat({
 		'package.path = "build/?.lua;" .. package.path; require("tfmenv");',
+		self.settings.debugCodeStart,
 		self.script,
-		self.settings.debugCode
-	})
+		self.settings.debugCodeEnd
+	}, "\n")
 	
 	local codeChunk, reason = load(testCode, self.scriptName)
 	
@@ -522,11 +528,14 @@ function Merger:testScript()
 		local assertion, result = pcall(codeChunk)
 		if assertion then
 			LOG("\n[TEST] Script executes correctly !")
+			retval.preview = self.settings.preview
+			
+			retval.result = result
 		else
 			LOG("\n[FAILURE] %s", result)
 			
 			-- Finds the line giving trouble
-			local line = tonumber(result:match(":(%d+):"))
+			local line = tonumber(result:match(":(%d+):")) - 2
 			
 			local currentLine = 1
 			local target = 1
@@ -542,20 +551,20 @@ function Merger:testScript()
 			local fileInfo = self.script:match("%s*([^\n]+)\n", target)
 			
 			LOG("[FAILURE] At file %s\nline: %s", fileName, fileInfo)
+			
+			retval.preview = false
 		end
 		
-		return result, {
-			source = self.script, 
-			preview = self.settings.preview
-		}
+		success = assertion
 	else
 		LOG("[TEST] Syntax error: %s", reason)
 		
-		return false, {
-			source = self.script,
-			preview = false
-		}
+		success = false
+		
+		retval.preview = false
 	end
+	
+	return success, retval
 end
 
 function Merger:logFile()

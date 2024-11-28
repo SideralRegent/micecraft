@@ -177,11 +177,11 @@ Appends two numerical tables
 ---
 
 ### **table.inherit** ( t, ex )
-Inhertis all values to a table, from the specified one. It does not modify the original tables, but copies them, to avoid links. All values to inherit will overwrite values on the target table.
+Inhertis all values to a table, from the specified one. Both tables are copied, so no original modifications. Given a default or template table (t) and another with specific values (ex), it will overwrite the specific values onto the template and return the combination.
 
 **Parameters:**
-- **t** (`Table`) : The table for which values will be inherited.
-- **ex** (`Table`) : The table to inherit values from.
+- **t** (`Table`) : The template table.
+- **ex** (`Table`) : The table to apply values from.
 
 **Returns:**
 - `Table` The new child table, product of the tables provided.
@@ -259,6 +259,61 @@ Copies all the keys from the table and assigns them the value given.
 
 **Returns:**
 - `Table` The table with the keys.
+
+---
+
+### **table.trim** ( t, i, j )
+Cuts a table into a specific range. 
+
+**Parameters:**
+- **t** (`Table`) : Table to trim.
+- **i** (`Int`) : Start point.
+- **j** (`Int`) : End point.
+
+**Returns:**
+- `Table` A trimed table.
+
+---
+
+### **table.trimsf** ( t, i, j, solve, ... )
+Cuts a table into a specific range and operates onto its values. 
+
+**Parameters:**
+- **t** (`Table`) : Table to trim.
+- **i** (`Int`) : Start point
+- **j** (`Int`) : End point.
+- **solve** (`Function`) : Operator.
+- **...** (`Any`) : Extra arguments.
+
+**Returns:**
+- `Table` A custom table.
+
+---
+
+### **table.array_numset** ( v, size )
+Sets all values to the specified. 
+
+**Parameters:**
+- **v** (`Any`) : Value to set.
+- **size** (`Int`) : Array size.
+
+**Returns:**
+- `Table` An array with all the same values.
+
+---
+
+### **table.numsetf** ( v, finish, start, solve, ... )
+Sets all values to the specified. 
+
+**Parameters:**
+- **v** (`Any`) : Value to set.
+- **finish** (`Int`) : End point to set.
+- **start** (`Int`) : Start point to set.
+- **solve** (`Function`) : Operator.
+- **...** (`Any`) : Extra arguments.
+
+**Returns:**
+- `Table` An array with all values operated on a certain way.
 
 ---
 

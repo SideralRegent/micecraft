@@ -21,13 +21,13 @@ do
 		return not next(t)
 	end
 	
-	table.concatf = function(list, field, sep, i, j)
+	table.concatf = function(list, key, sep, i, j)
 		i = i or 1
 		j = j or #list
 		local t = {}
 		
 		for n = i, j do
-			t[#t + 1] = list[n][field]
+			t[#t + 1] = list[n][key]
 		end
 		
 		return concat(t, sep)
@@ -105,12 +105,15 @@ do
 		return t
 	end
 	
+	
 	--- Inhertis all values to a table, from the specified one.
-	-- It does not modify the original tables, but copies them, to avoid links.
-	-- All values to inherit will overwrite values on the target table.
+	-- Both tables are copied, so no original modifications.
+	-- Given a default or template table (t) and another with specific values
+	-- (ex), it will overwrite the specific values onto the template and return
+	-- the combination.
 	-- @name table.inherit
-	-- @param Table:t The table for which values will be inherited.
-	-- @param Table:ex The table to inherit values from.
+	-- @param Table:t The template table.
+	-- @param Table:ex The table to apply values from.
 	-- @return `Table` The new child table, product of the tables provided.
 	table.inherit = function(t, ex)
 		local it
@@ -225,6 +228,92 @@ do
 		return nt
 	end
 	
+	--- Cuts a table into a specific range.
+	-- @name table.trim
+	-- @param Table:t Table to trim.
+	-- @param Int:i Start point.
+	-- @param Int:j End point.
+	-- @return `Table` A trimed table.
+	table.trim = function(t, i, j)
+		for n = j + 1, #t do
+			t[n] = nil
+		end
+			
+		for n = 1, i - 1 do
+			t[n] = nil
+		end
+			
+		return t
+	end
+	
+	
+	--- Cuts a table into a specific range and operates onto its values.
+	-- @name table.trimsf
+	-- @param Table:t Table to trim.
+	-- @param Int:i Start point
+	-- @param Int:j End point.
+	-- @param Function:solve Operator.
+	-- @param Any:... Extra arguments.
+	-- @return `Table` A custom table.
+	table.trimsf = function(t, i, j, solve, ...)
+		for n = j + 1, #t do
+			t[n] = nil
+		end
+		
+		for n = i, j do
+			t[n] = solve(t[n], ...)
+		end
+		
+		for n = 1, i - 1 do
+			t[n] = nil
+		end
+			
+		return t
+	end
+	
+	--- Sets all values to the specified.
+	-- @name table.array_numset
+	-- @param Any:v Value to set.
+	-- @param Int:size Array size.
+	-- @return `Table` An array with all the same values.
+	table.numset = function(v, finish, start)
+		start = start or 1
+		if type(v) == "table" then -- trim
+			return table.trim(v, start, finish)
+		else
+			local t = {}
+			
+			for i = start, finish do
+				t[i] = v
+			end
+			
+			return t
+		end
+	end
+	
+	--- Sets all values to the specified.
+	-- @name table.numsetf
+	-- @param Any:v Value to set.
+	-- @param Int:finish End point to set.
+	-- @param Int:start Start point to set.
+	-- @param Function:solve Operator.
+	-- @param Any:... Extra arguments.
+	-- @return `Table` An array with all values operated on a certain way.
+	table.numsetf = function(v, finish, start, solve, ...)
+		start = start or 1
+		if type(v) == "table" then -- trim
+			return table.trimsf(v, start, finish, solve, ...)
+		else
+			local t = {}
+			
+			for i = start, finish do
+				t[i] = solve(v, ...)
+			end
+			
+			return t
+		end
+	end
+	
 	--- Gives the value of a random entry from the table.
 	-- If the table is associative it converts the keys to an array.
 	-- @name table.random
@@ -285,42 +374,48 @@ do
 	
 	table.tostring = function(value, tb, seen, pretty, lim)
 		lim = lim or 8
-		tb = tb or 0
-		if tb > lim then return "..." end -- Do not descend anymore.
-		
+		tb = tb or 0		
 		local tv = type(value)
 		if tv == "table" then
-			seen = seen or {}
-			
-			local args = {}
-			local kk, vv
-			local p1 = tb + 1
-			for k, v in next, value do
-				kk = table.tostring(k, p1, nil, pretty, lim)
-				if not seen[v] and not tostring(k):match("__index") then
-					if type(v) == "table" then
-						seen[v] = true
-						vv = table.tostring(v, p1, seen, pretty)
-					else
-						vv = table.tostring(v, p1, seen, pretty)
-					end
-					
-					args[#args + 1] = ("%s%s"):format(
-						("\t"):rep(p1),
-						("%s = %s"):format(kk, vv)
-					)
-				end
-			end
-			
-			sort(args, alphabetic_sort)
-			
-			args = concat(args, ",\n")
-			
-			if pretty then
-				return ("<N>{\n%s\n%s}</N>"):format(args, ("\t"):rep(tb))
+			local args
+			if tb > lim then
+				args = "..."
 			else
-				return ("{\n%s\n%s}"):format(args, ("\t"):rep(tb))
+				args = {}
+			
+				seen = seen or {}
+				
+				local kk, vv
+				local p1 = tb + 1
+				for k, v in next, value do
+					kk = table.tostring(k, p1, nil, pretty, lim)
+					if not seen[v] and not tostring(k):match("__index") then
+						if type(v) == "table" then
+							seen[v] = true
+							vv = table.tostring(v, p1, seen, pretty, lim)
+						else
+							vv = table.tostring(v, p1, seen, pretty, lim)
+						end
+						
+						args[#args + 1] = ("%s%s"):format(
+							("\t"):rep(p1),
+							("%s = %s"):format(kk, vv)
+						)
+					end
+				end
+				
+				sort(args, alphabetic_sort)
+				
+				args = concat(args, ",\n")
 			end
+			
+			if args:len() > 10 then
+				args = ("{\n%s\n%s}"):format(args, ("\t"):rep(tb))
+			else
+				args = ("{ %s }"):format(args)
+			end
+			
+			return pretty and ("<N>%s</N>"):format(args) or args
 		else
 			if tv == "string" then
 				value = ('"%s"'):format(value:gsub("<", "&lt;"):gsub(">", "&gt;"))

@@ -6,8 +6,28 @@ do
 	local heightMapVar = math.heightMapVar
 	local random = math.random
 	
+	
+	-- idiom:
+	-- p: positive
+	-- n: negative
+	-- HM: height map
+	
+	--- Creates a terrain island.
+	-- @param Int:width Horizontal lenght of the island.
+	-- @param Number:xCenter The position of the X center of the island, in the field.
+	-- @param Number:yCenter Same as above, but for Y.
+	-- @param Table:pLayer Information about the positive layer, format as follows:
+	--[[
+		pLayer = {
+			overwrite = Boolean, -- If it should overwrite blocks other than void.
+			
+		}
+	]]
+	-- @param Table:nLayer Information about the negative layer. See **pLayer**.
 	function Field:makeIsland(width, xCenter, yCenter, pLayer, nLayer)
-		-- TODO: Make
+		local w_width, w_height = Map:getBlocks()
+		
+		--local pHM = 
 	end
 	
 	function Field:makeMountain(width, xCenter, yBase, peak, subPeaks, vibration)
@@ -24,14 +44,18 @@ do
 		]]
 	end
 	
-	local random = math.random
 	local randomseed = math.randomseed
 	function Field:applyBedrockLayer(size)
 		size = size or 3
 		
-		randomseed(0x132B7F7) -- Magic number which provides randomness to the random seed.
+		-- randomseed(0x132B7F7) -- Magic number which provides randomness to the random seed.
+		
+		randomseed(os.time())
 		
 		local width, height = Map:getBlocks()
+		
+		size = math.restrict(size, 1, height - 1)
+		
 		local BEDROCK = blockMeta.maps.bedrock
 		
 		for x = 1, width do
