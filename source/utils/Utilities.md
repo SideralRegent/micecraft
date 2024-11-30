@@ -101,6 +101,22 @@ Interpolates two points with a cosine curve.
 
 ---
 
+### **math.line** ( startPoint, endPoint, width, offset, lower, higher )
+Interpolates between a start point and an end point to create a line. 
+
+**Parameters:**
+- **startPoint** (`Number`) : Vertical init
+- **endPoint** (`Number`) : Vertical end.
+- **width** (`Int`) : How large should the line be.
+- **offset** (`Number`) : Overall value for which line will be increased.
+- **lower** (`Number`) : The lower limit of y values.
+- **higher** (`Number`) : The higher limit of y values.
+
+**Returns:**
+- `Table` An array that contains each point of the line.
+
+---
+
 ### **math.heightMap** ( amplitude, waveLenght, width, offset, lower, higher )
 Generates a Height Map based on the current `random seed`. 
 
@@ -131,6 +147,18 @@ Stretches a height map, or array with numerical values.
 
 **Returns:**
 - `Table` The array stretched
+
+---
+
+### **table.append** ( a, b )
+Appends two numerical tables. 
+
+**Parameters:**
+- **a** (`Table`) : First table.
+- **b** (`Table`) : Second table.
+
+**Returns:**
+- `Table` New table with B appended over A.
 
 ---
 

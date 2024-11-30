@@ -17,8 +17,8 @@ Module:newMode("testing", function(this, _L)
 		})]]
 		
 		field:setFunction({
-			overwrite = false,
-			exclusive = true,
+			overwrite = true,
+			exclusive = false,
 			solver = function(x, y)
 				if y >= 20 then
 					return blockMeta.maps.cactus

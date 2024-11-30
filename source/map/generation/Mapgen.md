@@ -61,11 +61,9 @@ Sets all cells to the value given by the function. Field `solver` expected as de
 
 ---
 
-### **nil** ( width, xCenter, yCenter, pLayer )
+### **nil** ( settings, info )
 Creates a terrain island. 
 
 **Parameters:**
-- **width** (`Int`) : Horizontal lenght of the island.
-- **xCenter** (`Number`) : The position of the X center of the island, in the field.
-- **yCenter** (`Number`) : Same as above, but for Y.
-- **pLayer** (`Table`) : Information about the positive layer, format as follows:
+- **settings** (`Table`) : Unified Field settings. See **field.lua**.
+- **info** (`Table`) : Describes parameters for the island:

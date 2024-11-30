@@ -145,19 +145,32 @@ do
 		return (a * (1 - f)) + (b * f)
 	end
 	
-	math.line = function(startPoint, finishPoint, width, offset, lower, higher, truncate)
+	--- Interpolates between a start point and an end point to create a line.
+	-- @name math.line
+	-- @param Number:startPoint Vertical init
+	-- @param Number:endPoint Vertical end.
+	-- @param Int:width How large should the line be.
+	-- @param Number:offset Overall value for which line will be increased.
+	-- @param Number:lower The lower limit of y values.
+	-- @param Number:higher The higher limit of y values.
+	-- @return `Table` An array that contains each point of the line.
+	
+	local restrict = math.restrict
+	local round = math.round
+	math.line = function(startPoint, endPoint, width, offset, lower, higher, truncate)
 		offset = offset or 0
-		lower = lower or math.min(startPoint, finishPoint)
-		higher = higher or math.max(finishPoint, startPoint)
-		local step = (finishPoint - startPoint) / width
+		lower = (lower or math.min(startPoint, endPoint)) + offset
+		higher = (higher or math.max(endPoint, startPoint)) + offset
+		local step = (endPoint - startPoint) / width
 		local line = {}
 		
 		local y
 		
 		for x = 1, width do
-			y = math.restrict(offset + startPoint + ((x - 1) * step), lower, higher)
+			y = offset + startPoint + ((x - 1) * step)
+			
 			if truncate then
-				y = math.round(y)
+				y = restrict(round(y), lower, higher)
 			end
 			
 			line[x] = y
@@ -176,7 +189,6 @@ do
 	-- @param Number:higher The higher limit of height
 	-- @return `Table` An array that contains each point of the height map.
 	local cosint = math.cosint
-	local restrict = math.restrict
 	math.heightMap = function(amplitude, waveLenght, width, offset, lower, higher, truncate)
 		lower = lower or 0
 		higher = higher or amplitude + offset
@@ -197,7 +209,7 @@ do
 			heightMap[x + 1] = restrict(y + offset, lower, higher)
 			
 			if truncate then
-				heightMap[x + 1] = math.round(heightMap[x + 1])
+				heightMap[x + 1] = round(heightMap[x + 1])
 			end
 			
 			x = x + 1
@@ -207,7 +219,6 @@ do
 	end
 	
 	local ipairs = ipairs
-	local round = math.round
 	math.heightMapVar = function(amplitude, width, direction, truncate)
 		local heightMap = {}
 		

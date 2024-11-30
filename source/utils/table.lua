@@ -13,6 +13,25 @@ do
 	local min = math.min
 	local random = math.random
 	
+	--- Appends two numerical tables.
+	-- @name table.append
+	-- @param Table:a First table.
+	-- @param Table:b Second table.
+	-- @return `Table` New table with B appended over A.
+	table.append = function(a, b)
+		local t = {}
+		
+		for i = 1, #a do
+			t[i] = a[i]
+		end
+		
+		for i = #a + 1, #a + #b do
+			t[i] = b[i - #a]
+		end
+		
+		return t
+	end
+	
 	--- Checks if the Table has no elements.
 	-- @name table.isEmpty
 	-- @param Table:t The table to check
@@ -261,6 +280,7 @@ do
 		end
 		
 		for n = i, j do
+		
 			t[n] = solve(t[n], ...)
 		end
 		
@@ -312,6 +332,15 @@ do
 			
 			return t
 		end
+	end
+	
+	table.shift = function(t, offset)
+		local rt = {}
+		for i = 1, #t do
+			rt[i + offset] = t[i]
+		end
+		
+		return rt
 	end
 	
 	--- Gives the value of a random entry from the table.
