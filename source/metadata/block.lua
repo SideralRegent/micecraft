@@ -409,7 +409,7 @@ blockMeta:set(0x10d1, "Fluid", {
 	name = "lava", 
 	sprite = "187ee766e73.png", -- false
 	color = 0xD96E1F,
-	shows = false,
+	shows = true,
 	category = mc.category.lava,
 	fluidRate = 3,
 	fluidImages = {"192398e7c9e.png", "192398febbe.png", "19239900dc4.png", "19239904431.png"}

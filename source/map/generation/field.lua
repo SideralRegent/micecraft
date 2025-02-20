@@ -27,10 +27,12 @@ do
 	local inf = math.huge
 	
 	local math_restrict = math.restrict
+	local math_min = math.min
+	local math_max = math.max
 	
 	local table_copy = table.copy
 	local table_inherit = table.inherit
-	local table_numsetf = table.numsetf
+	local table_numset = table.numset
 	
 	local no_except = {}
 	
@@ -123,6 +125,7 @@ do
 			end
 		end
 		
+		
 		-- Yes, I could do "set p_X and t_X" to represent the precedence and
 		-- the target, but guess what. That would add overhead to the operation.
 		-- More overhead to an already bloated implementation of a Field
@@ -137,16 +140,16 @@ do
 			limits.yStart = math_restrict(limits.yStart, 1, height)
 			limits.yEnd = math_restrict(limits.yEnd, 1, height)
 			
-			limits.xStart = table_numsetf(limits.xStart, limits.yEnd, limits.yStart, math.max, 1)
-			limits.xEnd = table_numsetf(limits.xEnd, limits.yEnd, limits.yStart, math.min, width)
+			limits.xStart = table_numset(limits.xStart, limits.yEnd, limits.yStart)
+			limits.xEnd = table_numset(limits.xEnd, limits.yEnd, limits.yStart)
 			
 			if limits.x_asOffset == "xEnd" then -- xEnd is an offset of xStart
 				for y = limits.yStart, limits.yEnd do
-					limits.xEnd[y] = limits.xStart[y] + limits.xEnd[y]
+					limits.xEnd[y] = math_restrict(limits.xStart[y] + limits.xEnd[y], 1, width)
 				end
 			elseif limits.x_asOffset == "xStart" then -- xStart is an offset of xEnd 
 				for y = limits.yStart, limits.yEnd do
-					limits.xStart[y] = limits.xEnd[y] - limits.xStart[y]
+					limits.xStart[y] = math_restrict(limits.xEnd[y] - limits.xStart[y], 1, width)
 				end
 			end -- else: no changes, both are absolute coordinates
 		else -- horizontal precedence
@@ -159,18 +162,18 @@ do
 			limits.xStart = math_restrict(limits.xStart, 1, width)
 			limits.xEnd = math_restrict(limits.xEnd, 1, width)
 			
-			limits.yStart = table_numsetf(limits.yStart, limits.xEnd, limits.xStart, math.max, 1)
-			limits.yEnd = table_numsetf(limits.yEnd, limits.xEnd, limits.xStart, math.min, height)
+			limits.yStart = table_numset(limits.yStart, limits.xEnd, limits.xStart)
+			limits.yEnd = table_numset(limits.yEnd, limits.xEnd, limits.xStart)
 			
-			if limits.y_asOffset == "yEnd" then -- yEnd is an offset of xStart
+			if limits.y_asOffset == "yEnd" then -- yEnd is an offset of yStart
 				for x = limits.xStart, limits.xEnd do
-					limits.yEnd[x] = limits.yStart[x] + limits.yEnd[x]
+					limits.yEnd[x] = math_restrict(limits.yStart[x] + limits.yEnd[x], 1, height)
 				end
-			elseif limits.y_asOffset == "yStart" then -- yStart is an offset of xEnd 
+			elseif limits.y_asOffset == "yStart" then -- yStart is an offset of yEnd 
 				for x = limits.xStart, limits.xEnd do
-					limits.yStart[x] = limits.yEnd[x] - limits.yStart[x]
+					limits.yStart[x] = math_restrict(limits.yEnd[x] - limits.yStart[x], 1, height)
 				end
-			end -- else: no changes, both are absolute coordinates
+			end			
 		end
 	end
 	
@@ -194,6 +197,8 @@ do
 				"Field call matrix must be a bidimensional table."
 			)
 		end
+		
+		self:correctLimits(settings.limits, settings.matrix)
 		
 		if settings.array then
 			local arr = settings.array
@@ -220,9 +225,7 @@ do
 			assert(type(settings.solver) == "function", "Field call solver must be a function.")
 		end
 		
-		self:correctLimits(settings.limits, settings.matrix)
-		
-		settings.extra = extra
+		settings.extra = extra or ext_settings.extra
 		
 		return settings
 	end
@@ -359,7 +362,6 @@ do
 		
 		if array then
 			local aux_setLayer
-			
 			if settings.extra and settings.extra.inverse then
 				aux_setLayer = function(x, y, i, _iStart, iEnd)
 					return array[(iEnd - i) + 1]

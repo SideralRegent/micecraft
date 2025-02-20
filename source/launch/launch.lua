@@ -19,7 +19,7 @@ function Module:softRelaunch(schedule)
 end
 
 function Module:start()
-	print("<T>Starting module...</T>")
+	print("<T><b>Starting module...</b></T>")
 	Room:init()
 	
 	local mode = self:setMode(Room.mode or "testing")	
@@ -38,6 +38,7 @@ function Module:start()
 	
 	-- mode:run()
 	debug.pmeasure("<u>Mode (run):</u> %s", mode.run, mode)
+	printf("«%s» has been loaded", mode.name)
 	
 	if not self.settings.manualLaunch then
 		print("<b>Loading map...</b>")
@@ -53,5 +54,10 @@ end
 --[[xpcall(Module.start, function(err)
 	Module:throwException(true, err)
 end, Module)]]
-
-Module:start()
+do
+	local ok, result = pcall(Module.start, Module)
+	
+	if not ok then
+		Module:throwException(true, result)
+	end
+end

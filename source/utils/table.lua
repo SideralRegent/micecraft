@@ -13,25 +13,6 @@ do
 	local min = math.min
 	local random = math.random
 	
-	--- Appends two numerical tables.
-	-- @name table.append
-	-- @param Table:a First table.
-	-- @param Table:b Second table.
-	-- @return `Table` New table with B appended over A.
-	table.append = function(a, b)
-		local t = {}
-		
-		for i = 1, #a do
-			t[i] = a[i]
-		end
-		
-		for i = #a + 1, #a + #b do
-			t[i] = b[i - #a]
-		end
-		
-		return t
-	end
-	
 	--- Checks if the Table has no elements.
 	-- @name table.isEmpty
 	-- @param Table:t The table to check
@@ -105,16 +86,15 @@ do
 		return list
 	end
 	
-	--- Appends two numerical tables
+	--- Appends two numerical tables.
 	-- @name table.append
-	-- @param Table:t The first table
-	-- @param Table:... Other tables to append
+	-- @param Table:... Tables to append
 	-- @return `Table` The new table.
-	table.append = function(t1, ...)
-		local t = table.copy(t1)
-		
+	table.append = function(...)
+		local t = {}
+		local t_size
 		for _, tb in next, {...} do
-			local t_size = #t
+			t_size = #t
 			
 			for i = 1, #tb do 
 				t[t_size + i] = tb[i]
@@ -124,6 +104,9 @@ do
 		return t
 	end
 	
+	table.appendt = function(lim, ...)
+		return table.trim(table.append(...), 1, lim)
+	end
 	
 	--- Inhertis all values to a table, from the specified one.
 	-- Both tables are copied, so no original modifications.
@@ -254,10 +237,12 @@ do
 	-- @param Int:j End point.
 	-- @return `Table` A trimed table.
 	table.trim = function(t, i, j)
+		printf("Limits at: i%d, j%d, t%d", i, j, #t)
+		
 		for n = j + 1, #t do
 			t[n] = nil
 		end
-			
+		
 		for n = 1, i - 1 do
 			t[n] = nil
 		end
@@ -280,7 +265,6 @@ do
 		end
 		
 		for n = i, j do
-		
 			t[n] = solve(t[n], ...)
 		end
 		
@@ -288,6 +272,17 @@ do
 			t[n] = nil
 		end
 			
+		return t
+	end
+	
+	table.forValues = function(t, i, j, solve, ...)
+		i = i or 1
+		j = j or #t
+		
+		for n = i, j do
+			t[n] = solve(t[n], ...)
+		end
+		
 		return t
 	end
 	

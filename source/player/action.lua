@@ -88,7 +88,7 @@ do
 			if targetBlock.type == 0 then return false end
 			
 			if self:checkCooldown("blockDamage") then
-				local _, destroyed = targetBlock:damage(1, true, true, true, true, self)
+				local _, destroyed = targetBlock:damage(10, true, true, true, true, self)
 				
 				if destroyed then
 					targetBlock:playSound("destroy")

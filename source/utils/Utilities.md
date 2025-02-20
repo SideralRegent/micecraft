@@ -150,18 +150,6 @@ Stretches a height map, or array with numerical values.
 
 ---
 
-### **table.append** ( a, b )
-Appends two numerical tables. 
-
-**Parameters:**
-- **a** (`Table`) : First table.
-- **b** (`Table`) : Second table.
-
-**Returns:**
-- `Table` New table with B appended over A.
-
----
-
 ### **table.isEmpty** ( t )
 Checks if the Table has no elements. 
 
@@ -192,12 +180,11 @@ Copies only the values from a table, in an arbitrary order.
 
 ---
 
-### **table.append** ( t, ... )
-Appends two numerical tables 
+### **table.append** ( ... )
+Appends two numerical tables. 
 
 **Parameters:**
-- **t** (`Table`) : The first table
-- **...** (`Table`) : Other tables to append
+- **...** (`Table`) : Tables to append
 
 **Returns:**
 - `Table` The new table.

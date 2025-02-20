@@ -8,9 +8,12 @@ Module:newMode("personal", function(this, _L)
 		local _, height = Map:getBlocks()
 		Field:setLayer({
 			overwrite = true,
-			exclusive = true,
-			dir = {
-				min = height,
+			exclusive = nil,
+			limits = {
+				yStart = height,
+				yEnd = height
+			},
+			array = {
 				[1] = blockMeta.maps.cobblestone
 			}
 		})
@@ -47,7 +50,7 @@ Module:newMode("personal", function(this, _L)
 		unloadDelay = math.huge,
 		manualLaunch = true,
 		
-		defaultPerms = {
+		enabledPerms = {
 			damageBlock = false,
 			placeBlock = false,
 			useItem = false,

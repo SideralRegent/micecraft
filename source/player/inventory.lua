@@ -44,7 +44,7 @@ do
 	local floor = math.floor
 	local collumn = 10
 	local scale = 0.625
-	local pxsize = scale * 32
+	local pxsize = scale * TEXTURE_SIZE
 	local offset = 0.5 * pxsize
 	local pxoffset = pxsize + offset
 		

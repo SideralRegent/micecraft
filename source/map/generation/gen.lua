@@ -8,7 +8,7 @@ do
 	local math_random = math.random
 	local math_combineMaps = math.combineMaps
 	
-	local table_append = table.append
+	local table_appendt = table.appendt
 	
 	local table_shift = table.shift
 	
@@ -19,46 +19,81 @@ do
 		local info = settings.extra
 		assert(info and info.width and info.xCenter and info.yCenter
 				and info.upperPeak and info.upperShift and info.upperOctaves
-				and info.lowerPeak and info.lowerShift and info.lowerOctaves,
+				and info.lowerPeak and info.lowerShift and info.lowerOctaves
+				and not (info.arraySeparator and not info.upperArray),
 			"One or more values expected in Field:makeIsland call."
 		)
 		
-		local xStart = info.xCenter - math_floor(info.width / 2)
-		local xEnd = info.xCenter + math_floor(info.width / 2) 
+		info.upperShift = math_round(info.upperShift)
+		info.lowerShift = math_round(info.lowerShift)
 		
-		local upperPeakX = (xStart - 1) + info.upperShift
-		local lowerPeakX = (xStart - 1) + info.lowerShift		
+		local xStart = math_round(info.xCenter - (info.width / 2))
+		local xEnd = xStart + info.width - 1
+		--local xEnd = math_round(info.xCenter + (info.width / 2))
 		
-		local raising = table_append(
+		local raising = table_appendt(
+			info.width,
 			math_line(0, info.upperPeak, info.upperShift, info.yCenter, nil, nil, true),
-			math_line(info.upperPeak, 0, info.width - info.upperShift + 1, info.yCenter, nil, nil, true)
+			math_line(info.upperPeak, 0, info.width - info.upperShift, info.yCenter, nil, nil, true)
 		)
 		
-		local descending = table_append(
+		local descending = table_appendt(
+			info.width,
 			math_line(0, info.lowerPeak, info.lowerShift, info.yCenter, nil, nil, true),
-			math_line(info.lowerPeak, 0, info.width - info.lowerShift + 1, info.yCenter, nil, nil, true)
-		)
+			math_line(info.lowerPeak, 0, info.width - info.lowerShift, info.yCenter, nil, nil, true)
+		)	
+		
 		
 		raising = math_combineMaps(raising, info.upperOctaves, "sub")
+		raising = table_shift(raising, xStart - 1)
+		
 		descending = math_combineMaps(descending, info.lowerOctaves, "add")
+		descending = table_shift(descending, xStart - 1)
 		
-		settings.limits = {
-			xStart = xStart,
-			xEnd = xEnd,
+		if info.arraySeparator then
+			info.arraySeparator = table.forValues(info.arraySeparator, nil, nil, function(v)
+				return v + info.yCenter
+			end)
+			info.arraySeparator = table_shift(info.arraySeparator, xStart - 1)
 			
-			yStart = table_shift(raising, xStart - 1),
-			yEnd = table_shift(descending, xStart - 1)
-		}
-		
-		-- Could add a setting such that you can add more custom terrain to both sides of the island.
-		-- with math_combineMaps(a, b, math.min) and playing with arrays.
-		-- But it would need a middle map to be defined or so, as the bound between lower and upper.
-		
-		self:setLayer(settings)
+			-- Lower
+			settings.array = info.lowerArray
+			info.inverse = true
+			settings.limits = {
+				xStart = xStart,
+				xEnd = xEnd,
+				yStart = info.arraySeparator,
+				yEnd = descending
+			}
+			settings.extra = info
+			self:setLayer(settings)
+			
+			-- Upper
+			settings.array = info.upperArray
+			info.inverse = false
+			settings.limits = {
+				xStart = xStart,
+				xEnd = xEnd,
+				yStart = raising,
+				yEnd = info.arraySeparator
+			}
+			settings.extra = info
+			self:setLayer(settings)
+		else
+			settings.limits = {
+				xStart = xStart,
+				xEnd = xEnd,
+				
+				yStart = raising,
+				yEnd = descending
+			}
+			self:setLayer(settings)
+		end
 	end
 	
+	
 	function Field:makeMountain(width, xCenter, yBase, peak, subPeaks, vibration)
-		
+		-- Todo
 	end
 	
 	local randomseed = math.randomseed

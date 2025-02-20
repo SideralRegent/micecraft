@@ -595,7 +595,7 @@ Module:newMode("editor", function(this, _L)
 		promptsMenu = false,
 		unloadDelay = math.huge,
 		
-		defaultPerms = {
+		enabledPerms = {
 			damageBlock = false,
 			placeBlock = false,
 			useItem = false,

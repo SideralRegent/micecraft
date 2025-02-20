@@ -106,6 +106,40 @@ local IEntity = {}
 
 local Player = setmetatable({}, {__index = IEntity})
 Player.__index = Player
+--[[
+do
+local NOISE = {
+checkForCurrentChunk = true,
+tfmUpdateInformation = true,
+updatePosition = true,
+setClock = true,
+runEvents = true,	
+updateDirection = true,
+getNearChunks = true,
+queueNearChunks = true,
+updateChunkArea = true
+}
+Player.__index = function(t, k)
+	local v = rawget(t, k) or rawget(Player, k)
+	if type(v) == "function" then
+		return function(p, ...)
+			if p.name == "Nazrin#4663" and not NOISE[k] then
+				local args = {...}
+				for i = 1, #args do
+					args[i] = tostring(args[i])
+				end
+				
+				printf("%s:%s(%s)", p.name, k, table.concat(args, ", "))
+			end
+			return v(p, ...)
+		end
+	end
+	
+	return v
+end
+end --]]
+
+--Player
 
 local PlayerInventory = {}
 PlayerInventory.__index = PlayerInventory

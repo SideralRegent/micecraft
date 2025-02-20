@@ -158,15 +158,16 @@ mc.perms = { -- player
 	damageBlock = false,
 	placeBlock = false,
 	useItem = false,
-	joinWorld = false,
-	spectateWorld = false,
 	hitEntities = false,
 	respawn = false,
 	useCommands = false,
 	seeInventory = false,
-	interfaceInteract = false,
 	keyboardInteract = false,
 	mouseInteract = false,
+	
+	spectateWorld = true,
+	joinWorld = true,
+	interfaceInteract = true,
 }
 
 mc.invalidPlayerReason = {

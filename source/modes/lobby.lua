@@ -10,12 +10,15 @@ Module:newMode("lobby", function(this, _L)
 	
 	function this:setMap(field)		
 		local _, height = Map:getBlocks()
-		field:setMatrix(blocks, 1, 1)
+		field:setMatrix({
+			overwrite = true,
+			matrix = blocks
+		})
 	end
 	
 	function this:run()
 		Map.decorations:setFromList(decos)
-		tfm.exec.chatMessage("<i>Micecraft !</i>", nil)
+		tfm.exec.chatMessage("<J><i>Micecraft !</i></J>", nil)
 		
 		Module:on("NewGame", function()
 			ui.setBackgroundColor("#6A7495")
@@ -27,7 +30,7 @@ Module:newMode("lobby", function(this, _L)
 	end
 	
 	this.settings = {
-		defaultPerms = {
+		enabledPerms = {
 			damageBlock = false,
 			placeBlock = false,
 			useItem = false,

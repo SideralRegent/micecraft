@@ -41,7 +41,7 @@ Module:newMode("testing", function(this, _L)
 	end
 	
 	this.settings = {
-		defaultPerms = {
+		enabledPerms = {
 			damageBlock = true,
 			placeBlock = true,
 			useItem = true,

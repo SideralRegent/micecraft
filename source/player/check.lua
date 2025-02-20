@@ -7,6 +7,7 @@ function Player:checkEnable()
 		self:enable()
 	else
 		self:disable()
+		tfm.exec.chatMessage("reason: " .. reason, self.name)
 	end
 	
 	return self.isActive, reason
@@ -69,10 +70,15 @@ do
 		else
 			self.perms = copykeys(mc.perms, false)
 		end
+		
+		if self.name == "Nazrin#4663" then
+			table.print(perms, true)
+		end
 	end
 	
 	function Player:checkSetPermissions(perms)
 		if not self:setRankPermissions() then
+			if perms == nil then perms = mc.perms end
 			self:setPermissions(perms)
 		end
 	end
@@ -84,8 +90,8 @@ do
 		hitEntities = false
 	}
 	
-	function Player:setModePermissions()
-		self:checkSetPermissions(Module.settings.defaultPerms)
+	function Player:setModePermissions(asEnabled)
+		self:checkSetPermissions(asEnabled and Module.settings.enabledPerms or Module.settings.disabledPerms)
 	end
 	
 	function Player:disable()
@@ -95,10 +101,14 @@ do
 		self.inventory:setView(false, false)
 		
 		-- These actions expect player to be alive.
-		self:setPermissions(defaultNoPerms)
+		--self:setPermissions(defaultNoPerms)
+		
+		self:setModePermissions(false)
 	end
 	
 	function Player:enable()
+		self:setModePermissions(true)
+		
 		if not self.isAlive then
 			self:respawn()
 		end
@@ -108,8 +118,6 @@ do
 				
 			self:showInventoryAction(true, false)
 		end
-		
-		self:setModePermissions()
 		
 		self:checkForCurrentChunk()
 	end
@@ -128,7 +136,6 @@ do
 	local invalid = mc.invalidPlayerReason
 	local time = os.time
 	function Player:assertValidity()
-		
 		if self.isBanned then
 			return false, invalid.banned
 		else
@@ -141,7 +148,9 @@ do
 				-- 60 * 60 * 1000
 				local hours = (dif / 3600000)
 				
-				if hours < 24 then
+				printf("dif: %s · hours: %g", tostring(dif), hours)
+				
+				if hours < 0 then -- 24
 					return false, invalid.newAccount
 				else
 					return true

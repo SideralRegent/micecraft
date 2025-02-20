@@ -62,7 +62,8 @@ do
 	-- @return `Table` The table with the data.
 	data.decode = function(str, depth)
 		depth = depth or 1
-		local this = {}		local pattern = ("[^%c]+"):format(17 + depth)
+		local this = {}
+		local pattern = ("[^%c]+"):format(17 + depth)
 		
 		local d_parse = data.parse
 		
@@ -108,22 +109,35 @@ do
 				return math.tonumber(str, BASE_REF) or str
 			end
 		end
-	end	--- Encondes a value into a reasonable format.
+	end	
+	
+	--- Encondes a value into a reasonable format.
 	-- @name data.serialize
 	-- @param Any:this The value to convert
 	-- @param Int:depth The depth to encode at, in case it's a table
 	-- @return `String` The value encoded.
 	
+	
+	local prep_table = function(this, depth)
+		local list = {}
+		local k, v
+		
+		for key, value in next, this do
+			k, v = key, data.serialize(value, depth + 1)
+			
+			if type(key) == "number" and key <= #this then
+				list[#list + 1] = v
+			else
+				list[#list + 1] = ("%s=%s"):format(k, v)
+			end
+		end
+		
+		return tconcat(list, char(17 + depth))
+	end
+	
 	local solve = {
 		table = function(this, depth)
-			local list = {}
-			local d_ser = data.serialize
-			
-			for _, value in next, this do
-				list[#list + 1] = d_ser(v, depth + 1)
-			end
-			
-			return ("{%s}"):format(tconcat(list, char(17 + depth)))
+			return ("{%s}"):format(prep_table(this, depth))
 		end,
 		number = function(this)
 			return math.tobase(this, BASE_REF)
@@ -134,10 +148,10 @@ do
 		string = function(this)
 			return ('"%s"'):format(this)
 		end,
-		coroutine = function(this)
+		coroutine = function()
 			return error("No.")
 		end,
-		["function"] = function(this)
+		["function"] = function()
 			return error("CHECK YOUR CODE!")
 		end
 	}
@@ -156,23 +170,8 @@ do
 		
 	data.encode = function(this, depth)
 		depth = depth or 1
-		local separator = char(17 + depth)
-		local str = {}
-		local k, v
 		
-		local numeric = (#this > 0)
-		
-		for key, value in next, this do
-			k, v = key, data.serialize(value, depth + 1)
-			
-			if numeric and type(key) == "number" then
-				str[#str + 1] = v
-			else
-				str[#str + 1] = ("%s=%s"):format(k, v)
-			end
-		end
-		
-		return tconcat(str, separator)
+		return prep_table(this, depth)
 	end
 	
 	data.parseName = function(str)

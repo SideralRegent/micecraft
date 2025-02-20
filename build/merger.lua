@@ -11,11 +11,11 @@ local Merger = {
 	},
 	
 	settings = {
-		debugCodeStart = "tfm.get.room.name = 'en-#micecraft1'",
-		debugCodeEnd = "return {field = Field, blockMeta = blockMeta}",
+		debugCodeStart = "tfm.get.room.name = 'en-#micecraft1';",
+		debugCodeEnd = "\nreturn {field = Field, blockMeta = blockMeta}",
 		shouldLog = false,
-		releaseBuild = false,
-		preview = true,
+		releaseBuild = true,
+		preview = false,
 		shouldCreateFile = true
 	},
 	
@@ -170,7 +170,8 @@ local fileList = {
 		"testing",
 		"lobby",
 		"personal",
-		"editor"
+		"editor",
+		"peaks"
 	},
 	{
 		__name = "Events",
@@ -381,7 +382,7 @@ function Merger:formatRelease(text)
 		:gsub("[^%p ]print", "--%1") -- Removes all prints (comments them)
 		:gsub("%-%-%[%[.-%]%]", "") -- Removes all comment blocks
 		:gsub("%-%-.-\n", "\n") -- Removes all inline comments
-	--	:gsub("\n%s*", "\n") -- Removes all excess lines & tabs
+		:gsub("\n[\t\n ]+\n", "\n\n") -- Removes multiple lines
 	--	:gsub("([%w])%s-([=,])%s-([%w{])", "%1%2%3") -- Removes all unnecesary spaces
 end
 
@@ -518,7 +519,7 @@ function Merger:testScript()
 		self.settings.debugCodeStart,
 		self.script,
 		self.settings.debugCodeEnd
-	}, "\n")
+	}, "")
 	
 	local codeChunk, reason = load(testCode, self.scriptName)
 	
@@ -584,7 +585,7 @@ function Merger:run()
 		self:logFile()
 	end
 	
-	return success, info
+	return (success and self.settings.preview), info
 end
 
 return Merger:run()

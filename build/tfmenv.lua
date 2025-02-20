@@ -159,6 +159,7 @@ tfm = {
         }
     },
     exec = {
+		addNPC = emptyFunc,
         addBonus = emptyFunc,
         addConjuration = emptyFunc,
         addImage = idFunc,
@@ -168,7 +169,7 @@ tfm = {
         attachBalloon = emptyFunc,
         bindKeyboard = emptyFunc,
         changePlayerSize = emptyFunc,
-        chatMessage = function(a) print("\t\t" .. tostring(a))end,
+        chatMessage = emptyFunc,--function(a) print("\t\t" .. tostring(a))end,
         disableAfkDeath = emptyFunc,
         disableAllShamanSkills = emptyFunc,
         disableAutoNewGame = emptyFunc,
@@ -205,6 +206,9 @@ tfm = {
             end
         end,
         playEmote = emptyFunc,
+		playMusic = emptyFunc,
+		stopMusic = emptyFunc,
+		playSound = emptyFunc,
         playerVictory = emptyFunc,
         removeBonus = emptyFunc,
         removeCheese = emptyFunc,
@@ -325,8 +329,9 @@ system = {
     exit = function() os.exit(0) end,
     giveEventGift = emptyFunc,
     loadFile = emptyFunc,
-    loadPlayerData = function(playerName) if eventPlayerDataLoaded then eventPlayerDataLoaded(playerName, "MCR a\017") end; end,
-    newTimer = function(c, t, l, ...) c(...) end,
+    loadPlayerData = function(playerName) if eventPlayerDataLoaded then eventPlayerDataLoaded(playerName, "") end; end,
+	luaEventLaunchInterval = emptyFunc,
+    newTimer = function(c, t, l, ...) if c then c(...) end; end,
     removeTimer = emptyFunc,
     saveFile = emptyFunc,
     savePlayerData = emptyFunc

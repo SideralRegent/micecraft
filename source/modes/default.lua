@@ -51,36 +51,61 @@ Module:newMode("default", function(this, _L)
 			}
 		})
 		--]]
-		
-		for i = 1, 15 do
-			local island_width = math.random(40, 140)
+		-- [[
+		for i = 1, 1 do
+			local island_width = math.random(500, 600)
 			field:makeIsland({
 				overwrite = false,
 				exclusive = { [VOID] = true },
 				
-				array = {
-					[1] = blockMeta.maps.grass,
-					[2] = blockMeta.maps.dirt,
-					[10] = blockMeta.maps.stone
-				},
-				
 				extra = {
 					width = island_width,
-					xCenter = math.round(math.random(6) * (width/6)),
-					yCenter = math.round(math.random(4) * (height/4)),
-					upperPeak = math.random(-60, -1),
-					upperShift = (island_width/2) + math.random(-30, 30),
-					lowerPeak = math.random(60),
-					lowerShift = (island_width/2) + math.random(-30, 30),
+					xCenter = width/2,--math.round(math.random(3) * (width/3)) - width/6,
+					yCenter = height/2,--math.round(math.random(2) * (height/2)) - height/4,
+					upperPeak = -70, --math.random(-60, -30),
+					upperShift = (island_width/2) + math.random(-200, 200),
+					lowerPeak = 70, --math.random(30, 60),
+					lowerShift = (island_width/2) + math.random(-200, 200),
 					
-					upperOctaves = math.heightMap(6, 5, 90, 0, nil, nil, true),
-					lowerOctaves = math.heightMap(6, 5, 90, 0, nil, nil, true)
-					--[[info.width and info.xCenter and info.yCenter
-					and info.upperPeak and info.upperShift and info.upperOctaves
-					and info.lowerPeak and info.lowerShift and info.lowerOctaves]]
+					upperOctaves = math.heightMap(6, 5, island_width, 0, nil, nil, true),
+					lowerOctaves = math.heightMap(6, 5, island_width, 0, nil, nil, true),
+					
+					arraySeparator = math.heightMap(6, 5, island_width, 0, nil, nil, true),
+					upperArray = {
+						[1] = blockMeta.maps.grass,
+						[2] = blockMeta.maps.dirt,
+						[10] = blockMeta.maps.stone
+					},
+					lowerArray = {
+						[1] = blockMeta.maps.mycelium,
+					--	[2] = blockMeta.maps.mycelium,
+						[10] = blockMeta.maps.cobblestone
+					},
+				--	lowerArray = {
+				--		[1] = blockMeta.maps.bedrock,
+				--		[3] = blockMeta.maps.lava
+				--	}
 				}
 			})
 		end
+		--]]
+		-- [[
+		for i = 1, 5 do
+			field:setLayer({
+				overwrite = true,
+				exclusive = nil,
+				excludes = { [blockMeta.maps.water] = true},
+				array = { [1] = VOID },
+				limits = {
+					--xEnd = width,
+					yStart = math.heightMap(20, 10, width, (i*height/5)-35, nil, nil, true),
+					yEnd = math.heightMap(20, 5, width, 0, nil, nil, true),
+					
+					y_asOffset = "yEnd"
+				}
+			})
+		end
+		--]]
 		
 		field:applyBedrockLayer(6)
 	end
@@ -90,7 +115,9 @@ Module:newMode("default", function(this, _L)
 			ui.setBackgroundColor("#5947A6")
 			--	ui.setBackgroundColor("#6a7495")
 		--	ui.setBackgroundColor("#5A5A5A")
-		end)		Module:on("PlayerDied", function(playerName)
+		end)
+
+		Module:on("PlayerDied", function(playerName)
 			local player = Room:getPlayer(playerName)
 			
 			if player then
@@ -102,7 +129,22 @@ Module:newMode("default", function(this, _L)
 	this.settings = {
 		unloadDelay = 90,
 		
-		defaultPerms = {
+		disabledPerms = {
+			damageBlock = false,
+			placeBlock = false,
+			useItem = false,
+			spectateWorld = true,
+			hitEntities = false,
+			seeInventory = true,
+			mouseInteract = false,
+			joinWorld = true,
+			respawn = false,
+			useCommands = true,
+			interfaceInteract = true,
+			keyboardInteract = false,
+		},
+		
+		enabledPerms = {
 			damageBlock = true,
 			placeBlock = true,
 			useItem = true,
@@ -115,6 +157,8 @@ Module:newMode("default", function(this, _L)
 			useCommands = true,
 			interfaceInteract = true,
 			keyboardInteract = true
-		}
+		},
+		
+		promptsMenu = true
 	}
 end)

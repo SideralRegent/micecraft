@@ -45,7 +45,7 @@ do
 		
 		 -- Auto set
 		this:setPresenceId()
-		this:checkSetPermissions(mc.perms.player)
+		this:checkSetPermissions(mc.perms)
 		
 		this.inventory:set()
 		this:setSelectedContainer(1, this.inventory.bank, false)

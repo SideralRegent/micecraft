@@ -419,7 +419,17 @@ do
 	-- @name Module:trigger
 	-- @param String:eventName The event to trigger.
 	-- @return `Boolean` Whether the Event triggered without errors.
+	local ff = function(...)
+		local t = {...}
+		
+		for i = 1, #t do
+			t[i] = tostring(t[i])
+		end
+		
+		return table.concat(t, ", ")
+	end
 	function Module:trigger(eventName, ...)
+		--printf("%s (%s)", eventName, ff(...)) -- for debug
 		self:getEvent(eventName):trigger(...) -- dafuq?
 		--[[local ok, result =
 		if not ok then
@@ -546,8 +556,6 @@ do
 		local mode = self:getMode(modeName) or self:getMode("default")
 		
 		if mode then
-			self.settings = mode.settings or {}
-			
 			mode:constructor({ -- Proxy table
 				__index = function(_, k)
 					return rawget(mode.environment, k)
@@ -557,6 +565,9 @@ do
 				end
 			})
 			mode.__index = mode
+			
+			-- Setting are established after calling the constructor.
+			self.settings = mode.settings or {}
 		end
 		
 		self.subMode = mode.name or "unknown"

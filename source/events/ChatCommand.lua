@@ -11,16 +11,16 @@ do
 	local pcall = pcall
 	local table = table
 	local ipairs = ipairs
-	local unpack = table.unpack
+	local table_unpack = table.unpack
 	
-	local ranks = mc.ranks
+	local mc_ranks = mc.ranks
 	
 	-- Some defaults to not create too many tables
-	local none = {}
-	local staff = {ranks.staff}
-	local moderators = {ranks.staff, ranks.moderator}
-	local roomModifier = {ranks.moderator, ranks.roomAdmin}
-	local everyone = table.copyvalues(ranks)
+	local preset_none = {}
+	local preset_staff = {mc_ranks.staff}
+	local preset_moderators = {mc_ranks.staff, mc_ranks.moderator}
+	local preset_roomModifier = {mc_ranks.moderator, mc_ranks.roomAdmin}
+	local preset_everyone = table.copyvalues(mc_ranks)
 	
 	function Command:new(commandName, callback, aliases, allowedRanks)
 		local this = setmetatable({
@@ -29,7 +29,7 @@ do
 			issues = setmetatable({}, {__index = table}),
 			aliases = aliases,
 			allowedRanks = {
-				[ranks.loader] = true
+				[mc_ranks.loader] = true
 			}
 		}, self)
 		
@@ -45,7 +45,7 @@ do
 	end
 	
 	function Command:execute(args)
-		local ok, result = pcall(self.callback, unpack(args))
+		local ok, result = pcall(self.callback, table_unpack(args))
 		
 		if not ok then
 			self:logError(result, args[-1])
@@ -83,7 +83,7 @@ do
 	-- For all commands, the first argument passed is the player
 	-- that invoked it.
 	
-	Commands:new("list", none, none, 
+	Commands:new("list", preset_none, preset_none, 
 	function(player, _)
 		tfm.exec.chatMessage("<J>List of Registered Blocks</J>", player.name)
 		for index, info in next, blockMeta do
@@ -93,7 +93,7 @@ do
 		end
 	end)
 	
-	Commands:new("time", {"t"}, roomModifier,
+	Commands:new("time", {"t"}, preset_roomModifier,
 	function(player, time)
 		if time then
 			World:setTime(time, false, true)
@@ -102,10 +102,10 @@ do
 		end
 	end)
 	
-	Commands:new("tp", {"teleport"}, roomModifier,
+	Commands:new("tp", {"teleport"}, preset_roomModifier,
 	function(player, x, y, offset)
 		player:move(x, y, offset)
-	end)	Commands:new("btp", {"block_teleport"}, roomModifier,
+	end)	Commands:new("btp", {"block_teleport"}, preset_roomModifier,
 	function(player, x, y)
 		local block = Map:getBlock(x, y, CD_MTX)
 		if block then
@@ -116,7 +116,7 @@ do
 	Commands:new(
 		"goto", 
 		{"gt"},
-		staff,
+		preset_staff,
 	function(player, target1, target2)
 		local p1 = Room:getPlayer(target1)
 		local p2 = Room:getPlayer(target2)
@@ -136,21 +136,21 @@ do
 				player:move(p1.x, p1.y, false)
 			end
 		end
-	end)	Commands:new("runtime", {"rt"}, everyone,
+	end)	Commands:new("runtime", {"rt"}, preset_everyone,
 	function(player)
 		ui.addTextArea(mc.textId.runtime, "NaN ms", player.name, 755, 384, 45, 0, 0x0, 0x0, 1.0, true)
-	end)	Commands:new("reload", none, staff,
+	end)	Commands:new("reload", preset_none, preset_staff,
 	function()
 		print("Reloading map.")
 		Module:loadMap()
-	end)	Commands:new("save", none, roomModifier,
+	end)	Commands:new("save", preset_none, preset_roomModifier,
 	function(player)
 		if player.name == Room.referenceAdmin then
 			player:saveWorld(false)
 		end
 	end)
 	
-	Commands:new("api", {"lua", "lu"}, none,
+	Commands:new("api", {"lua", "lu"}, preset_none,
 	function(player, func, ...)		
 		local env = table.shallowcopy(_G)
 		
@@ -194,13 +194,13 @@ do
 			end
 		end
 		
-	end)	Commands:new("logs", none, staff,
+	end)	Commands:new("logs", preset_none, preset_staff,
 	function(player)
 		local logs = Module.errorLog:concatf("message", "\n"):sub(1, 990)
 		
 		tfm.exec.chatMessage(logs, player.name)
 	end)
-	Commands:new("getchunk", none, everyone,
+	Commands:new("getchunk", preset_none, preset_everyone,
 	function(player)
 		local chunk = Map:getChunk(player.x, player.y, CD_MAP)
 		if chunk then
@@ -211,10 +211,21 @@ do
 		end
 	end)
 	
-	Commands:new("perms", none, everyone,
-	function(player)
-		tfm.exec.chatMessage(table.tostring(player.perms, 0, nil, true, nil), player.name)
-	end, true)	Commands:new("checkperms", none, everyone,
+	Commands:new("perms", preset_none, preset_staff,
+	function(player, targetPlayer)
+		local target
+		if targetPlayer then
+			target = Room:getPlayer(targetPlayer)
+		else
+			target = player
+		end
+		
+		if target then
+			tfm.exec.chatMessage(table.tostring(target.perms, 0, nil, true, nil), player.name)
+		end
+	end, true)
+
+	Commands:new("checkperms", preset_none, preset_everyone,
 	function(player)
 		player:setRankPermissions()
 	end, true)

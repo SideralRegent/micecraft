@@ -190,8 +190,16 @@ do
 	-- @return `Table` An array that contains each point of the height map.
 	local cosint = math.cosint
 	math.heightMap = function(amplitude, waveLenght, width, offset, lower, higher, truncate)
-		lower = lower or 0
-		higher = higher or amplitude + offset
+		local lowerLim, upperLim
+		if amplitude > 0 then
+			lowerLim = lower or 0
+			upperLim = higher or amplitude + offset
+		else
+			lowerLim = higher or amplitude + offset
+			upperLim = lower or 0
+		end
+		
+		
 		local heightMap = {}
 		local a, b = random(), random()
 		
@@ -206,7 +214,7 @@ do
 				y = cosint(a, b, (x % waveLenght) / waveLenght) * amplitude
 			end
 			
-			heightMap[x + 1] = restrict(y + offset, lower, higher)
+			heightMap[x + 1] = restrict(y + offset, lowerLim, upperLim)
 			
 			if truncate then
 				heightMap[x + 1] = round(heightMap[x + 1])
